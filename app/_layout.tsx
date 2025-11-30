@@ -1,7 +1,6 @@
 import { Barlow_400Regular, Barlow_500Medium } from '@expo-google-fonts/barlow';
 import { Jost_700Bold } from '@expo-google-fonts/jost';
 
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {
   DarkTheme,
   DefaultTheme,
@@ -13,6 +12,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import 'react-native-reanimated';
 import '../global.css';
@@ -35,8 +35,6 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
     Barlow_400Regular: Barlow_400Regular,
     Barlow_500Medium: Barlow_500Medium,
     Jost_700Bold: Jost_700Bold,
@@ -44,23 +42,28 @@ export default function RootLayout() {
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
-    if (error) throw error;
+    if (error) {
+      console.warn(
+        'Font loading error (this is normal in development):',
+        error
+      );
+      // Don't throw - let the app continue with fallback fonts
+    }
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
+    // Hide splash screen even if fonts didn't load
+    if (loaded || error) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
+  }, [loaded, error]);
 
   return (
-    <AuthProvider>
-      <RootLayoutNav />
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        <RootLayoutNav />
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }
 

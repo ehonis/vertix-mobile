@@ -96,8 +96,11 @@ class ApiService {
     });
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
+  async delete<T>(endpoint: string, data?: unknown): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'DELETE',
+      body: JSON.stringify(data),
+    });
   }
 
   // Auth methods
@@ -176,6 +179,21 @@ class ApiService {
     return this.post(API_ENDPOINTS.ROUTE_COMPLETE, data);
   }
 
+  async attemptRoute(data: {
+    userId: string;
+    routeId: string;
+  }): Promise<any> {
+    return this.post(API_ENDPOINTS.ROUTE_ATTEMPT, data);
+  }
+
+  async gradeRoute(data: {
+    userId: string;
+    routeId: string;
+    selectedGrade: string;
+  }): Promise<any> {
+    return this.post(API_ENDPOINTS.ROUTE_GRADE, data);
+  }
+
   // Dashboard methods
   async getDashboardCompletions(): Promise<{ data: any[] }> {
     return this.get<{ data: any[] }>(API_ENDPOINTS.DASHBOARD_COMPLETIONS);
@@ -183,6 +201,14 @@ class ApiService {
 
   async getDashboardAttempts(): Promise<{ data: any[] }> {
     return this.get<{ data: any[] }>(API_ENDPOINTS.DASHBOARD_ATTEMPTS);
+  }
+
+  async deleteCompletion(completionId: number): Promise<any> {
+    return this.delete(API_ENDPOINTS.DELETE_COMPLETION, { completionId });
+  }
+
+  async deleteAttempt(attemptId: number): Promise<any> {
+    return this.delete(API_ENDPOINTS.DELETE_ATTEMPT, { attemptId });
   }
 }
 

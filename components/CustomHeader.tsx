@@ -9,7 +9,7 @@ export default function CustomHeader() {
   const router = useRouter();
 
   return (
-    <View className="bg-black border-b border-slate-800 pt-14 pb-3 flex-row items-center justify-between px-4">
+    <View className="bg-black border-slate-800 pt-14 pb-3 flex-row items-center justify-between px-4">
       {/* Logo on the left */}
       <View className="flex-row items-center">
         <Text className="text-white text-4xl font-jost-700-bold">Vertix</Text>

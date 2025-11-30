@@ -3,15 +3,19 @@ import { api } from '@/services/api';
 import { cn } from '@/utils/cn';
 import { getLevelForXp, getXpForLevel } from '@/utils/routes';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Image,
+  Modal,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
+import Svg, { Path } from 'react-native-svg';
 
 interface Completion {
   id: number;
@@ -45,12 +49,18 @@ interface Attempt {
 }
 
 export default function DashboardScreen() {
-  const { user } = useAuth();
+  const { user, refreshSession } = useAuth();
   const router = useRouter();
   const [completions, setCompletions] = useState<Completion[]>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [completionToDelete, setCompletionToDelete] =
+    useState<Completion | null>(null);
+  const [attemptToDelete, setAttemptToDelete] = useState<Attempt | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const swipeableRefs = useRef<Record<string, Swipeable | null>>({});
 
   useEffect(() => {
     if (user) {
@@ -58,10 +68,12 @@ export default function DashboardScreen() {
     }
   }, [user?.id]); // Only depend on user ID, not the entire user object
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (showLoading = true) => {
     try {
-      setIsLoading(true);
-      setError(null);
+      if (showLoading) {
+        setIsLoading(true);
+        setError(null);
+      }
       const [completionsRes, attemptsRes] = await Promise.all([
         api.getDashboardCompletions(),
         api.getDashboardAttempts(),
@@ -70,10 +82,131 @@ export default function DashboardScreen() {
       setAttempts(attemptsRes.data || []);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      setError('Failed to load dashboard data');
+      if (showLoading) {
+        setError('Failed to load dashboard data');
+      }
     } finally {
-      setIsLoading(false);
+      if (showLoading) {
+        setIsLoading(false);
+      }
     }
+  };
+
+  const handleDeleteCompletion = (completion: Completion) => {
+    setCompletionToDelete(completion);
+    setAttemptToDelete(null);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteAttempt = (attempt: Attempt) => {
+    setAttemptToDelete(attempt);
+    setCompletionToDelete(null);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      setIsDeleting(true);
+      if (completionToDelete) {
+        await api.deleteCompletion(completionToDelete.id);
+      } else if (attemptToDelete) {
+        await api.deleteAttempt(attemptToDelete.id);
+      } else {
+        setIsDeleting(false);
+        return;
+      }
+
+      // Refresh dashboard data silently (no loading screen)
+      await fetchDashboardData(false);
+      // Refresh user session to update XP and stats (only for completions)
+      if (completionToDelete) {
+        await refreshSession();
+      }
+      setShowDeleteConfirm(false);
+      setCompletionToDelete(null);
+      setAttemptToDelete(null);
+      setIsDeleting(false);
+    } catch (err) {
+      console.error('Error deleting:', err);
+      setIsDeleting(false);
+      Alert.alert(
+        'Error',
+        `Failed to delete ${completionToDelete ? 'completion' : 'attempt'}`
+      );
+      setShowDeleteConfirm(false);
+      setCompletionToDelete(null);
+      setAttemptToDelete(null);
+    }
+  };
+
+  const handleEditCompletion = (completion: Completion) => {
+    // TODO: Implement edit functionality
+    // For now, just close the swipeable
+    const key = `completion-${completion.id}`;
+    swipeableRefs.current[key]?.close();
+    Alert.alert('Edit', 'Edit functionality coming soon!');
+  };
+
+  const renderLeftActions = (
+    item: Completion | Attempt,
+    type: 'completion' | 'attempt'
+  ) => {
+    return (
+      <View className="flex-row gap-2 p-1 items-center">
+        <TouchableOpacity
+          onPress={() => {
+            if (type === 'completion') {
+              handleEditCompletion(item as Completion);
+            } else {
+              // Edit attempt - same as completion for now
+              const key = `attempt-${(item as Attempt).id}`;
+              swipeableRefs.current[key]?.close();
+              Alert.alert('Edit', 'Edit functionality coming soon!');
+            }
+          }}
+          className="bg-blue-500 justify-center items-center px-6 h-full rounded-lg"
+        >
+          <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+            <Path
+              d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+              stroke="#fff"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <Path
+              d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+              stroke="#fff"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </Svg>
+          <Text className="text-white text-xs font-barlow mt-1">Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            if (type === 'completion') {
+              handleDeleteCompletion(item as Completion);
+            } else {
+              handleDeleteAttempt(item as Attempt);
+            }
+          }}
+          className="bg-red-500 justify-center items-center px-6 h-full rounded-lg"
+        >
+          <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+            <Path
+              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+              stroke="#fff"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </Svg>
+          <Text className="text-white text-xs font-barlow mt-1">Delete</Text>
+        </TouchableOpacity>
+      </View>
+    );
   };
 
   // Calculate statistics
@@ -185,7 +318,7 @@ export default function DashboardScreen() {
 
   return (
     <ScrollView className="flex-1 bg-black">
-      <View className="p-5 pt-2 gap-2 items-center">
+      <View className="p-5 pt-0 gap-2 items-center">
         {/* User Profile Section - ImageNamePlate Style */}
         <View className="w-full items-start  py-4 relative">
           {/* Profile Picture - positioned with negative margin */}
@@ -270,9 +403,14 @@ export default function DashboardScreen() {
 
         {/* Recent Activity */}
         <View className="w-full">
-          <Text className="text-white text-2xl font-bold font-barlow mb-3">
-            Recent Tix & Attempts
-          </Text>
+          <View className="flex-col my-3">
+            <Text className="text-white text-2xl font-bold font-barlow ">
+              Recent Tix & Attempts
+            </Text>
+            <Text className="text-gray-400 font-barlow text-sm">
+              Swipe to edit or delete a completion or attempt.
+            </Text>
+          </View>
           <ScrollView className="bg-slate-900 rounded-lg px-3 py-2 gap-3 max-h-96 overflow-y-scroll">
             {allActivities.length === 0 ? (
               <Text className="text-gray-400 text-center py-8 font-barlow">
@@ -298,16 +436,31 @@ export default function DashboardScreen() {
                       : (activity as Attempt).route;
                     const activityDate = new Date(activity.date);
                     const activityType = isCompletion ? 'Tick' : 'Attempt';
+                    const completion = isCompletion
+                      ? (activity as Completion)
+                      : null;
+                    const key = `${activity.type}-${activity.id}-${index}`;
 
-                    return (
+                    const content = (
                       <View
-                        key={`${activity.type}-${activity.id}-${index}`}
                         className={cn(
-                          'flex-row justify-between items-center rounded-md p-2',
+                          'flex-row justify-between items-center rounded-md p-2 relative',
                           getRouteTileStyles(route.color)
                         )}
+                        style={{
+                          backgroundColor: '#0f172a', // Solid slate-900 background to hide buttons
+                          overflow: 'hidden',
+                        }}
                       >
-                        <View className="flex-col flex-1">
+                        {/* Solid background overlay to ensure buttons don't show through */}
+                        <View
+                          className="absolute inset-0 bg-slate-900 rounded-md"
+                          style={{ zIndex: 0 }}
+                        />
+                        <View
+                          className="flex-col flex-1 relative"
+                          style={{ zIndex: 1 }}
+                        >
                           <Text
                             className="text-white text-lg font-bold font-barlow"
                             numberOfLines={1}
@@ -321,7 +474,10 @@ export default function DashboardScreen() {
                             {activityType}
                           </Text>
                         </View>
-                        <Text className="text-gray-300 font-barlow">
+                        <Text
+                          className="text-gray-300 font-barlow relative"
+                          style={{ zIndex: 1 }}
+                        >
                           {activityDate.toLocaleTimeString('en-US', {
                             hour: '2-digit',
                             minute: '2-digit',
@@ -329,6 +485,51 @@ export default function DashboardScreen() {
                         </Text>
                       </View>
                     );
+
+                    // Allow swipe on both completions and attempts
+                    if (isCompletion && completion) {
+                      return (
+                        <Swipeable
+                          key={key}
+                          ref={(ref) => {
+                            if (ref) {
+                              swipeableRefs.current[
+                                `completion-${completion.id}`
+                              ] = ref;
+                            }
+                          }}
+                          renderLeftActions={() =>
+                            renderLeftActions(completion, 'completion')
+                          }
+                          leftThreshold={40}
+                        >
+                          {content}
+                        </Swipeable>
+                      );
+                    }
+
+                    if (!isCompletion) {
+                      const attempt = activity as Attempt;
+                      return (
+                        <Swipeable
+                          key={key}
+                          ref={(ref) => {
+                            if (ref) {
+                              swipeableRefs.current[`attempt-${attempt.id}`] =
+                                ref;
+                            }
+                          }}
+                          renderLeftActions={() =>
+                            renderLeftActions(attempt, 'attempt')
+                          }
+                          leftThreshold={40}
+                        >
+                          {content}
+                        </Swipeable>
+                      );
+                    }
+
+                    return <View key={key}>{content}</View>;
                   })}
                 </View>
               ))
@@ -336,6 +537,76 @@ export default function DashboardScreen() {
           </ScrollView>
         </View>
       </View>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        visible={showDeleteConfirm}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          setShowDeleteConfirm(false);
+          setCompletionToDelete(null);
+          setAttemptToDelete(null);
+        }}
+      >
+        <View className="flex-1 bg-black/50 justify-center items-center p-6">
+          <View className="bg-slate-900 rounded-lg p-6 w-full max-w-sm border-2 border-red-500">
+            <Text className="text-white text-2xl font-bold font-barlow mb-2">
+              Delete {completionToDelete ? 'Completion' : 'Attempt'}?
+            </Text>
+            <Text className="text-gray-300 font-barlow mb-6">
+              Are you sure you want to delete this{' '}
+              {completionToDelete ? 'completion' : 'attempt'}? This action
+              cannot be undone.
+            </Text>
+            {(completionToDelete || attemptToDelete) && (
+              <View className="bg-slate-800 rounded-lg p-3 mb-6">
+                <Text className="text-white font-barlow font-semibold">
+                  {completionToDelete
+                    ? completionToDelete.route.title
+                    : attemptToDelete?.route.title}
+                </Text>
+                <Text className="text-gray-400 font-barlow text-sm">
+                  {completionToDelete
+                    ? completionToDelete.route.grade
+                    : attemptToDelete?.route.grade}
+                </Text>
+              </View>
+            )}
+            <View className="flex-row gap-3">
+              <TouchableOpacity
+                onPress={() => {
+                  setShowDeleteConfirm(false);
+                  setCompletionToDelete(null);
+                  setAttemptToDelete(null);
+                }}
+                disabled={isDeleting}
+                className={cn(
+                  'flex-1 bg-gray-600 px-4 py-3 rounded-lg',
+                  isDeleting && 'opacity-50'
+                )}
+              >
+                <Text className="text-white text-center font-barlow font-semibold">
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={confirmDelete}
+                disabled={isDeleting}
+                className={cn(
+                  'flex-1 bg-red-500 px-4 py-3 rounded-lg flex-row justify-center items-center gap-2',
+                  isDeleting && 'opacity-50'
+                )}
+              >
+                {isDeleting && <ActivityIndicator size="small" color="#fff" />}
+                <Text className="text-white text-center font-barlow font-semibold">
+                  {isDeleting ? 'Deleting...' : 'Delete'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }

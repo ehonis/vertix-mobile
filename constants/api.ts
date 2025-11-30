@@ -18,11 +18,14 @@ export const API_ENDPOINTS = {
   ROUTES_BY_WALL: '/api/routes/get-wall-routes-non-archive',
   ROUTES_ALL_NON_ARCHIVE: '/api/mobile/routes/fetch-all-routes-non-archive',
   ROUTE_BY_ID: '/api/routes/get-route-by-id',
-  ROUTE_COMPLETE: '/api/routes/complete-route',
-  ROUTE_ATTEMPT: '/api/routes/attempt-route',
+  ROUTE_COMPLETE: '/api/mobile/routes/complete-route',
+  ROUTE_ATTEMPT: '/api/mobile/routes/attempt-route',
+  ROUTE_GRADE: '/api/mobile/routes/grade',
   
   // Dashboard endpoints
   DASHBOARD_COMPLETIONS: '/api/mobile/dashboard/completions',
   DASHBOARD_ATTEMPTS: '/api/mobile/dashboard/attempts',
+  DELETE_COMPLETION: '/api/mobile/routes/delete-completion',
+  DELETE_ATTEMPT: '/api/mobile/routes/delete-attempt',
 } as const;
 

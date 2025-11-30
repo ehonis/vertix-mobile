@@ -1,9 +1,11 @@
+import RoutePopup from '@/components/RoutePopup';
 import TopDown, { Locations } from '@/components/TopDown';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { cn } from '@/utils/cn';
 import {
   calculateCompletionXpForRoute,
+  findCommunityGradeForRoute,
   getBoulderGradeMapping,
   isGradeHigher,
 } from '@/utils/routes';
@@ -25,6 +27,21 @@ interface RouteCompletion {
   flash: boolean;
 }
 
+interface RouteAttempt {
+  id: number;
+  userId: string;
+  routeId: string;
+  attemptDate: string;
+  attempts: number;
+}
+
+interface CommunityGrade {
+  id: number;
+  userId: string;
+  routeId: string;
+  grade: string;
+}
+
 interface Route {
   id: string;
   title: string;
@@ -35,7 +52,10 @@ interface Route {
   completed: boolean;
   setDate: string;
   completions: RouteCompletion[];
+  attempts?: RouteAttempt[];
+  communityGrades?: CommunityGrade[];
   bonusXp?: number | null;
+  isArchive?: boolean;
 }
 
 export default function TabOneScreen() {
@@ -45,6 +65,7 @@ export default function TabOneScreen() {
   const [selectedWall, setSelectedWall] = useState<Locations | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
 
   useEffect(() => {
     fetchRoutes();
@@ -80,6 +101,62 @@ export default function TabOneScreen() {
 
   const handleWallSelection = (wall: Locations | null) => {
     setSelectedWall(wall);
+  };
+
+  const handleRoutePress = (route: Route) => {
+    setSelectedRoute(route);
+  };
+
+  const handleRouteCompleted = async () => {
+    const routeId = selectedRoute?.id;
+    if (!routeId) return;
+
+    const tempCompletion: RouteCompletion = {
+      id: Date.now(), // Temporary ID
+      userId: user?.id || '',
+      routeId: routeId,
+      completionDate: new Date().toISOString(),
+      xpEarned: 0,
+      flash: false,
+    };
+
+    // Update selectedRoute optimistically
+    if (selectedRoute) {
+      const updatedRoute = {
+        ...selectedRoute,
+        completions: [...(selectedRoute.completions || []), tempCompletion],
+        completed: true,
+      };
+      setSelectedRoute(updatedRoute);
+    }
+
+    // Update route in allRoutes array immediately (for the checkmark in the list)
+    setAllRoutes((prev) =>
+      prev.map((route) =>
+        route.id === routeId
+          ? {
+              ...route,
+              completions: [...(route.completions || []), tempCompletion],
+              completed: true,
+            }
+          : route
+      )
+    );
+
+    // Refresh routes silently in background (don't show loading)
+    try {
+      const response = await api.getAllRoutesNonArchive(user?.id);
+      const fetchedRoutes = response.data || [];
+      setAllRoutes(fetchedRoutes);
+
+      // Update selectedRoute with fresh data
+      const freshRoute = fetchedRoutes.find((r) => r.id === routeId);
+      if (freshRoute) {
+        setSelectedRoute(freshRoute);
+      }
+    } catch (err) {
+      console.error('Error refreshing routes:', err);
+    }
   };
 
   const getRouteTileStyles = (color: string) => {
@@ -128,10 +205,12 @@ export default function TabOneScreen() {
   return (
     <ScrollView className="flex-1 bg-black">
       <View className="p-4">
-        <Text className="text-white text-2xl font-bold mb-4">Routes</Text>
+        <Text className="text-white text-2xl font-bold mb-4 font-barlow-500">
+          Routes
+        </Text>
 
         {/* TopDown Map */}
-        <View className="bg-slate-900 rounded-lg p-4 mb-4 items-center">
+        <View className="bg-blue-500/15 border-2 border-blue-400 rounded-lg p-2 mb-4 items-center">
           <TopDown
             onData={handleWallSelection}
             initialSelection={selectedWall}
@@ -161,12 +240,13 @@ export default function TabOneScreen() {
             )}
           </View>
         ) : (
-          <View className="gap-3">
+          <View className="gap-5 mt-2">
             {routes.map((route) => (
               <TouchableOpacity
                 key={route.id}
                 className={cn(getRouteTileStyles(route.color), 'relative')}
                 activeOpacity={0.7}
+                onPress={() => handleRoutePress(route)}
               >
                 <View className="flex-1 flex-col max-w-[70%]">
                   <Text
@@ -182,7 +262,7 @@ export default function TabOneScreen() {
                   </Text>
                 </View>
                 {user && (
-                  <View className="flex-row gap-2 items-center absolute -top-2 -right-2">
+                  <View className="flex-row gap-1 items-center absolute -top-3 -right-3">
                     {(() => {
                       // Only show XP if route is not completed (showing potential XP)
 
@@ -211,7 +291,7 @@ export default function TabOneScreen() {
                       if (xpData.xp > 0) {
                         return (
                           <View className="bg-black border border-green-400 rounded-full px-2 py-1">
-                            <Text className="text-green-400 text-sm font-extrabold italic font-barlow">
+                            <Text className="text-green-400 text-base font-extrabold italic font-barlow">
                               {xpData.xp}xp
                             </Text>
                           </View>
@@ -220,8 +300,8 @@ export default function TabOneScreen() {
                       return null;
                     })()}
                     {route.completed && (
-                      <View className="bg-black border border-green-400 rounded-full w-8 h-8 flex items-center justify-center">
-                        <Text className="text-green-400 text-lg font-bold">
+                      <View className="bg-black border border-green-400 rounded-full p-2 py-0.5 flex items-center justify-center">
+                        <Text className="text-green-400 text-xl font-bold">
                           ✓
                         </Text>
                       </View>
@@ -233,6 +313,61 @@ export default function TabOneScreen() {
           </View>
         )}
       </View>
+
+      {/* Route Popup */}
+      {selectedRoute &&
+        (() => {
+          const previousCompletions = selectedRoute.completions?.length || 0;
+          const routeType =
+            selectedRoute.type.toLowerCase() === 'rope' ? 'rope' : 'boulder';
+          const userHighestGrade =
+            routeType === 'rope'
+              ? user?.highestRopeGrade
+              : user?.highestBoulderGrade;
+          const newHighestGrade = user
+            ? isGradeHigher(userHighestGrade, selectedRoute.grade, routeType)
+            : false;
+
+          const xpData =
+            user && !selectedRoute.isArchive
+              ? calculateCompletionXpForRoute({
+                  grade: selectedRoute.grade,
+                  previousCompletions,
+                  newHighestGrade,
+                  bonusXp: selectedRoute.bonusXp || 0,
+                })
+              : null;
+
+          const communityGrade = selectedRoute.communityGrades
+            ? findCommunityGradeForRoute(selectedRoute.communityGrades)
+            : 'none';
+
+          const userGrade =
+            user && selectedRoute.communityGrades
+              ? selectedRoute.communityGrades.find((g) => g.userId === user.id)
+                  ?.grade || null
+              : null;
+
+          const attemptsCount = selectedRoute.attempts?.[0]?.attempts || 0;
+
+          return (
+            <RoutePopup
+              id={selectedRoute.id}
+              grade={selectedRoute.grade}
+              name={selectedRoute.title}
+              color={selectedRoute.color}
+              completions={previousCompletions}
+              attempts={attemptsCount}
+              userGrade={userGrade}
+              communityGrade={communityGrade}
+              xp={xpData}
+              isArchived={selectedRoute.isArchive || false}
+              bonusXp={selectedRoute.bonusXp || 0}
+              onCancel={() => setSelectedRoute(null)}
+              onRouteCompleted={handleRouteCompleted}
+            />
+          );
+        })()}
     </ScrollView>
   );
 }

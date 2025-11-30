@@ -44,12 +44,11 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Routes',
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ color, focused }) => (
             <Svg
-              fill="none"
+              stroke={focused ? Colors.tint : color}
               viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="white"
+              strokeWidth={focused ? 2 : 1.5}
               className="size-8"
             >
               <Path
@@ -65,12 +64,11 @@ export default function TabLayout() {
         name="dashboard"
         options={{
           title: 'Dashboard',
-          tabBarIcon: () => (
+          tabBarIcon: ({ color, focused }) => (
             <Svg
-              fill="none"
+              stroke={focused ? Colors.tint : color}
               viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="white"
+              strokeWidth={focused ? 2 : 1.5}
               className="size-6"
             >
               <Path

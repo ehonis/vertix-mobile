@@ -18,6 +18,8 @@ interface User {
   highestRopeGrade?: string | null;
   highestBoulderGrade?: string | null;
   totalXp?: number;
+  isOnboarded?: boolean;
+  phoneNumber?: string | null;
 }
 
 interface AuthContextType {
@@ -42,11 +44,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadStoredUser();
   }, []);
 
+  // Filter out temp email (@phone.local) from user data
+  const filterTempEmail = (userData: User): User => {
+    if (userData.email && userData.email.includes('@phone.local')) {
+      return { ...userData, email: '' };
+    }
+    return userData;
+  };
+
   const loadStoredUser = async () => {
     try {
       const storedUser = await SecureStore.getItemAsync(USER_KEY);
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
+        const userData = JSON.parse(storedUser);
+        setUser(filterTempEmail(userData));
       }
     } catch (error) {
       console.error('Error loading stored user:', error);
@@ -58,15 +69,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (token: string, userData: User) => {
     try {
       await api.signInWithToken(token);
-      // Store initial user data
-      await SecureStore.setItemAsync(USER_KEY, JSON.stringify(userData));
-      setUser(userData);
+      // Filter out temp email before storing
+      const filteredUserData = filterTempEmail(userData);
+      await SecureStore.setItemAsync(
+        USER_KEY,
+        JSON.stringify(filteredUserData)
+      );
+      setUser(filteredUserData);
       // Refresh session to get complete user data (XP, highest grades, etc.)
       try {
         const session = await api.getSession();
         if (session?.user) {
-          const completeUserData = session.user;
-          await SecureStore.setItemAsync(USER_KEY, JSON.stringify(completeUserData));
+          const completeUserData = filterTempEmail(session.user);
+          await SecureStore.setItemAsync(
+            USER_KEY,
+            JSON.stringify(completeUserData)
+          );
           setUser(completeUserData);
         }
       } catch (refreshError) {
@@ -96,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const session = await api.getSession();
       if (session?.user) {
-        const userData = session.user;
+        const userData = filterTempEmail(session.user);
         await SecureStore.setItemAsync(USER_KEY, JSON.stringify(userData));
         setUser(userData);
       } else {

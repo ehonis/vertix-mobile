@@ -28,7 +28,7 @@ export default function ProfileScreen() {
           <TouchableOpacity onPress={() => router.back()} className="mr-4 p-2">
             <FontAwesome name="arrow-left" size={24} color="#fff" />
           </TouchableOpacity>
-          <Text className="text-white text-2xl font-bold font-barlow">
+          <Text className="text-white text-2xl font-barlow-700">
             Profile
           </Text>
         </View>
@@ -42,14 +42,14 @@ export default function ProfileScreen() {
             />
           ) : (
             <View className="w-24 h-24 rounded-full bg-purple-600 items-center justify-center mb-4 border-4 border-slate-800">
-              <Text className="text-white text-4xl font-bold">
+              <Text className="text-white text-4xl font-barlow-700">
                 {user.name?.[0]?.toUpperCase() ||
                   user.email[0]?.toUpperCase() ||
                   'U'}
               </Text>
             </View>
           )}
-          <Text className="text-white text-2xl font-bold mb-1 font-barlow">
+          <Text className="text-white text-2xl font-barlow-700 mb-1">
             {user.name || 'User'}
           </Text>
           {user.username && (
@@ -61,7 +61,7 @@ export default function ProfileScreen() {
 
         {/* User Information Card */}
         <View className="bg-slate-900 rounded-xl p-6 mb-6">
-          <Text className="text-white text-lg font-semibold mb-4 font-barlow">
+          <Text className="text-white text-lg font-barlow-600 mb-4">
             Profile Information
           </Text>
 
@@ -93,7 +93,7 @@ export default function ProfileScreen() {
               </Text>
               {user.role === 'ADMIN' && (
                 <View className="ml-2 bg-purple-600 px-2 py-1 rounded">
-                  <Text className="text-white text-xs font-semibold font-barlow">
+                  <Text className="text-white text-xs font-barlow-600">
                     ADMIN
                   </Text>
                 </View>
@@ -108,7 +108,7 @@ export default function ProfileScreen() {
             <View className="flex-row items-center gap-4">
               <View>
                 <Text className="text-gray-400 text-xs font-barlow">Rope</Text>
-                <Text className="text-white text-base font-bold font-barlow">
+                <Text className="text-white text-base font-barlow-700">
                   {user.highestRopeGrade || 'n/a'}
                 </Text>
               </View>
@@ -117,7 +117,7 @@ export default function ProfileScreen() {
                 <Text className="text-gray-400 text-xs font-barlow">
                   Boulder
                 </Text>
-                <Text className="text-white text-base font-bold font-barlow">
+                <Text className="text-white text-base font-barlow-700">
                   {user.highestBoulderGrade || 'n/a'}
                 </Text>
               </View>
@@ -137,7 +137,7 @@ export default function ProfileScreen() {
           onPress={handleSignOut}
           className="bg-red-600 rounded-xl py-4 px-6 items-center"
         >
-          <Text className="text-white text-base font-semibold font-barlow">
+          <Text className="text-white text-base font-barlow-600">
             Sign Out
           </Text>
         </TouchableOpacity>

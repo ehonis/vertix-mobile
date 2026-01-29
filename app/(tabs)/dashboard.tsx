@@ -3,12 +3,13 @@ import { api } from '@/services/api';
 import { cn } from '@/utils/cn';
 import { getLevelForXp, getXpForLevel } from '@/utils/routes';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Image,
   Modal,
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -60,6 +61,7 @@ export default function DashboardScreen() {
     useState<Completion | null>(null);
   const [attemptToDelete, setAttemptToDelete] = useState<Attempt | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const swipeableRefs = useRef<Record<string, Swipeable | null>>({});
 
   useEffect(() => {
@@ -91,6 +93,19 @@ export default function DashboardScreen() {
       }
     }
   };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await fetchDashboardData(false);
+      // Also refresh user session to get updated XP and stats
+      await refreshSession();
+    } catch (err) {
+      console.error('Error refreshing dashboard:', err);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refreshSession]);
 
   const handleDeleteCompletion = (completion: Completion) => {
     setCompletionToDelete(completion);
@@ -317,7 +332,12 @@ export default function DashboardScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-black">
+    <ScrollView
+      className="flex-1 bg-black"
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
+      }
+    >
       <View className="p-5 pt-0 gap-2 items-center">
         {/* User Profile Section - ImageNamePlate Style */}
         <View className="w-full items-start  py-4 relative">
@@ -340,15 +360,15 @@ export default function DashboardScreen() {
             activeOpacity={0.7}
           >
             <View className="flex-1">
-              <Text className="text-white font-barlow font-bold text-2xl text-start">
+              <Text className="text-white font-barlow-700 text-2xl text-start">
                 {user?.name || 'User'}
               </Text>
-              <Text className="text-gray-400 font-barlow font-bold text-start text-sm">
+              <Text className="text-gray-400 font-barlow-500 text-start text-sm">
                 @{user?.username || user?.id}
               </Text>
             </View>
             <View className="font-barlow text-white flex flex-col justify-center items-center gap-1">
-              <Text className="font-bold text-lg font-barlow text-white">
+              <Text className="font-barlow-600 text-lg text-white">
                 Highest Grade
               </Text>
               <View className="flex-row gap-3">
@@ -368,7 +388,7 @@ export default function DashboardScreen() {
         <View className="bg-slate-900 rounded-lg p-4 w-full -mt-2">
           <View className="flex-row items-center gap-3">
             <Text
-              className={`text-5xl font-extrabold font-barlow ${accentColors.text} -mt-1`}
+              className={`text-5xl font-barlow-700 ${accentColors.text} -mt-1`}
             >
               {currentLevel}
             </Text>
@@ -404,7 +424,7 @@ export default function DashboardScreen() {
         {/* Recent Activity */}
         <View className="w-full">
           <View className="flex-col my-3">
-            <Text className="text-white text-2xl font-bold font-barlow ">
+            <Text className="text-white text-2xl font-barlow-700">
               Recent Tix & Attempts
             </Text>
             <Text className="text-gray-400 font-barlow text-sm">
@@ -422,7 +442,7 @@ export default function DashboardScreen() {
                   {/* Date separator */}
                   <View className="flex-row items-center gap-2">
                     <View className="h-px bg-gray-500 flex-1" />
-                    <Text className="text-gray-400 font-barlow text-lg font-medium px-2">
+                    <Text className="text-gray-400 font-barlow-500 text-lg px-2">
                       {date}
                     </Text>
                     <View className="h-px bg-gray-500 flex-1" />
@@ -462,7 +482,7 @@ export default function DashboardScreen() {
                           style={{ zIndex: 1 }}
                         >
                           <Text
-                            className="text-white text-lg font-bold font-barlow"
+                            className="text-white text-lg font-barlow-700"
                             numberOfLines={1}
                           >
                             {route.title}
@@ -551,7 +571,7 @@ export default function DashboardScreen() {
       >
         <View className="flex-1 bg-black/50 justify-center items-center p-6">
           <View className="bg-slate-900 rounded-lg p-6 w-full max-w-sm border-2 border-red-500">
-            <Text className="text-white text-2xl font-bold font-barlow mb-2">
+            <Text className="text-white text-2xl font-barlow-700 mb-2">
               Delete {completionToDelete ? 'Completion' : 'Attempt'}?
             </Text>
             <Text className="text-gray-300 font-barlow mb-6">
@@ -561,7 +581,7 @@ export default function DashboardScreen() {
             </Text>
             {(completionToDelete || attemptToDelete) && (
               <View className="bg-slate-800 rounded-lg p-3 mb-6">
-                <Text className="text-white font-barlow font-semibold">
+                <Text className="text-white font-barlow-600">
                   {completionToDelete
                     ? completionToDelete.route.title
                     : attemptToDelete?.route.title}
@@ -586,7 +606,7 @@ export default function DashboardScreen() {
                   isDeleting && 'opacity-50'
                 )}
               >
-                <Text className="text-white text-center font-barlow font-semibold">
+                <Text className="text-white text-center font-barlow-600">
                   Cancel
                 </Text>
               </TouchableOpacity>
@@ -599,7 +619,7 @@ export default function DashboardScreen() {
                 )}
               >
                 {isDeleting && <ActivityIndicator size="small" color="#fff" />}
-                <Text className="text-white text-center font-barlow font-semibold">
+                <Text className="text-white text-center font-barlow-600">
                   {isDeleting ? 'Deleting...' : 'Delete'}
                 </Text>
               </TouchableOpacity>

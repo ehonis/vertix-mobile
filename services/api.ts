@@ -10,6 +10,8 @@ class ApiService {
     this.baseURL = API_BASE_URL;
   }
 
+  // token management methods
+
   private async getToken(): Promise<string | null> {
     try {
       return await SecureStore.getItemAsync(TOKEN_KEY);
@@ -34,7 +36,7 @@ class ApiService {
       console.error('Error removing token:', error);
     }
   }
-
+// generic request method
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -65,7 +67,13 @@ class ApiService {
           throw new Error('Unauthorized');
         }
         const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-        throw new Error(error.message || `HTTP error! status: ${response.status}`);
+        // Preserve error structure for onboarding endpoint
+        const errorObj: any = new Error(error.message || error.error || `HTTP error! status: ${response.status}`);
+        if (error.field) {
+          errorObj.field = error.field;
+          errorObj.message = error.message || error.error;
+        }
+        throw errorObj;
       }
 
       return await response.json();
@@ -74,6 +82,8 @@ class ApiService {
       throw error;
     }
   }
+
+  //generic get, post, put, delete methods
 
   async get<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
     const queryString = params
@@ -137,9 +147,36 @@ class ApiService {
     await this.removeToken();
   }
 
+  // Phone Auth methods
+  async sendPhoneVerification(phoneNumber: string): Promise<any> {
+    return this.post(API_ENDPOINTS.PHONE_SEND_VERIFICATION, { phoneNumber });
+  }
+
+  async verifyPhoneCode(phoneNumber: string, code: string): Promise<any> {
+    return this.post(API_ENDPOINTS.PHONE_VERIFY, { phoneNumber, code });
+  }
+
+  // Email Auth methods
+  async sendEmailVerification(email: string): Promise<any> {
+    return this.post(API_ENDPOINTS.EMAIL_SEND_VERIFICATION, { email });
+  }
+
+  async verifyEmailCode(email: string, code: string): Promise<any> {
+    return this.post(API_ENDPOINTS.EMAIL_VERIFY, { email, code });
+  }
+
   // User methods
   async getUserXp(): Promise<{ xp: number; monthlyXp: number }> {
     return this.get(API_ENDPOINTS.USER_XP);
+  }
+
+  async completeOnboarding(data: {
+    name: string;
+    username: string;
+    phoneNumber?: string;
+    email?: string;
+  }): Promise<any> {
+    return this.post(API_ENDPOINTS.USER_ONBOARDING, data);
   }
 
   // Route methods
@@ -209,6 +246,17 @@ class ApiService {
 
   async deleteAttempt(attemptId: number): Promise<any> {
     return this.delete(API_ENDPOINTS.DELETE_ATTEMPT, { attemptId });
+  }
+
+  // Leaderboard methods
+  async getLeaderboard(): Promise<{
+    monthly: { user: { id: string; name: string | null; username: string | null; image: string | null; totalXp: number }; xp: number }[];
+    total: { id: string; name: string | null; username: string | null; image: string | null; totalXp: number }[];
+    userMonthlyRank: number | null;
+    userTotalRank: number | null;
+    currentMonth: string;
+  }> {
+    return this.get(API_ENDPOINTS.LEADERBOARD);
   }
 }
 

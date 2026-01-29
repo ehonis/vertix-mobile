@@ -1,32 +1,39 @@
 export function getBoulderGradeMapping(grade: string) {
-  let mappedGrade = '';
-  if (grade === 'vfeature') {
-    mappedGrade = 'vfeature';
-  } else if (grade === 'v1' || grade === 'v0') {
-    mappedGrade = 'v0-v2';
-  } else if (grade === 'v2') {
-    mappedGrade = 'v1-v3';
-  } else if (grade === 'v3') {
-    mappedGrade = 'v2-v4';
-  } else if (grade === 'v4') {
-    mappedGrade = 'v3-v5';
-  } else if (grade === 'v5') {
-    mappedGrade = 'v4-v6';
-  } else if (grade === 'v6') {
-    mappedGrade = 'v5-v7';
-  } else if (grade === 'v7') {
-    mappedGrade = 'v6-v8';
-  } else if (grade === 'v8') {
-    mappedGrade = 'v7-v9';
-  } else if (grade === 'v9') {
-    mappedGrade = 'v8-v10';
-  } else if (grade === 'v10') {
-    mappedGrade = 'v9-v11';
-  } else {
-    mappedGrade = 'vb';
+  const gradeLower = grade.toLowerCase();
+  
+  // vfeature and vb don't get grade ranges - return as-is
+  if (gradeLower === 'vfeature') {
+    return 'vfeature';
   }
-
-  return mappedGrade;
+  if (gradeLower === 'vb') {
+    return 'vb';
+  }
+  
+  // All other grades get a range format (one grade below to one grade above)
+  if (gradeLower === 'v0' || gradeLower === 'v1') {
+    return 'v0-v2';
+  } else if (gradeLower === 'v2') {
+    return 'v1-v3';
+  } else if (gradeLower === 'v3') {
+    return 'v2-v4';
+  } else if (gradeLower === 'v4') {
+    return 'v3-v5';
+  } else if (gradeLower === 'v5') {
+    return 'v4-v6';
+  } else if (gradeLower === 'v6') {
+    return 'v5-v7';
+  } else if (gradeLower === 'v7') {
+    return 'v6-v8';
+  } else if (gradeLower === 'v8') {
+    return 'v7-v9';
+  } else if (gradeLower === 'v9') {
+    return 'v8-v10';
+  } else if (gradeLower === 'v10') {
+    return 'v9-v11';
+  }
+  
+  // Fallback for unknown grades
+  return grade;
 }
 
 export function getRouteXp(grade: string): number {

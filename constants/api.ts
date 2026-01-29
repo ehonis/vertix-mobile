@@ -9,9 +9,18 @@ export const API_ENDPOINTS = {
   AUTH_SIGNOUT: '/api/mobile-auth/signout',
   AUTH_OAUTH: '/api/mobile-auth/oauth',
   
+  // Phone Auth endpoints
+  PHONE_SEND_VERIFICATION: '/api/auth/phone/send-verification',
+  PHONE_VERIFY: '/api/auth/phone/verify',
+  
+  // Email Auth endpoints
+  EMAIL_SEND_VERIFICATION: '/api/auth/email/send-verification',
+  EMAIL_VERIFY: '/api/auth/email/verify',
+  
   // User endpoints
   USER_XP: '/api/user/xp',
   USER_PROFILE: '/api/user/profile',
+  USER_ONBOARDING: '/api/user/onboarding',
   
   // Route endpoints
   ROUTES_SEARCH: '/api/routes/search-routes',
@@ -27,5 +36,8 @@ export const API_ENDPOINTS = {
   DASHBOARD_ATTEMPTS: '/api/mobile/dashboard/attempts',
   DELETE_COMPLETION: '/api/mobile/routes/delete-completion',
   DELETE_ATTEMPT: '/api/mobile/routes/delete-attempt',
+  
+  // Leaderboard endpoints
+  LEADERBOARD: '/api/mobile/leaderboard',
 } as const;
 

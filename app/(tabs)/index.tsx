@@ -486,7 +486,7 @@ export default function TabOneScreen() {
         {/* Map title - shows wall name when selected, "Gym Map" when not */}
 
 
-        <View className="bg-slate-900/80 border-2 border-blue-500/50 rounded-lg p-4  items-center overflow-hidden w-full max-w-full">
+        <View className="bg-slate-900/80 border-2 border-blue-500/50 rounded-lg p-3  items-center overflow-hidden w-full max-w-full">
           <View className="flex-row items-center w-full relative">
             <Animated.View
               className="flex-1"
@@ -552,7 +552,7 @@ export default function TabOneScreen() {
               </Animated.View>
             )}
           </View>
-          <View className="w-full items-center overflow-hidden ml-3">
+          <View className="w-full items-center overflow-hidden ">
             <TopDown
               onData={handleWallSelection}
               initialSelection={selectedWall}

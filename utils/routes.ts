@@ -1,6 +1,6 @@
 export function getBoulderGradeMapping(grade: string) {
   const gradeLower = grade.toLowerCase();
-  
+
   // vfeature and vb don't get grade ranges - return as-is
   if (gradeLower === 'vfeature') {
     return 'vfeature';
@@ -8,7 +8,7 @@ export function getBoulderGradeMapping(grade: string) {
   if (gradeLower === 'vb') {
     return 'vb';
   }
-  
+
   // All other grades get a range format (one grade below to one grade above)
   if (gradeLower === 'v0' || gradeLower === 'v1') {
     return 'v0-v2';
@@ -31,13 +31,14 @@ export function getBoulderGradeMapping(grade: string) {
   } else if (gradeLower === 'v10') {
     return 'v9-v11';
   }
-  
+
   // Fallback for unknown grades
   return grade;
 }
 
 export function getRouteXp(grade: string): number {
   const boulderGrades: Record<string, number> = {
+    competition: 0,
     vfeature: 0,
     vb: 10,
     v0: 20,
@@ -54,6 +55,7 @@ export function getRouteXp(grade: string): number {
   };
 
   const ropeGrades: Record<string, number> = {
+    competition: 0,
     '5.feature': 0,
     '5.b': 10,
     '5.7-': 20,
@@ -102,8 +104,7 @@ export function calculateCompletionXpForRoute({
   const newHighestGradeBonusXP = 250;
 
   const baseXp = getRouteXp(grade);
-  const isFeatureRoute =
-    grade.toLowerCase() === 'vfeature' || grade.toLowerCase() === '5.feature';
+  const isFeatureRoute = grade.toLowerCase() === 'vfeature' || grade.toLowerCase() === '5.feature';
 
   if (isFeatureRoute && previousCompletions > 0) {
     return {
@@ -264,19 +265,14 @@ export function getGradeRange(grade: string): string[] {
   if (index === -1) return []; // Handle case where grade isn't found
 
   if (isBoulderGrade) {
-    if (index === 0) return ['vfeature', 'vb', 'v0'];
-    if (index === 1) return ['vfeature', 'vb', 'v0', 'v1'];
+    if (index === 0) return ['vb', 'v0'];
+    if (index === 1) return ['vb', 'v0', 'v1'];
     if (index === gradeList.length - 1) return ['v8', 'v9', 'v10'];
-    return gradeList.slice(
-      Math.max(0, index - 1),
-      Math.min(gradeList.length, index + 2)
-    );
+    return gradeList.slice(Math.max(0, index - 1), Math.min(gradeList.length, index + 2));
   } else {
     if (index === 0) return ['5.feature', '5.B', '5.7-', '5.7'];
-    if (index <= 2)
-      return ['5.feature', '5.B', '5.7-', '5.7', '5.7+', '5.8-'];
-    if (index >= gradeList.length - 3)
-      return ['5.12', '5.12+', '5.13-', '5.13', '5.13+'];
+    if (index <= 2) return ['5.feature', '5.B', '5.7-', '5.7', '5.7+', '5.8-'];
+    if (index >= gradeList.length - 3) return ['5.12', '5.12+', '5.13-', '5.13', '5.13+'];
     return gradeList.slice(index - 2, index + 3);
   }
 }
@@ -288,13 +284,10 @@ export function findCommunityGradeForRoute(communityGrades: Array<{ grade: strin
   // Separate rope and boulder grades based on whether they start with 'v'
   const ropeGrades = communityGrades.filter(
     (grade) =>
-      !grade.grade.toLowerCase().startsWith('v') &&
-      grade.grade.toLowerCase() !== '5.feature'
+      !grade.grade.toLowerCase().startsWith('v') && grade.grade.toLowerCase() !== '5.feature'
   );
   const boulderGrades = communityGrades.filter(
-    (grade) =>
-      grade.grade.toLowerCase().startsWith('v') &&
-      grade.grade.toLowerCase() !== 'vfeature'
+    (grade) => grade.grade.toLowerCase().startsWith('v') && grade.grade.toLowerCase() !== 'vfeature'
   );
 
   // Handle rope grades if any exist
@@ -330,8 +323,7 @@ export function findCommunityGradeForRoute(communityGrades: Array<{ grade: strin
 
     if (!numericGrades.length) return 'none';
 
-    const averageNumeric =
-      numericGrades.reduce((sum, num) => sum + num, 0) / numericGrades.length;
+    const averageNumeric = numericGrades.reduce((sum, num) => sum + num, 0) / numericGrades.length;
 
     // Find closest grade
     let closestGrade = '';
@@ -369,13 +361,11 @@ export function findCommunityGradeForRoute(communityGrades: Array<{ grade: strin
 
     if (!numericGrades.length) return 'none';
 
-    const averageNumeric =
-      numericGrades.reduce((sum, num) => sum + num, 0) / numericGrades.length;
+    const averageNumeric = numericGrades.reduce((sum, num) => sum + num, 0) / numericGrades.length;
     const closestNumeric = Math.round(averageNumeric);
 
     return (
-      Object.entries(boulderGradeMap).find(([_, value]) => value === closestNumeric)?.[0] ||
-      'none'
+      Object.entries(boulderGradeMap).find(([_, value]) => value === closestNumeric)?.[0] || 'none'
     );
   }
 

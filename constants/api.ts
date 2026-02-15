@@ -30,6 +30,8 @@ export const API_ENDPOINTS = {
   ROUTE_COMPLETE: '/api/mobile/routes/complete-route',
   ROUTE_ATTEMPT: '/api/mobile/routes/attempt-route',
   ROUTE_GRADE: '/api/mobile/routes/grade',
+  ROUTE_DELETE: '/api/routes/edit/delete-route',
+  ROUTE_ARCHIVE: '/api/routes/edit/archive-route',
   
   // Dashboard endpoints
   DASHBOARD_COMPLETIONS: '/api/mobile/dashboard/completions',

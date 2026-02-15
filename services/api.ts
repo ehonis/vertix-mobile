@@ -113,6 +113,13 @@ class ApiService {
     });
   }
 
+  async patch<T>(endpoint: string, data?: unknown): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
   // Auth methods
   async signInWithToken(token: string): Promise<void> {
     await this.setToken(token);
@@ -221,6 +228,18 @@ class ApiService {
     routeId: string;
   }): Promise<any> {
     return this.post(API_ENDPOINTS.ROUTE_ATTEMPT, data);
+  }
+
+  async deleteRoute(routeIds: string[]): Promise<{ message: string }> {
+    return this.delete<{ message: string }>(API_ENDPOINTS.ROUTE_DELETE, {
+      routes: routeIds.map((id) => ({ id })),
+    });
+  }
+
+  async archiveRoute(routeIds: string[]): Promise<{ message: string }> {
+    return this.patch<{ message: string }>(API_ENDPOINTS.ROUTE_ARCHIVE, {
+      routes: routeIds.map((id) => ({ id })),
+    });
   }
 
   async gradeRoute(data: {

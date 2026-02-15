@@ -99,20 +99,20 @@ const WALL_DEFINITIONS: Record<Locations, WallDefinition> = {
   ropeSouth: {
     type: 'rope',
     segments: [
-      { x: 175, y: 185, width: 12, height: 20 },
-      { x: 159, y: 180, width: 12, height: 25, rotation: 305 },
-      { x: 152, y: 164, width: 12, height: 18, rotation: 335 },
-      { x: 163, y: 159, width: 12, height: 30, rotation: 115 },
-      { x: 135, y: 146, width: 12, height: 38, rotation: 70 },
-      { x: 111.1, y: 220, width: 12, height: 60, rotation: 180 },
+      { x: 175, y: 170, width: 12, height: 20 },
+      { x: 159, y: 165, width: 12, height: 25, rotation: 305 },
+      { x: 152, y: 149, width: 12, height: 18, rotation: 335 },
+      { x: 163, y: 144, width: 12, height: 30, rotation: 115 },
+      { x: 135, y: 131, width: 12, height: 38, rotation: 70 },
+      { x: 111.1, y: 190, width: 12, height: 45, rotation: 180 },
     ],
   },
   ABWall: {
     type: 'rope',
     segments: [
-      { x: 10, y: 25, width: 12, height: 125 },
-      { x: 10, y: 151, width: 12, height: 25, rotation: -45 },
-      { x: 25, y: 160, width: 12, height: 40, rotation: 0 },
+      { x: 10, y: 25, width: 12, height: 130 },
+      { x: 10, y: 155, width: 12, height: 25, rotation: -45 },
+      { x: 24, y: 164, width: 12, height: 26, rotation: 0 },
     ],
   },
   ropeNorthWest: {
@@ -219,13 +219,109 @@ const WALL_DEFINITIONS: Record<Locations, WallDefinition> = {
   boulderSouth: {
     type: 'boulder',
     segments: [
-      { x: 242, y: 148, width: 12, height: 40, rotation: 270 },
-      { x: 242, y: 140, width: 12, height: 30, rotation: 0 },
-      { x: 248, y: 168, width: 12, height: 20 },
-      { x: 248, y: 190, width: 12, height: 35, rotation: 270 },
+      { x: 242, y: 168, width: 12, height: 40, rotation: 270 },
+      { x: 242, y: 160, width: 12, height: 45, rotation: 0 },
+      { x: 248, y: 203, width: 12, height: 20 },
+      { x: 248, y: 234, width: 12, height: 35, rotation: 270 },
     ],
   },
 };
+
+// ============================================================================
+// NON-CLIMBING GYM WALLS / AREAS
+// ============================================================================
+
+/**
+ * Non-climbing area IDs (for reference; not selectable for routes).
+ * Add or remove ids here and in NON_CLIMBING_DEFINITIONS to match your gym layout.
+ */
+export type NonClimbingAreaId =
+  | 'graffitiWall'
+  | 'hallway'
+  | 'outsideGymRope'
+  | 'outsideGymBoulder'
+
+
+/**
+ * Definition for a non-climbing gym area (lobby, bathrooms, etc.).
+ * Uses the same segment shapes as climbing walls but are not selectable.
+ */
+export interface NonClimbingAreaDefinition {
+  id: NonClimbingAreaId;
+  /** Optional display label (can also use TEXT_LABELS for map labels) */
+  label?: string;
+  /** Fill color (default: #6B7280 gray) */
+  fill?: string;
+  /** Stroke/border color (default: none) */
+  stroke?: string;
+  /** Opacity 0–1 (default: 1) */
+  opacity?: number;
+  segments: WallSegment[];
+}
+
+/**
+ * NON-CLIMBING AREA CONFIGURATION
+ *
+ * Add gym areas that are not climbable: lobby, bathrooms, training, etc.
+ * Same segment types as WALL_DEFINITIONS: rect, triangle (with or without points/rightAngleCorner).
+ * These render behind climbing walls and are not selectable.
+ */
+const NON_CLIMBING_DEFINITIONS: NonClimbingAreaDefinition[] = [
+  {
+    id: 'outsideGymRope',
+    label: 'Outside Gym Rope',
+    fill: '#1447E6',
+    opacity: 0.25,
+    segments: [
+
+      { x: 10, y: 240, width: 12, height: 225, rotation: 180 },
+      { x: 25, y: 240, width: 15, height: 85, rotation: 180 },
+      { x: 45, y: 240, width: 25, height: 50, rotation: 180 },
+
+      { x: 111, y: 144, width: 50, height: 21, rotation: 0 },
+      { x: 111, y: 165, width: 68, height: 27, rotation: 0 },
+
+      { x: 25, y: -5, width: 165, height: 12, rotation: 0 },
+      { x: 92, y: -5, width: 45, height: 30, rotation: 0 },
+      { x: 97, y: 25, width: 25, height: 15, rotation: 0 },
+    ],
+  },
+  {
+    id: 'outsideGymBoulder',
+    label: 'Outside Gym Boulder',
+    fill: '#8200DB',
+    opacity: 0.25,
+    segments: [
+      { x: 250, y: -1, width: 25, height: 15, rotation: 0 },
+      { x: 220, y: 74, width: 55, height: 26, rotation: 0 },
+      { x: 247, y: 165, width: 50, height: 67, rotation: 0 },
+    ],
+  },
+  {
+    id: 'graffitiWall',
+    label: 'Lobby',
+    fill: '#6B7280',
+    segments: [
+      { x: 187, y: 190, width: 6, height: 88, rotation: 90 },
+      { x: 186.8, y: 225, width: 30, height: 86.7, rotation: 90 },
+    ],
+  },
+
+  {
+    id: 'hallway',
+    label: 'Hallway',
+    fill: '#6B7280',
+    segments: [
+      { x: 24, y: 196, width: 6, height: 25, rotation: 270 },
+      { x: 49, y: 251, width: 6, height: 55, rotation: 180 },
+      { x: 48, y: 221, width: 6, height: 5, rotation: 270 },
+      { x: 67, y: 221, width: 6, height: 10, rotation: 270 },
+      { x: 71, y: 220, width: 6, height: 25, rotation: 0 },
+    ],
+  },
+
+
+];
 
 // ============================================================================
 // TEXT LABEL CONFIGURATION
@@ -275,6 +371,7 @@ const TEXT_LABELS: TextLabel[] = [
   { x: 125, y: 100, text: 'The Arch', backgroundColor: '#1976D2', fontSize: 12, fill: '#ffffff' },
 
   { x: 220, y: 20, text: 'Slab', backgroundColor: '#8200DB', fontSize: 12, fill: '#ffffff' },
+  { x: 143, y: 220, text: 'Graffiti Wall', backgroundColor: '#6B7280', fontSize: 8, fill: '#ffffff' },
 ];
 
 // ============================================================================
@@ -324,8 +421,8 @@ const OVERHANG_DEFINITIONS: OverhangSegment[] = [
   // Add your overhang areas here
   { x: 258.8, y: 20, width: 12, height: 45, rotation: 0 },
   //boulder overhang
-  { shape: 'polygon', points: '211,107 240,110 242,130 255,145 245,165 212,140' },
-  { shape: 'polygon', points: '98,48 142,30 160,159 100,160' },
+  { shape: 'polygon', points: '211,107 240,110 242,130 255,160 245,175 211,135' },
+  { shape: 'polygon', points: '98,48 135,25 162,159, 138,140 100,145' },
   //rope overhang
 ];
 
@@ -345,38 +442,41 @@ const VIEWBOX_CONFIG = {
   /** Minimum Y coordinate */
   minY: 0,
   /** Maximum X coordinate (width of coordinate space) */
-  maxX: 300,
+  maxX: 275,
   /** Maximum Y coordinate (height of coordinate space) */
-  maxY: 200,
+  maxY: 240,
   /** Display width in pixels */
-  displayWidth: 350,
+  displayWidth: 330,
   /** Display height in pixels */
-  displayHeight: 233,
+  displayHeight: 290,
 };
 
 // ============================================================================
 // ============================================================================
-// DOT DEFINITION
+// ROUTE DEFINITION (map display, aligned with Prisma Route model)
 // ============================================================================
 
 /**
- * Dot Definition
+ * Route Definition
  *
- * A dot rendered on the map in viewBox coordinates (same space as VIEWBOX_CONFIG).
+ * A route rendered on the map in viewBox coordinates. Matches Route model fields
+ * used for display and editing. x/y/title are optional for routes not yet placed or named.
  */
-export interface DotDefinition {
-  /** X position in viewBox coordinates */
-  x: number;
-  /** Y position in viewBox coordinates */
-  y: number;
-  /** Radius in viewBox units (default: 4) */
-  r?: number;
-  /** Fill color (default: #22C55E green) */
-  fill?: string;
-  /** Stroke color (default: #FFFFFF white) */
-  stroke?: string;
-  /** Stroke width in viewBox units (default: 2) */
-  strokeWidth?: number;
+export interface RouteDefinition {
+  routeId: string;
+  /** Optional; missing or empty means route needs a title */
+  title?: string;
+  grade: string;
+  /** Fill color (from route) */
+  color: string;
+  /** X position in viewBox coordinates; undefined if not yet placed on map */
+  x?: number;
+  /** Y position in viewBox coordinates; undefined if not yet placed on map */
+  y?: number;
+  /** Route type (BOULDER | ROPE), optional for demo/legacy */
+  type?: 'BOULDER' | 'ROPE';
+  /** Wall location, optional */
+  location?: Locations;
 }
 
 // ============================================================================
@@ -387,8 +487,16 @@ interface TopDownProps {
   onData: (data: Locations | null) => void;
   initialSelection?: Locations | null;
   onViewBoxChange?: (viewBox: { minX: number; minY: number; width: number; height: number }) => void;
-  /** Dots to render on the map (viewBox coordinates) */
-  dots?: DotDefinition[];
+  /** Routes to render on the map (viewBox coordinates) */
+  routes?: RouteDefinition[];
+  /** Which route is selected (e.g. from index when swiping) */
+  selectedRouteId?: string | null;
+  /** Called when user taps a route */
+  onRouteSelect?: (routeId: string) => void;
+  /** Mode: 'view' (select routes), 'create' (place new route), 'edit' (move selected route) */
+  mode?: 'view' | 'create' | 'edit';
+  /** Called when user taps empty map area (e.g. in edit mode to deselect) */
+  onBackgroundTap?: () => void;
 }
 
 interface WallProps {
@@ -891,6 +999,90 @@ function OverhangLayer({ opacity }: { opacity?: number }) {
 }
 
 // ============================================================================
+// NON-CLIMBING LAYER (gym areas: lobby, bathrooms, etc.)
+// ============================================================================
+
+const NON_CLIMBING_DEFAULT_FILL = '#6B7280';
+
+/**
+ * Renders non-climbing gym areas (lobby, bathrooms, training, etc.).
+ * Not selectable; uses same segment shapes as climbing walls.
+ */
+function NonClimbingLayer({ opacity }: { opacity?: number }) {
+  return (
+    <G opacity={opacity !== undefined ? opacity : 1}>
+      {NON_CLIMBING_DEFINITIONS.map((area) => {
+        const fill = area.fill ?? NON_CLIMBING_DEFAULT_FILL;
+        const stroke = area.stroke ?? 'none';
+        const areaOpacity = area.opacity ?? 1;
+        return (
+          <G key={area.id} fill={fill} stroke={stroke} strokeWidth={stroke === 'none' ? 0 : 1} opacity={areaOpacity}>
+            {area.segments.map((segment, index) => {
+              const shape = segment.shape || 'rect';
+              const transform = segment.rotation
+                ? `rotate(${segment.rotation} ${segment.x} ${segment.y})`
+                : undefined;
+
+              if (shape === 'triangle' && segment.points) {
+                return (
+                  <Polygon
+                    key={index}
+                    points={segment.points}
+                    transform={transform}
+                  />
+                );
+              }
+
+              if (shape === 'triangle') {
+                let points: string;
+                if (segment.rightAngleCorner) {
+                  const { x, y, width, height } = segment;
+                  switch (segment.rightAngleCorner) {
+                    case 'bottom-left':
+                      points = [`${x},${y}`, `${x + width},${y}`, `${x},${y - height}`].join(' ');
+                      break;
+                    case 'bottom-right':
+                      points = [`${x},${y}`, `${x - width},${y}`, `${x},${y - height}`].join(' ');
+                      break;
+                    case 'top-left':
+                      points = [`${x},${y}`, `${x + width},${y}`, `${x},${y + height}`].join(' ');
+                      break;
+                    case 'top-right':
+                      points = [`${x},${y}`, `${x - width},${y}`, `${x},${y + height}`].join(' ');
+                      break;
+                    default:
+                      points = '';
+                  }
+                } else {
+                  const halfWidth = segment.width / 2;
+                  points = [
+                    `${segment.x},${segment.y - segment.height / 2}`,
+                    `${segment.x - halfWidth},${segment.y + segment.height / 2}`,
+                    `${segment.x + halfWidth},${segment.y + segment.height / 2}`,
+                  ].join(' ');
+                }
+                return <Polygon key={index} points={points} transform={transform} />;
+              }
+
+              return (
+                <Rect
+                  key={index}
+                  x={segment.x}
+                  y={segment.y}
+                  width={segment.width}
+                  height={segment.height}
+                  transform={transform}
+                />
+              );
+            })}
+          </G>
+        );
+      })}
+    </G>
+  );
+}
+
+// ============================================================================
 // TEXT LABEL RENDERING COMPONENT
 // ============================================================================
 
@@ -985,19 +1177,93 @@ function Compass() {
 }
 
 // ============================================================================
-// ============================================================================
-// DOT LAYER COMPONENT
+// ROUTE LAYER COMPONENT
 // ============================================================================
 
+const ROUTE_R = 2;
+const ROUTE_STROKE = '#FFFFFF';
+const ROUTE_STROKE_WIDTH = 0.75;
+const ROUTE_SELECTED_SCALE = 1.5;
+/** Larger invisible hit area so routes are tappable (react-native-svg hit detection can miss small shapes). */
+const ROUTE_HIT_R = 4;
+
+/** Route with required map position (used when rendering on map). */
+type RouteWithPosition = RouteDefinition & { x: number; y: number };
+
 /**
- * Renders dots on the map in viewBox coordinates.
- * Only rendered when zoomed (caller passes hasZoomed). Animates in with fade + scale pop.
+ * Single route marker with selected scale animation. Uses an invisible larger circle for hit area.
  */
-function DotLayer({ dots }: { dots: DotDefinition[] }) {
+function MapRoute({
+  route,
+  isSelected,
+  onPress,
+}: {
+  route: RouteWithPosition;
+  isSelected: boolean;
+  onPress?: () => void;
+}) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const listener = scaleAnim.addListener(({ value }) => setScale(value));
+    return () => scaleAnim.removeListener(listener);
+  }, [scaleAnim]);
+
+  useEffect(() => {
+    Animated.spring(scaleAnim, {
+      toValue: isSelected ? ROUTE_SELECTED_SCALE : 1,
+      friction: 8,
+      tension: 80,
+      useNativeDriver: false,
+    }).start();
+  }, [isSelected, scaleAnim]);
+
+  const transform = `translate(${route.x}, ${route.y}) scale(${scale}) translate(${-route.x}, ${-route.y})`;
+
+  return (
+    <G transform={transform}>
+      <Circle
+        cx={route.x}
+        cy={route.y}
+        r={ROUTE_HIT_R}
+        fill="#000000"
+        fillOpacity={0.001}
+        onPress={onPress}
+      />
+      <Circle
+        cx={route.x}
+        cy={route.y}
+        r={ROUTE_R}
+        fill={route.color}
+        stroke={ROUTE_STROKE}
+        strokeWidth={ROUTE_STROKE_WIDTH}
+        onPress={onPress}
+      />
+    </G>
+  );
+}
+
+/**
+ * Renders routes on the map in viewBox coordinates.
+ * Only rendered when zoomed. Layer fades in + scale pop; individual routes are tappable and scale when selected.
+ */
+function RouteLayer({
+  routes,
+  selectedRouteId,
+  onRouteSelect,
+  mode = 'view',
+}: {
+  routes: RouteDefinition[];
+  selectedRouteId?: string | null;
+  onRouteSelect?: (routeId: string) => void;
+  mode?: 'view' | 'create' | 'edit';
+}) {
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.3)).current;
   const [opacity, setOpacity] = useState(0);
   const [scale, setScale] = useState(0.3);
+  const prevCountWithPosition = useRef(0);
 
   useEffect(() => {
     const opacityListener = opacityAnim.addListener(({ value }) => setOpacity(value));
@@ -1008,45 +1274,65 @@ function DotLayer({ dots }: { dots: DotDefinition[] }) {
     };
   }, [opacityAnim, scaleAnim]);
 
+  // Only play entrance animation when the number of routes with position *increases* (new route placed),
+  // not when routes are moved (x/y update) or removed, to avoid glitchy re-bounce on every rerender.
   useEffect(() => {
-    if (!dots.length) return;
-    opacityAnim.setValue(0);
-    scaleAnim.setValue(0.3);
-    Animated.parallel([
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 280,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: false,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 8,
-        tension: 80,
-        useNativeDriver: false,
-      }),
-    ]).start();
-  }, [dots, opacityAnim, scaleAnim]);
+    const countWithPosition = routes.filter(
+      (r) => typeof r.x === 'number' && typeof r.y === 'number'
+    ).length;
+    if (countWithPosition === 0) {
+      prevCountWithPosition.current = 0;
+      return;
+    }
+    if (countWithPosition > prevCountWithPosition.current) {
+      opacityAnim.setValue(0);
+      scaleAnim.setValue(0.3);
+      Animated.parallel([
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: false,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 8,
+          tension: 80,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    }
+    prevCountWithPosition.current = countWithPosition;
+  }, [routes, opacityAnim, scaleAnim]);
 
-  if (!dots.length) return null;
+  if (!routes.length) return null;
 
-  const centerX = dots.reduce((s, d) => s + d.x, 0) / dots.length;
-  const centerY = dots.reduce((s, d) => s + d.y, 0) / dots.length;
-  const transform = `translate(${centerX}, ${centerY}) scale(${scale}) translate(${-centerX}, ${-centerY})`;
+  // Only show routes that have map position (x, y)
+  const routesWithPosition = routes.filter(
+    (r): r is RouteWithPosition =>
+      typeof r.x === 'number' && typeof r.y === 'number'
+  );
+  if (!routesWithPosition.length) return null;
+
+  const centerX = routesWithPosition.reduce((s, r) => s + r.x, 0) / routesWithPosition.length;
+  const centerY = routesWithPosition.reduce((s, r) => s + r.y, 0) / routesWithPosition.length;
+  const layerTransform = `translate(${centerX}, ${centerY}) scale(${scale}) translate(${-centerX}, ${-centerY})`;
 
   return (
-    <G opacity={opacity} transform={transform}>
-      {dots.map((dot, index) => (
-        <Circle
-          key={index}
-          cx={dot.x}
-          cy={dot.y}
-          r={dot.r ?? 4}
-          fill={dot.fill ?? '#22C55E'}
-          stroke={dot.stroke ?? '#FFFFFF'}
-          strokeWidth={dot.strokeWidth ?? 2}
-        />
-      ))}
+    <G opacity={opacity} transform={layerTransform}>
+      {routesWithPosition.map((route) => {
+        const isSelected = selectedRouteId === route.routeId;
+        const isBeingEdited = mode === 'edit' && isSelected;
+        if (isBeingEdited) return null;
+        return (
+          <MapRoute
+            key={route.routeId}
+            route={route}
+            isSelected={isSelected}
+            onPress={(mode === 'view' || mode === 'edit') && onRouteSelect ? () => onRouteSelect(route.routeId) : undefined}
+          />
+        );
+      })}
     </G>
   );
 }
@@ -1118,7 +1404,11 @@ export default function TopDown({
   onData,
   initialSelection = null,
   onViewBoxChange,
-  dots = [],
+  routes = [],
+  selectedRouteId = null,
+  onRouteSelect,
+  mode = 'view',
+  onBackgroundTap,
 }: TopDownProps) {
   const [selectedPart, setSelectedPart] = useState<Locations | null>(
     initialSelection
@@ -1329,7 +1619,10 @@ export default function TopDown({
   };
 
   return (
-    <View className="items-center justify-center relative w-full">
+    <View
+      className="relative w-full items-center justify-center"
+      pointerEvents="box-none"
+    >
       {/* Wall name label - appears when wall is selected, positioned in top left */}
       {/* {selectedPart && (
         <View className="absolute top-0 left-0 z-20 m-2">
@@ -1342,7 +1635,8 @@ export default function TopDown({
       )} */}
 
       <View
-        className="w-full  rounded-lg overflow-hidden"
+        className="w-full overflow-hidden rounded-lg"
+        pointerEvents="box-none"
         style={{ aspectRatio: VIEWBOX_CONFIG.displayWidth / VIEWBOX_CONFIG.displayHeight }}
       >
         <Svg
@@ -1350,7 +1644,22 @@ export default function TopDown({
           width="100%"
           height="100%"
           preserveAspectRatio="xMidYMid meet"
+          pointerEvents="box-none"
         >
+          {/* Invisible full-viewBox Rect to catch taps on empty map (edit mode: click off to deselect) */}
+          {mode === 'edit' && onBackgroundTap && (
+            <Rect
+              x={viewBoxMinX}
+              y={viewBoxMinY}
+              width={viewBoxWidth}
+              height={viewBoxHeight}
+              fill="#000000"
+              fillOpacity={0.001}
+              onPress={onBackgroundTap}
+            />
+          )}
+          {/* Non-climbing gym areas (lobby, bathrooms, etc.) - not selectable; dim when a wall is selected */}
+          <NonClimbingLayer opacity={selectedPart ? 0.5 : 1} />
           {/* Render overhangs first (underneath walls) - keep visible when wall is selected */}
           <OverhangLayer opacity={1} />
 
@@ -1372,10 +1681,18 @@ export default function TopDown({
           })}
 
           {/* Compass indicator */}
-          <Compass />
 
-          {/* Dots only when zoomed; fade-in + scale pop */}
-          {selectedPart && dots.length > 0 && <DotLayer dots={dots} />}
+
+          {/* Routes only when zoomed; fade-in + scale pop; tappable with selected scale */}
+          {selectedPart && routes && routes.length > 0 && (
+            <RouteLayer
+              routes={routes}
+              selectedRouteId={selectedRouteId}
+              onRouteSelect={onRouteSelect}
+              mode={mode}
+            />
+          )}
+
         </Svg>
       </View>
     </View>

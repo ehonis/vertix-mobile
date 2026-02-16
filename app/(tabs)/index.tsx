@@ -1,8 +1,10 @@
 import LongPressRouteCard from '@/components/LongPressRouteCard';
 import RoutePopup from '@/components/RoutePopup';
+import SafeScreen from '@/components/SafeScreen';
 import TopDown, { Legend, Locations } from '@/components/TopDown';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
+import { cn } from '@/utils/cn';
 import {
   calculateCompletionXpForRoute,
   findCommunityGradeForRoute,
@@ -79,6 +81,9 @@ export default function TabOneScreen() {
   const scrollX = useRef(new Animated.Value(0)).current;
   const carouselRef = useRef<FlatList>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  
+  // Track if we're currently in a momentum scroll to prevent race conditions
+  const isScrollingRef = useRef(false);
 
   // Map height animation - smooth transition when wall is selected
   const mapHeightAnim = useRef(new Animated.Value(1)).current; // 1 = full height, 0.5 = half height
@@ -323,20 +328,20 @@ export default function TabOneScreen() {
   //loading state
   if (isLoading) {
     return (
-      <View className="flex-1 bg-black justify-center items-center">
+      <SafeScreen className="bg-black justify-center items-center">
         <ActivityIndicator size="large" color="#fff" />
         <Text className="text-white mt-4">Loading routes...</Text>
-      </View>
+      </SafeScreen>
     );
   }
 
   //error state
   if (error) {
     return (
-      <View className="flex-1 bg-black justify-center items-center p-6">
+      <SafeScreen className="bg-black justify-center items-center p-6">
         <Text className="text-red-500 text-lg mb-4">{error}</Text>
         <Text className="text-white text-center">Please try again later</Text>
-      </View>
+      </SafeScreen>
     );
   }
 
@@ -350,8 +355,10 @@ export default function TabOneScreen() {
         const offsetX = event.nativeEvent.contentOffset.x;
         // Calculate index accounting for padding
         const index = Math.round(offsetX / CARD_WIDTH);
-        if (index !== activeIndex && index >= 0 && index < routes.length) {
-          setActiveIndex(index);
+        // Clamp index to valid range
+        const clampedIndex = Math.max(0, Math.min(index, routes.length - 1));
+        if (clampedIndex !== activeIndex && clampedIndex >= 0 && clampedIndex < routes.length) {
+          setActiveIndex(clampedIndex);
         }
       },
     }
@@ -359,18 +366,30 @@ export default function TabOneScreen() {
 
   // Snap to nearest item when scroll ends
   const handleMomentumScrollEnd = (event: any) => {
+    // If already scrolling, don't trigger another scroll
+    if (isScrollingRef.current) {
+      return;
+    }
+
     const offsetX = event.nativeEvent.contentOffset.x;
     // Calculate which card we're closest to
     const index = Math.round(offsetX / CARD_WIDTH);
     const targetIndex = Math.max(0, Math.min(index, routes.length - 1));
 
+    // Only snap if we're not already at the target index
+    if (targetIndex === activeIndex) {
+      return;
+    }
+
     if (carouselRef.current && routes.length > 0) {
+      isScrollingRef.current = true;
       try {
         // Use scrollToOffset to account for padding correctly
         carouselRef.current.scrollToOffset({
           offset: targetIndex * CARD_WIDTH,
           animated: true,
         });
+        setActiveIndex(targetIndex);
       } catch (error) {
         // Fallback to scrollToIndex if scrollToOffset fails
         try {
@@ -378,12 +397,18 @@ export default function TabOneScreen() {
             index: targetIndex,
             animated: true,
           });
+          setActiveIndex(targetIndex);
         } catch (e) {
           console.error('Failed to scroll to index:', e);
         }
       }
+      // Reset scrolling flag after animation completes
+      setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 300);
+    } else {
+      setActiveIndex(targetIndex);
     }
-    setActiveIndex(targetIndex);
   };
 
   const formatWallName = (wall: Locations) => {
@@ -477,7 +502,7 @@ export default function TabOneScreen() {
 
   // Unified layout with consistent width and animated height
   return (
-    <View className="flex-1 justify-between  py-5 pt-3 bg-black">
+    <SafeScreen className="flex  py-5 bg-black">
 
       <Animated.View
         className="justify-start items-center overflow-hidden  px-2"
@@ -486,7 +511,7 @@ export default function TabOneScreen() {
         {/* Map title - shows wall name when selected, "Gym Map" when not */}
 
 
-        <View className="bg-slate-900/80 border-2 border-blue-500/50 rounded-lg p-3  items-center overflow-hidden w-full max-w-full">
+        <View className={cn("bg-slate-900/80 border-2 border-blue-500/50 rounded-lg p-3 items-center overflow-hidden w-full max-w-full")}>
           <View className="flex-row items-center w-full relative">
             <Animated.View
               className="flex-1"
@@ -552,12 +577,13 @@ export default function TabOneScreen() {
               </Animated.View>
             )}
           </View>
-          <View className="w-full items-center overflow-hidden ">
+          <View className={"w-full items-center overflow-hidden transition-all duration-300 "}>
             <TopDown
               onData={handleWallSelection}
               initialSelection={selectedWall}
             />
           </View>
+
         </View>
 
         {/* Helper text when no wall selected - outside blue box */}
@@ -573,14 +599,14 @@ export default function TabOneScreen() {
         {!selectedWall && <Legend showWhenSelected={true} />}
       </Animated.View>
 
-      <View className="px-2">
-        {selectedWall && (
+      <View className="px-2 mt-2">
+        {/* {selectedWall && (
           <View className="items-center">
             <Text className="text-white text-xl font-barlow-600 mt-3 text-start">
               Routes Sorted Left to Right
             </Text>
           </View>
-        )}
+        )} */}
 
         {/* Carousel Section - Takes remaining space when wall is selected */}
         {selectedWall && (
@@ -622,6 +648,7 @@ export default function TabOneScreen() {
                 onScroll={handleScroll}
                 onMomentumScrollEnd={handleMomentumScrollEnd}
                 initialScrollIndex={0}
+                bounces={false}
                 contentContainerStyle={{
                   paddingHorizontal: PEEK_WIDTH,
                   marginTop: 10
@@ -691,6 +718,6 @@ export default function TabOneScreen() {
             />
           );
         })()}
-    </View>
+    </SafeScreen>
   );
 }

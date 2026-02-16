@@ -1,4 +1,5 @@
 import RouteEditPopup from '@/components/RouteEditPopup';
+import SafeScreen from '@/components/SafeScreen';
 import TopDown, { Locations, RouteDefinition } from '@/components/TopDown';
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
@@ -588,8 +589,9 @@ export default function RouteManagerScreen() {
   }, [createRopeBase]);
 
   return (
-    <View className="flex-1 bg-black">
-      <View className="absolute left-0 top-16 z-10 px-4">
+    <SafeScreen edges={['top', 'bottom']} className="bg-black">
+      <View className="flex-1">
+      <View className="absolute left-0 top-4 z-10 px-4">
         <TouchableOpacity onPress={() => router.back()} className="flex-row items-center gap-2 p-2">
           <FontAwesome name="arrow-left" size={24} color={Colors.text} />
           <Text className="text-lg font-barlow-700 text-white">Admin Center</Text>
@@ -601,8 +603,8 @@ export default function RouteManagerScreen() {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
         className="flex-1"
       >
-        <View className="flex-1 overflow-hidden">
-          <View className="mt-48 min-h-0 flex-1 items-center justify-center">
+        <View className="flex overflow mt-48">
+          <View className="items-center justify-center">
             {!selectedWall && (
               <View className="z-10 m-2 flex w-full items-center">
                 <Text className="font-barlow-700 text-xl text-white">
@@ -611,7 +613,7 @@ export default function RouteManagerScreen() {
               </View>
             )}
             <View
-              className="relative min-h-0 w-full flex-1 items-center rounded-lg border-2 border-white"
+              className="relative w-full items-center rounded-lg border-2 border-white"
               onLayout={handleContainerLayout}
             >
               <TopDown
@@ -904,6 +906,7 @@ export default function RouteManagerScreen() {
           />
         );
       })()}
-    </View>
+      </View>
+    </SafeScreen>
   );
 }

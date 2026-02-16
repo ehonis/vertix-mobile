@@ -1,3 +1,4 @@
+import SafeScreen from '@/components/SafeScreen';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { cn } from '@/utils/cn';
@@ -315,25 +316,26 @@ export default function DashboardScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-black justify-center items-center">
+      <SafeScreen className="bg-black justify-center items-center">
         <ActivityIndicator size="large" color="#fff" />
         <Text className="text-white mt-4">Loading dashboard...</Text>
-      </View>
+      </SafeScreen>
     );
   }
 
   if (error) {
     return (
-      <View className="flex-1 bg-black justify-center items-center p-6">
+      <SafeScreen className="bg-black justify-center items-center p-6">
         <Text className="text-red-500 text-lg mb-4">{error}</Text>
         <Text className="text-white text-center">Please try again later</Text>
-      </View>
+      </SafeScreen>
     );
   }
 
   return (
+    <SafeScreen className="bg-black">
     <ScrollView
-      className="flex-1 bg-black"
+      className="flex-1"
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
       }
@@ -355,7 +357,7 @@ export default function DashboardScreen() {
 
           {/* Name and ID Plate - overlaps with image */}
           <TouchableOpacity
-            onPress={() => router.push('/profile')}
+            onPress={() => router.push('/(tabs)/profile')}
             className="bg-slate-900 w-full rounded-lg mt-12 p-6 px-4 relative flex-row justify-between items-center"
             activeOpacity={0.7}
           >
@@ -628,5 +630,6 @@ export default function DashboardScreen() {
         </View>
       </Modal>
     </ScrollView>
+    </SafeScreen>
   );
 }

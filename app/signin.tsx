@@ -1,3 +1,4 @@
+import SafeScreen from '@/components/SafeScreen';
 import { API_BASE_URL } from '@/constants/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
@@ -329,9 +330,10 @@ export default function SignInScreen() {
   // Main sign-in screen
   if (step === 'initial') {
     return (
+      <SafeScreen edges={['top', 'bottom']} className="bg-black">
       <ScrollView
         contentContainerClassName="flex-grow justify-center items-center p-1"
-        className="flex-1 bg-black"
+        className="flex-1"
       >
         <View className="w-full max-w-sm items-center">
           <Text
@@ -568,15 +570,17 @@ export default function SignInScreen() {
           </Text>
         </View>
       </ScrollView>
+      </SafeScreen>
     );
   }
 
   // Create Account Screen
   if (step === 'createAccount') {
     return (
+      <SafeScreen edges={['top', 'bottom']} className="bg-black">
       <ScrollView
         contentContainerClassName="flex-grow justify-center items-center p-1"
-        className="flex-1 bg-black"
+        className="flex-1"
       >
         <View className="w-full max-w-sm items-center">
           <Text
@@ -801,6 +805,7 @@ export default function SignInScreen() {
           </View>
         </View>
       </ScrollView>
+      </SafeScreen>
     );
   }
 
@@ -813,9 +818,10 @@ export default function SignInScreen() {
     const isResending = isPhoneVerification ? isPhoneLoading : isEmailLoading;
 
     return (
+      <SafeScreen edges={['top', 'bottom']} className="bg-black">
       <ScrollView
         contentContainerClassName="flex-grow justify-center items-center p-4"
-        className="flex-1 bg-black"
+        className="flex-1"
       >
         <View className="w-full max-w-sm items-center">
           <Text
@@ -894,6 +900,7 @@ export default function SignInScreen() {
           </View>
         </View>
       </ScrollView>
+      </SafeScreen>
     );
   }
 }

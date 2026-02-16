@@ -1,3 +1,4 @@
+import SafeScreen from '@/components/SafeScreen';
 import { useAuth } from '@/contexts/AuthContext';
 import { useXp } from '@/contexts/XpContext';
 import { api } from '@/services/api';
@@ -297,16 +298,16 @@ export default function LeaderboardScreen() {
 
     if (isLoading) {
         return (
-            <View className="flex-1 bg-black justify-center items-center">
+            <SafeScreen className="bg-black justify-center items-center">
                 <ActivityIndicator size="large" color="#fff" />
                 <Text className="text-white mt-4 font-barlow">Loading leaderboard...</Text>
-            </View>
+            </SafeScreen>
         );
     }
 
     if (error) {
         return (
-            <View className="flex-1 bg-black justify-center items-center p-6">
+            <SafeScreen className="bg-black justify-center items-center p-6">
                 <Text className="text-red-500 text-lg mb-4 font-barlow-600">{error}</Text>
                 <TouchableOpacity
                     onPress={fetchLeaderboard}
@@ -314,13 +315,14 @@ export default function LeaderboardScreen() {
                 >
                     <Text className="text-white font-barlow-600">Try Again</Text>
                 </TouchableOpacity>
-            </View>
+            </SafeScreen>
         );
     }
 
     return (
+        <SafeScreen className="bg-black">
         <ScrollView
-            className="flex-1 bg-black"
+            className="flex-1"
             refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
             }
@@ -424,6 +426,7 @@ export default function LeaderboardScreen() {
                 )}
             </View>
         </ScrollView>
+        </SafeScreen>
     );
 }
 

@@ -1,5 +1,5 @@
+import SafeScreen from '@/components/SafeScreen';
 import { useAuth } from '@/contexts/AuthContext';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
@@ -14,27 +14,18 @@ export default function ProfileScreen() {
 
   if (!user) {
     return (
-      <View className="flex-1 justify-center items-center bg-black">
+      <SafeScreen className="justify-center items-center bg-black">
         <Text className="text-white text-lg">No user data available</Text>
-      </View>
+      </SafeScreen>
     );
   }
 
   return (
-    <ScrollView className="flex-1 bg-black">
-      <View className="flex-1 mt-12 p-6">
-        {/* Header with back button */}
-        <View className="flex-row items-center mb-4">
-          <TouchableOpacity onPress={() => router.back()} className="mr-4 p-2">
-            <FontAwesome name="arrow-left" size={24} color="#fff" />
-          </TouchableOpacity>
-          <Text className="text-white text-2xl font-barlow-700">
-            Profile
-          </Text>
-        </View>
-
+    <SafeScreen className="bg-black">
+    <ScrollView className="flex-1">
+      <View className="flex-1 p-6">
         {/* Profile Header */}
-        <View className="items-center mb-8 mt-4">
+        <View className="items-center mb-8">
           {user.image ? (
             <Image
               source={{ uri: user.image }}
@@ -143,5 +134,6 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </SafeScreen>
   );
 }

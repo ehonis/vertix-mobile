@@ -4,8 +4,8 @@ import { api } from '@/services/api';
 import { cn } from '@/utils/cn';
 import {
     calculateCompletionXpForRoute,
-    getBoulderGradeMapping,
-    isGradeHigher,
+    getGradeMapping,
+    isGradeHigher
 } from '@/utils/routes';
 import React, { useCallback, useRef, useState } from 'react';
 import {
@@ -19,7 +19,6 @@ import {
     Vibration,
     View,
 } from 'react-native';
-import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 // Optional expo-haptics import with fallback
 let Haptics: typeof import('expo-haptics') | null = null;
@@ -513,10 +512,12 @@ export default function LongPressRouteCard({
         outputRange: [0, cardWidth],
     });
 
+
+
     return (
-        <View className="flex-1 justify-between">
+        <View className="flex flex-1  justify-between gap-3">
             {/* Route Card - Opens menu on press */}
-            <View className="relative flex-1">
+            <View className="relative flex flex-1">
                 {/* XP and completion badge - outside the clipped card */}
                 {user && (
                     <View className="flex-row gap-1 items-center absolute -top-3 -right-3 z-20">
@@ -537,12 +538,13 @@ export default function LongPressRouteCard({
                 >
                     <View
                         className={cn(
-                            'rounded-lg border-2 h-full overflow-hidden relative',
-                            styles.border
+                            'rounded-lg border-2 h-full w-full relative',
+                            styles.border,
+                            styles.bg,
                         )}
                     >
                         {/* Gradient Background */}
-                        <View className="absolute inset-0">
+                        {/* <View className="absolute inset-0">
                             <Svg width="100%" height="100%">
                                 <Defs>
                                     <LinearGradient id={`routeGradient-${route.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
@@ -552,7 +554,7 @@ export default function LongPressRouteCard({
                                 </Defs>
                                 <Rect width="100%" height="100%" fill={`url(#routeGradient-${route.id})`} />
                             </Svg>
-                        </View>
+                        </View> */}
 
                         {/* Large Grade Background (semi-transparent) */}
                         <View className="absolute inset-0 justify-center items-center">
@@ -564,9 +566,7 @@ export default function LongPressRouteCard({
                                     fontWeight: '700',
                                 }}
                             >
-                                {route.type === 'boulder'
-                                    ? getBoulderGradeMapping(route.grade)
-                                    : route.grade}
+                                {getGradeMapping(route.grade)}
                             </Text>
                         </View>
 
@@ -615,7 +615,7 @@ export default function LongPressRouteCard({
             {/* Hold to Flash Button - Full width at bottom */}
             {user && !route.isArchive && (
                 <View
-                    className="relative overflow-hidden rounded-lg mt-3"
+                    className="relative overflow-hidden rounded-lg "
                     onLayout={handleLayout}
                     onTouchStart={handlePressIn}
                     onTouchMove={handleTouchMove}

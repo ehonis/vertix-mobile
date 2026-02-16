@@ -19,6 +19,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import 'react-native-reanimated';
 import '../global.css';
@@ -73,8 +74,9 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView className="flex-1 bg-black" style={{ flex: 1 }}>
-      <StatusBar style="light" />
-      <AuthProvider>
+      <SafeAreaProvider>
+        <StatusBar style="light" />
+        <AuthProvider>
         <XpProvider>
           <NotificationProvider>
 
@@ -83,6 +85,7 @@ export default function RootLayout() {
           </NotificationProvider>
         </XpProvider>
       </AuthProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
@@ -241,13 +244,6 @@ function RootLayoutNav() {
           <Stack.Screen name="signin" options={{ headerShown: false }} />
           <Stack.Screen name="onboarding" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="profile"
-            options={{
-              headerShown: false,
-              presentation: 'card',
-            }}
-          />
           <Stack.Screen
             name="route-manager"
             options={{

@@ -1,3 +1,4 @@
+import SafeScreen from '@/components/SafeScreen';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
@@ -20,8 +21,9 @@ export default function AdminScreen() {
   }
 
   return (
+    <SafeScreen className="bg-black">
     <ScrollView
-      className="bg-black"
+      className="flex-1"
       contentContainerClassName="px-5 pt-5"
     >
       <Text className="text-white text-2xl font-barlow-700 mb-3">
@@ -39,5 +41,6 @@ export default function AdminScreen() {
         </Text>
       </TouchableOpacity>
     </ScrollView>
+    </SafeScreen>
   );
 }

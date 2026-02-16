@@ -2,7 +2,7 @@ export function getBoulderGradeMapping(grade: string) {
   const gradeLower = grade.toLowerCase();
 
   // vfeature and vb don't get grade ranges - return as-is
-  if (gradeLower === 'vfeature') {
+  if (gradeLower === 'vFeature') {
     return 'vfeature';
   }
   if (gradeLower === 'vb') {
@@ -34,6 +34,18 @@ export function getBoulderGradeMapping(grade: string) {
 
   // Fallback for unknown grades
   return grade;
+}
+
+export function getGradeMapping(grade: string): string {
+  const gradeLower = grade.toLowerCase();
+  if (gradeLower.startsWith('v')) {
+    return getBoulderGradeMapping(grade);
+  }
+  if (gradeLower.includes('5.feature')) {
+    return '5.Feature';
+  } else {
+    return grade;
+  }
 }
 
 export function getRouteXp(grade: string): number {
@@ -270,8 +282,8 @@ export function getGradeRange(grade: string): string[] {
     if (index === gradeList.length - 1) return ['v8', 'v9', 'v10'];
     return gradeList.slice(Math.max(0, index - 1), Math.min(gradeList.length, index + 2));
   } else {
-    if (index === 0) return ['5.feature', '5.B', '5.7-', '5.7'];
-    if (index <= 2) return ['5.feature', '5.B', '5.7-', '5.7', '5.7+', '5.8-'];
+    if (index === 0) return ['5.B', '5.7-', '5.7'];
+    if (index <= 2) return ['5.B', '5.7-', '5.7', '5.7+', '5.8-'];
     if (index >= gradeList.length - 3) return ['5.12', '5.12+', '5.13-', '5.13', '5.13+'];
     return gradeList.slice(index - 2, index + 3);
   }

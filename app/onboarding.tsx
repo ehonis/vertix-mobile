@@ -1,3 +1,4 @@
+import SafeScreen from '@/components/SafeScreen';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { useRouter } from 'expo-router';
@@ -132,16 +133,17 @@ export default function OnboardingScreen() {
 
   if (!user) {
     return (
-      <View className="flex-1 bg-black justify-center items-center">
+      <SafeScreen edges={['top', 'bottom']} className="bg-black justify-center items-center">
         <ActivityIndicator size="large" color="#fff" />
-      </View>
+      </SafeScreen>
     );
   }
 
   return (
+    <SafeScreen edges={['top', 'bottom']} className="bg-black">
     <ScrollView
       contentContainerClassName="flex-grow justify-center p-4"
-      className="flex-1 bg-black"
+      className="flex-1"
     >
       <View className="w-full max-w-sm mx-auto">
         <Text className="text-3xl text-white font-barlow-700 mb-2">
@@ -312,5 +314,6 @@ export default function OnboardingScreen() {
         </View>
       </View>
     </ScrollView>
+    </SafeScreen>
   );
 }

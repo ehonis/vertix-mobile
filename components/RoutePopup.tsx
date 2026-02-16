@@ -338,579 +338,544 @@ export default function RoutePopup({
           StyleSheet.absoluteFill,
           { opacity: modalOpacity, transform: [{ scale: modalScale }] },
         ]}
-    >
-      <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill}>
-        <Pressable
-          className="flex-1 items-center justify-center p-4"
-          onPress={onCancel}
-        >
-          {/* XP Section */}
-          {!isArchived && currentXp && (
-            <Pressable
-              onPress={() => setIsXpExpanded(!isXpExpanded)}
-              className={cn(
-                'bg-black/50 border rounded-full px-3 py-1 mb-2',
-                isXpExpanded ? 'rounded-lg' : 'rounded-full',
-                'border-green-400'
-              )}
-            >
-              <View className="flex-row items-center gap-2">
-                <Text className="text-green-400 text-xl font-barlow-700 italic">
-                  {currentXp.xp}xp
-                </Text>
-                <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d={isXpExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}
-                    stroke="#22c55e"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </Svg>
-              </View>
-
-              {isXpExpanded && (
-                <View className="mt-2 gap-1">
-                  <View className="flex-row justify-between">
-                    <Text className="text-gray-300 text-xs font-barlow">
-                      Base XP:
-                    </Text>
-                    <Text className="text-green-400 text-xs font-barlow-700">
-                      {currentXp.baseXp} XP
-                    </Text>
-                  </View>
-                  {currentXp.xpExtrapolated.map((extrapolated) => (
-                    <View
-                      key={extrapolated.type}
-                      className="flex-row justify-between"
-                    >
-                      <Text className="text-gray-300 text-xs font-barlow">
-                        {extrapolated.type}:
-                      </Text>
-                      <Text
-                        className={cn(
-                          'text-xs font-barlow-700',
-                          extrapolated.xp > 0
-                            ? 'text-green-400'
-                            : 'text-red-400'
-                        )}
-                      >
-                        {extrapolated.xp > 0 ? '+' : ''}
-                        {extrapolated.xp} XP
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </Pressable>
-          )}
-
-          {/* Route Info Card */}
+      >
+        <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill}>
           <Pressable
-            onPress={(e) => e.stopPropagation()}
-            className={cn(
-              'bg-slate-900/90 p-6 rounded-lg w-full max-w-sm border-2',
-              getRouteTileStyles(color)
-            )}
+            className="flex-1 items-center justify-center p-4"
+            onPress={onCancel}
           >
-            {/* Close Button */}
-            <TouchableOpacity
-              onPress={onCancel}
-              className="absolute top-4 right-4 z-10"
-            >
-              <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-                <Path
-                  d="M6 18L18 6M6 6l12 12"
-                  stroke="#fff"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </Svg>
-            </TouchableOpacity>
-
-            {/* Route Header */}
-            <View className="flex-row gap-3 items-center mb-6">
-              {(frontendCompletions > 0 || isFrontendCompleted) && (
-                <View className="bg-green-400 rounded-full w-10 h-10 items-center justify-center">
-                  <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+            {/* XP Section */}
+            {!isArchived && currentXp && (
+              <Pressable
+                onPress={() => setIsXpExpanded(!isXpExpanded)}
+                className={cn(
+                  'bg-black/50 border rounded-full px-3 py-1 mb-2',
+                  isXpExpanded ? 'rounded-lg' : 'rounded-full',
+                  'border-green-400'
+                )}
+              >
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-green-400 text-xl font-barlow-700 italic">
+                    {currentXp.xp}xp
+                  </Text>
+                  <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
                     <Path
-                      d="M4.5 12.75l6 6 9-13.5"
-                      stroke="#000"
-                      strokeWidth={3}
+                      d={isXpExpanded ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}
+                      stroke="#22c55e"
+                      strokeWidth={2}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   </Svg>
                 </View>
-              )}
-              <View className="flex-1">
-                <Text
-                  className="text-white text-3xl font-barlow-700"
-                  numberOfLines={1}
-                >
-                  {name}
-                </Text>
-                <Text className="text-gray-300 text-xl italic font-barlow">
-                  {gradeMapped}
-                </Text>
-                {grade.toLowerCase() !== 'vfeature' &&
-                  grade.toLowerCase() !== '5.feature' && (
-                    <Text className="text-gray-400 text-sm font-barlow mt-1">
-                      Community Grade:{' '}
-                      <Text className="font-barlow-700">
-                        {frontendCommunityGrade === 'none' ||
-                        !frontendCommunityGrade
-                          ? 'N/A'
-                          : frontendCommunityGrade}
+
+                {isXpExpanded && (
+                  <View className="mt-2 gap-1">
+                    <View className="flex-row justify-between">
+                      <Text className="text-gray-300 text-xs font-barlow">
+                        Base XP:
                       </Text>
-                    </Text>
-                  )}
-              </View>
-            </View>
-
-            {!user ? (
-              <View className="items-center gap-4">
-                <Text className="text-white text-lg text-center font-barlow">
-                  To complete or attempt this route you must be signed in
-                </Text>
-              </View>
-            ) : (
-              <ScrollView className="max-h-96">
-                <View className="gap-4">
-                  {/* Complete and Attempt Buttons */}
-                  <View className="flex-row justify-between gap-4">
-                    <View className="flex-1 items-center gap-2">
-                      <TouchableOpacity
-                        onPress={handleRouteAttempt}
-                        disabled={isAttemptLoading}
-                        className="bg-gray-400/45 border border-gray-300 px-5 py-3 rounded-full relative overflow-hidden"
-                      >
-                        {isAttemptLoading ? (
-                          <ActivityIndicator color="#fff" />
-                        ) : (
-                          <>
-                            <Text
-                              className="text-white text-xl font-barlow-600"
-                              style={{ opacity: showAttemptSuccess ? 0 : 1 }}
-                            >
-                              Attempt
-                            </Text>
-                            {showAttemptSuccess && (
-                              <Animated.View
-                                style={{
-                                  position: 'absolute',
-                                  top: 0,
-                                  left: 0,
-                                  right: 0,
-                                  bottom: 0,
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                  transform: [{ scale: attemptScale }],
-                                  opacity: attemptOpacity,
-                                }}
-                              >
-                                <View className="bg-green-500 rounded-full p-2">
-                                  <Svg
-                                    width={24}
-                                    height={24}
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                  >
-                                    <Path
-                                      d="M4.5 12.75l6 6 9-13.5"
-                                      stroke="#fff"
-                                      strokeWidth={3}
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </Svg>
-                                </View>
-                              </Animated.View>
-                            )}
-                          </>
-                        )}
-                      </TouchableOpacity>
-                      {frontendAttempts > 0 && (
-                        <Text className="text-gray-400 text-sm font-barlow">
-                          {frontendAttempts} attempt
-                          {frontendAttempts !== 1 ? 's' : ''}
-                        </Text>
-                      )}
+                      <Text className="text-green-400 text-xs font-barlow-700">
+                        {currentXp.baseXp} XP
+                      </Text>
                     </View>
-
-                    <View className="flex-1 items-center gap-2">
-                      <TouchableOpacity
-                        onPress={handleQuickComplete}
-                        disabled={isCompletionLoading}
-                        className="bg-green-400/45 border border-green-400 px-5 py-3 rounded-full relative overflow-hidden"
+                    {currentXp.xpExtrapolated.map((extrapolated) => (
+                      <View
+                        key={extrapolated.type}
+                        className="flex-row justify-between"
                       >
-                        {isCompletionLoading ? (
-                          <ActivityIndicator color="#fff" />
-                        ) : (
-                          <>
-                            <Text
-                              className="text-white text-xl font-barlow-600"
-                              style={{ opacity: showCompleteSuccess ? 0 : 1 }}
-                            >
-                              Complete
-                            </Text>
-                            {showCompleteSuccess && (
-                              <Animated.View
-                                style={{
-                                  position: 'absolute',
-                                  top: 0,
-                                  left: 0,
-                                  right: 0,
-                                  bottom: 0,
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                  transform: [{ scale: completeScale }],
-                                  opacity: completeOpacity,
-                                }}
-                              >
-                                <View className="bg-green-500 rounded-full p-2">
-                                  <Svg
-                                    width={24}
-                                    height={24}
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                  >
-                                    <Path
-                                      d="M4.5 12.75l6 6 9-13.5"
-                                      stroke="#fff"
-                                      strokeWidth={3}
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </Svg>
-                                </View>
-                              </Animated.View>
-                            )}
-                          </>
-                        )}
-                      </TouchableOpacity>
-                      {(frontendCompletions > 0 || isFrontendCompleted) && (
-                        <Text className="text-gray-400 text-sm font-barlow">
-                          {frontendCompletions} send
-                          {frontendCompletions !== 1 ? 's' : ''}
+                        <Text className="text-gray-300 text-xs font-barlow">
+                          {extrapolated.type}:
                         </Text>
-                      )}
-                    </View>
+                        <Text
+                          className={cn(
+                            'text-xs font-barlow-700',
+                            extrapolated.xp > 0
+                              ? 'text-green-400'
+                              : 'text-red-400'
+                          )}
+                        >
+                          {extrapolated.xp > 0 ? '+' : ''}
+                          {extrapolated.xp} XP
+                        </Text>
+                      </View>
+                    ))}
                   </View>
+                )}
+              </Pressable>
+            )}
 
-                  {/* Grade Selection */}
-                  {!userGrade &&
-                    grade.toLowerCase() !== 'vfeature' &&
+            {/* Route Info Card */}
+            <Pressable
+              onPress={(e) => e.stopPropagation()}
+              className={cn(
+                'bg-slate-900/90 p-6 rounded-lg w-full max-w-sm border-2',
+                getRouteTileStyles(color)
+              )}
+            >
+              {/* Close Button */}
+              <TouchableOpacity
+                onPress={onCancel}
+                className="absolute top-4 right-4 z-10"
+              >
+                <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+                  <Path
+                    d="M6 18L18 6M6 6l12 12"
+                    stroke="#fff"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </Svg>
+              </TouchableOpacity>
+
+              {/* Route Header */}
+              <View className="flex-row gap-3 items-center mb-6">
+                {(frontendCompletions > 0 || isFrontendCompleted) && (
+                  <View className="bg-green-400 rounded-full w-10 h-10 items-center justify-center">
+                    <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+                      <Path
+                        d="M4.5 12.75l6 6 9-13.5"
+                        stroke="#000"
+                        strokeWidth={3}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </Svg>
+                  </View>
+                )}
+                <View className="flex-1">
+                  <Text
+                    className="text-white text-3xl font-barlow-700"
+                    numberOfLines={1}
+                  >
+                    {name}
+                  </Text>
+                  <Text className="text-gray-300 text-xl italic font-barlow">
+                    {gradeMapped}
+                  </Text>
+                  {grade.toLowerCase() !== 'vfeature' &&
                     grade.toLowerCase() !== '5.feature' && (
-                      <View className="items-center gap-3 mt-4">
-                        <Text className="text-white text-lg font-barlow-600">
-                          Grade it Yourself!
+                      <Text className="text-gray-400 text-sm font-barlow mt-1">
+                        Community Grade:{' '}
+                        <Text className="font-barlow-700">
+                          {frontendCommunityGrade === 'none' ||
+                            !frontendCommunityGrade
+                            ? 'N/A'
+                            : frontendCommunityGrade}
                         </Text>
-                        <View className="w-full">
-                          <TouchableOpacity
-                            onPress={() =>
-                              setShowGradeDropdown(!showGradeDropdown)
-                            }
-                            className={cn(
-                              'w-full px-4 py-3 rounded-lg border flex-row items-center justify-between',
-                              selectedGrade
-                                ? 'bg-green-500/20 border-green-400'
-                                : 'bg-gray-600/45 border-gray-300'
-                            )}
-                          >
-                            <Text
+                      </Text>
+                    )}
+                </View>
+              </View>
+
+              {!user ? (
+                <View className="items-center gap-4">
+                  <Text className="text-white text-lg text-center font-barlow">
+                    To complete or attempt this route you must be signed in
+                  </Text>
+                </View>
+              ) : (
+                <ScrollView className="max-h-96">
+                  <View className="gap-4">
+                    {/* Complete and Attempt Buttons */}
+                    <View className="flex-row justify-between gap-4">
+                      <View className="flex-1 items-center gap-2">
+                        <TouchableOpacity
+                          onPress={handleRouteAttempt}
+                          disabled={isAttemptLoading}
+                          className="bg-gray-400/45 border border-gray-300 px-5 py-3 rounded-full relative overflow-hidden"
+                        >
+                          {isAttemptLoading ? (
+                            <ActivityIndicator color="#fff" />
+                          ) : (
+                            <>
+                              <Text
+                                className="text-white text-xl font-barlow-600"
+                                style={{ opacity: showAttemptSuccess ? 0 : 1 }}
+                              >
+                                Attempt
+                              </Text>
+                              {showAttemptSuccess && (
+                                <Animated.View
+                                  style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    transform: [{ scale: attemptScale }],
+                                    opacity: attemptOpacity,
+                                  }}
+                                >
+                                  <View className="bg-green-500 rounded-full p-2">
+                                    <Svg
+                                      width={24}
+                                      height={24}
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <Path
+                                        d="M4.5 12.75l6 6 9-13.5"
+                                        stroke="#fff"
+                                        strokeWidth={3}
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                    </Svg>
+                                  </View>
+                                </Animated.View>
+                              )}
+                            </>
+                          )}
+                        </TouchableOpacity>
+                        {frontendAttempts > 0 && (
+                          <Text className="text-gray-400 text-sm font-barlow">
+                            {frontendAttempts} attempt
+                            {frontendAttempts !== 1 ? 's' : ''}
+                          </Text>
+                        )}
+                      </View>
+
+                      <View className="flex-1 items-center gap-2">
+                        <TouchableOpacity
+                          onPress={handleQuickComplete}
+                          disabled={isCompletionLoading}
+                          className="bg-green-400/45 border border-green-400 px-5 py-3 rounded-full relative overflow-hidden"
+                        >
+                          {isCompletionLoading ? (
+                            <ActivityIndicator color="#fff" />
+                          ) : (
+                            <>
+                              <Text
+                                className="text-white text-xl font-barlow-600"
+                                style={{ opacity: showCompleteSuccess ? 0 : 1 }}
+                              >
+                                Complete
+                              </Text>
+                              {showCompleteSuccess && (
+                                <Animated.View
+                                  style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    transform: [{ scale: completeScale }],
+                                    opacity: completeOpacity,
+                                  }}
+                                >
+                                  <View className="bg-green-500 rounded-full p-2">
+                                    <Svg
+                                      width={24}
+                                      height={24}
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                    >
+                                      <Path
+                                        d="M4.5 12.75l6 6 9-13.5"
+                                        stroke="#fff"
+                                        strokeWidth={3}
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                    </Svg>
+                                  </View>
+                                </Animated.View>
+                              )}
+                            </>
+                          )}
+                        </TouchableOpacity>
+                        {(frontendCompletions > 0 || isFrontendCompleted) && (
+                          <Text className="text-gray-400 text-sm font-barlow">
+                            {frontendCompletions} send
+                            {frontendCompletions !== 1 ? 's' : ''}
+                          </Text>
+                        )}
+                      </View>
+                    </View>
+
+                    {/* Grade Selection */}
+                    {!userGrade &&
+                      grade.toLowerCase() !== 'vfeature' &&
+                      grade.toLowerCase() !== '5.feature' && (
+                        <View className="items-center gap-3 mt-4">
+                          <Text className="text-white text-lg font-barlow-600">
+                            Grade it Yourself!
+                          </Text>
+                          <View className="w-full">
+                            <TouchableOpacity
+                              onPress={() =>
+                                setShowGradeDropdown(!showGradeDropdown)
+                              }
                               className={cn(
-                                'font-barlow-600',
+                                'w-full px-4 py-3 rounded-lg border flex-row items-center justify-between',
                                 selectedGrade
-                                  ? 'text-green-400'
-                                  : 'text-gray-400'
+                                  ? 'bg-green-500/20 border-green-400'
+                                  : 'bg-gray-600/45 border-gray-300'
                               )}
                             >
-                              {selectedGrade || 'Select a grade...'}
-                            </Text>
-                            <Svg
-                              width={20}
-                              height={20}
-                              viewBox="0 0 24 24"
-                              fill="none"
-                            >
-                              <Path
-                                d={
-                                  showGradeDropdown
-                                    ? 'M5 15l7-7 7 7'
-                                    : 'M19 9l-7 7-7-7'
-                                }
-                                stroke={selectedGrade ? '#22c55e' : '#9ca3af'}
-                                strokeWidth={2}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </Svg>
-                          </TouchableOpacity>
-
-                          {/* Dropdown Options */}
-                          {showGradeDropdown && (
-                            <View className="mt-2 w-full bg-gray-800 border border-gray-600 rounded-lg max-h-48">
-                              <ScrollView
-                                showsVerticalScrollIndicator={false}
-                                className="max-h-48"
+                              <Text
+                                className={cn(
+                                  'font-barlow-600',
+                                  selectedGrade
+                                    ? 'text-green-400'
+                                    : 'text-gray-400'
+                                )}
                               >
-                                {gradeRange.map((gradeOption) => (
-                                  <TouchableOpacity
-                                    key={gradeOption}
-                                    onPress={() => {
-                                      setSelectedGrade(gradeOption);
-                                      setShowGradeDropdown(false);
-                                    }}
-                                    className={cn(
-                                      'px-4 py-3 border-b border-gray-700',
-                                      selectedGrade === gradeOption
-                                        ? 'bg-green-500/20'
-                                        : 'bg-transparent'
-                                    )}
-                                  >
-                                    <Text
+                                {selectedGrade || 'Select a grade...'}
+                              </Text>
+                              <Svg
+                                width={20}
+                                height={20}
+                                viewBox="0 0 24 24"
+                                fill="none"
+                              >
+                                <Path
+                                  d={
+                                    showGradeDropdown
+                                      ? 'M5 15l7-7 7 7'
+                                      : 'M19 9l-7 7-7-7'
+                                  }
+                                  stroke={selectedGrade ? '#22c55e' : '#9ca3af'}
+                                  strokeWidth={2}
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </Svg>
+                            </TouchableOpacity>
+
+                            {/* Dropdown Options */}
+                            {showGradeDropdown && (
+                              <View className="mt-2 w-full bg-gray-800 border border-gray-600 rounded-lg max-h-48">
+                                <ScrollView
+                                  showsVerticalScrollIndicator={false}
+                                  className="max-h-48"
+                                >
+                                  {gradeRange.map((gradeOption) => (
+                                    <TouchableOpacity
+                                      key={gradeOption}
+                                      onPress={() => {
+                                        setSelectedGrade(gradeOption);
+                                        setShowGradeDropdown(false);
+                                      }}
                                       className={cn(
-                                        'font-barlow-600',
+                                        'px-4 py-3 border-b border-gray-700',
                                         selectedGrade === gradeOption
-                                          ? 'text-green-400'
-                                          : 'text-white'
+                                          ? 'bg-green-500/20'
+                                          : 'bg-transparent'
                                       )}
                                     >
-                                      {gradeOption}
-                                    </Text>
-                                  </TouchableOpacity>
-                                ))}
-                              </ScrollView>
-                            </View>
+                                      <Text
+                                        className={cn(
+                                          'font-barlow-600',
+                                          selectedGrade === gradeOption
+                                            ? 'text-green-400'
+                                            : 'text-white'
+                                        )}
+                                      >
+                                        {gradeOption}
+                                      </Text>
+                                    </TouchableOpacity>
+                                  ))}
+                                </ScrollView>
+                              </View>
+                            )}
+                          </View>
+                          {selectedGrade !== '' && !frontendCommunityGrade && (
+                            <TouchableOpacity
+                              onPress={handleGradeSubmission}
+                              disabled={isGradeLoading}
+                              className="bg-green-500 px-4 py-2 rounded-full relative overflow-hidden"
+                            >
+                              {isGradeLoading ? (
+                                <ActivityIndicator color="#fff" />
+                              ) : (
+                                <>
+                                  <Text
+                                    className="text-white text-lg font-barlow-600"
+                                    style={{ opacity: showGradeSuccess ? 0 : 1 }}
+                                  >
+                                    Submit
+                                  </Text>
+                                  {showGradeSuccess && (
+                                    <Animated.View
+                                      style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        transform: [{ scale: gradeScale }],
+                                        opacity: gradeOpacity,
+                                      }}
+                                    >
+                                      <View className="bg-green-600 rounded-full p-1.5">
+                                        <Svg
+                                          width={20}
+                                          height={20}
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                        >
+                                          <Path
+                                            d="M4.5 12.75l6 6 9-13.5"
+                                            stroke="#fff"
+                                            strokeWidth={3}
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          />
+                                        </Svg>
+                                      </View>
+                                    </Animated.View>
+                                  )}
+                                </>
+                              )}
+                            </TouchableOpacity>
                           )}
                         </View>
-                        {selectedGrade !== '' && !frontendCommunityGrade && (
-                          <TouchableOpacity
-                            onPress={handleGradeSubmission}
-                            disabled={isGradeLoading}
-                            className="bg-green-500 px-4 py-2 rounded-full relative overflow-hidden"
-                          >
-                            {isGradeLoading ? (
-                              <ActivityIndicator color="#fff" />
-                            ) : (
-                              <>
-                                <Text
-                                  className="text-white text-lg font-barlow-600"
-                                  style={{ opacity: showGradeSuccess ? 0 : 1 }}
-                                >
-                                  Submit
-                                </Text>
-                                {showGradeSuccess && (
-                                  <Animated.View
-                                    style={{
-                                      position: 'absolute',
-                                      top: 0,
-                                      left: 0,
-                                      right: 0,
-                                      bottom: 0,
-                                      justifyContent: 'center',
-                                      alignItems: 'center',
-                                      transform: [{ scale: gradeScale }],
-                                      opacity: gradeOpacity,
-                                    }}
-                                  >
-                                    <View className="bg-green-600 rounded-full p-1.5">
-                                      <Svg
-                                        width={20}
-                                        height={20}
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                      >
-                                        <Path
-                                          d="M4.5 12.75l6 6 9-13.5"
-                                          stroke="#fff"
-                                          strokeWidth={3}
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                        />
-                                      </Svg>
-                                    </View>
-                                  </Animated.View>
-                                )}
-                              </>
-                            )}
-                          </TouchableOpacity>
-                        )}
+                      )}
+
+                    {userGrade && (
+                      <View className="items-center mt-4">
+                        <Text className="text-white text-center font-barlow">
+                          You graded this climb a{' '}
+                          <Text className="font-barlow-700">
+                            {userGrade.toUpperCase()}
+                          </Text>
+                        </Text>
                       </View>
                     )}
 
-                  {userGrade && (
-                    <View className="items-center mt-4">
-                      <Text className="text-white text-center font-barlow">
-                        You graded this climb a{' '}
-                        <Text className="font-barlow-700">
-                          {userGrade.toUpperCase()}
-                        </Text>
+                    {/* Options */}
+                    <View className="mt-4">
+                      <Text className="text-white text-lg font-barlow-600 mb-3">
+                        Options
                       </Text>
-                    </View>
-                  )}
-
-                  {/* Options */}
-                  <View className="mt-4">
-                    <Text className="text-white text-lg font-barlow-600 mb-3">
-                      Options
-                    </Text>
-                    <View className="bg-gray-600/45 border border-gray-300 p-4 rounded-lg gap-4">
-                      {/* Today Toggle */}
-                      <View className="flex-row items-center gap-3">
-                        <TouchableOpacity
-                          onPress={() => setIsToday(!isToday)}
-                          className={cn(
-                            'w-6 h-6 rounded-full items-center justify-center',
-                            isToday
-                              ? 'bg-green-400/45 border border-green-400'
-                              : 'bg-gray-600'
-                          )}
-                        >
-                          {isToday && (
-                            <Svg
-                              width={16}
-                              height={16}
-                              viewBox="0 0 24 24"
-                              fill="none"
-                            >
-                              <Path
-                                d="M4.5 12.75l6 6 9-13.5"
-                                stroke="#22c55e"
-                                strokeWidth={2}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </Svg>
-                          )}
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => {
-                            if (!isToday) {
-                              setShowDatePicker(true);
-                            }
-                          }}
-                          disabled={isToday}
-                          className="flex-1"
-                        >
-                          <Text className="text-white font-barlow">
-                            Completion Date is{' '}
-                            {isToday ? (
-                              <Text className="text-green-400">Today</Text>
-                            ) : (
-                              <Text className="text-blue-400 underline">
-                                {completionDate.toLocaleDateString()}
-                              </Text>
+                      <View className="bg-gray-600/45 border border-gray-300 p-4 rounded-lg gap-4">
+                        {/* Today Toggle */}
+                        <View className="flex-row items-center gap-3">
+                          <TouchableOpacity
+                            onPress={() => setIsToday(!isToday)}
+                            className={cn(
+                              'w-6 h-6 rounded-full items-center justify-center',
+                              isToday
+                                ? 'bg-green-400/45 border border-green-400'
+                                : 'bg-gray-600'
                             )}
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
+                          >
+                            {isToday && (
+                              <Svg
+                                width={16}
+                                height={16}
+                                viewBox="0 0 24 24"
+                                fill="none"
+                              >
+                                <Path
+                                  d="M4.5 12.75l6 6 9-13.5"
+                                  stroke="#22c55e"
+                                  strokeWidth={2}
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </Svg>
+                            )}
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() => {
+                              if (!isToday) {
+                                setShowDatePicker(true);
+                              }
+                            }}
+                            disabled={isToday}
+                            className="flex-1"
+                          >
+                            <Text className="text-white font-barlow">
+                              Completion Date is{' '}
+                              {isToday ? (
+                                <Text className="text-green-400">Today</Text>
+                              ) : (
+                                <Text className="text-blue-400 underline">
+                                  {completionDate.toLocaleDateString()}
+                                </Text>
+                              )}
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
 
-                      {/* Flash Toggle */}
-                      <View className="flex-row items-center gap-3">
-                        <TouchableOpacity
-                          onPress={() => handleFlashModeToggle(!isFlash)}
-                          className={cn(
-                            'w-6 h-6 rounded-full items-center justify-center',
-                            isFlash
-                              ? 'bg-green-400/45 border border-green-400'
-                              : 'bg-gray-600'
-                          )}
-                        >
-                          {isFlash && (
-                            <Svg
-                              width={16}
-                              height={16}
-                              viewBox="0 0 24 24"
-                              fill="none"
-                            >
-                              <Path
-                                d="M4.5 12.75l6 6 9-13.5"
-                                stroke="#22c55e"
-                                strokeWidth={2}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </Svg>
-                          )}
-                        </TouchableOpacity>
-                        <Text className="text-white font-barlow flex-1">
-                          Flash Mode is{' '}
-                          {isFlash ? (
-                            <Text className="text-green-400">ON</Text>
-                          ) : (
-                            <Text className="text-red-400">OFF</Text>
-                          )}
-                        </Text>
+                        {/* Flash Toggle */}
+
                       </View>
                     </View>
                   </View>
-                </View>
-              </ScrollView>
-            )}
+                </ScrollView>
+              )}
+            </Pressable>
           </Pressable>
-        </Pressable>
 
-        {/* Date Picker */}
-        {showDatePicker && !isToday && (
-          <View className="bg-black rounded-lg p-4 flex items-center justify-center">
-            <DateTimePicker
-              value={completionDate}
-              mode="date"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              textColor="#ffffff"
-              themeVariant="dark"
-              onChange={(event, selectedDate) => {
-                if (Platform.OS === 'android') {
-                  setShowDatePicker(false);
-                }
-
-                if (event.type === 'set' && selectedDate) {
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-                  const selected = new Date(selectedDate);
-                  selected.setHours(0, 0, 0, 0);
-
-                  // Prevent selecting future dates
-                  if (selected > today) {
-                    setCompletionDate(today);
-                  } else {
-                    setCompletionDate(selectedDate);
+          {/* Date Picker */}
+          {showDatePicker && !isToday && (
+            <View className="bg-black rounded-lg p-4 flex items-center justify-center">
+              <DateTimePicker
+                value={completionDate}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                textColor="#ffffff"
+                themeVariant="dark"
+                onChange={(event, selectedDate) => {
+                  if (Platform.OS === 'android') {
+                    setShowDatePicker(false);
                   }
-                } else if (
-                  event.type === 'dismissed' &&
-                  Platform.OS === 'android'
-                ) {
-                  setShowDatePicker(false);
-                }
-              }}
-              maximumDate={new Date()}
-            />
-          </View>
-        )}
 
-        {/* iOS Date Picker Dismiss Button */}
-        {showDatePicker && Platform.OS === 'ios' && (
-          <View className="absolute bottom-0 left-0 right-0 bg-slate-900 border-t border-gray-700 p-4 px-8">
-            <View className="flex-row justify-end gap-3">
-              <TouchableOpacity
-                onPress={() => setShowDatePicker(false)}
-                className="px-6 py-2"
-              >
-                <Text className="text-gray-400 font-barlow">Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setShowDatePicker(false)}
-                className="px-6 py-2 bg-green-500 rounded-lg"
-              >
-                <Text className="text-white font-barlow-600">Done</Text>
-              </TouchableOpacity>
+                  if (event.type === 'set' && selectedDate) {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const selected = new Date(selectedDate);
+                    selected.setHours(0, 0, 0, 0);
+
+                    // Prevent selecting future dates
+                    if (selected > today) {
+                      setCompletionDate(today);
+                    } else {
+                      setCompletionDate(selectedDate);
+                    }
+                  } else if (
+                    event.type === 'dismissed' &&
+                    Platform.OS === 'android'
+                  ) {
+                    setShowDatePicker(false);
+                  }
+                }}
+                maximumDate={new Date()}
+              />
             </View>
-          </View>
-        )}
-      </BlurView>
+          )}
+
+          {/* iOS Date Picker Dismiss Button */}
+          {showDatePicker && Platform.OS === 'ios' && (
+            <View className="absolute bottom-0 left-0 right-0 bg-slate-900 border-t border-gray-700 p-4 px-8">
+              <View className="flex-row justify-end gap-3">
+                <TouchableOpacity
+                  onPress={() => setShowDatePicker(false)}
+                  className="px-6 py-2"
+                >
+                  <Text className="text-gray-400 font-barlow">Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setShowDatePicker(false)}
+                  className="px-6 py-2 bg-green-500 rounded-lg"
+                >
+                  <Text className="text-white font-barlow-600">Done</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </BlurView>
       </Animated.View>
     </Modal>
   );

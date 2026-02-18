@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Image,
+    Modal,
     Pressable,
     RefreshControl,
     ScrollView,
@@ -17,15 +18,33 @@ import {
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-// Leaderboard category (future-ready: only XP wired to API)
-export type LeaderboardCategoryId = 'xp' | 'highest_grade' | 'most_sends' | 'flash_count' | 'projects_completed';
+// Leaderboard category (future-ready: only XP and grade_points wired to API)
+export type LeaderboardCategoryId = 'xp' | 'grade_points' | 'most_sends' | 'flash_count' | 'projects_completed';
 
 const LEADERBOARD_CATEGORIES: { id: LeaderboardCategoryId; label: string }[] = [
     { id: 'xp', label: 'XP' },
-    { id: 'highest_grade', label: 'Highest grade' },
-    { id: 'most_sends', label: 'Most Sends' },
+    { id: 'grade_points', label: 'Grade points' },
 
 ];
+
+const LEADERBOARD_INFO: Record<string, string> = {
+    xp: 'XP leaderboard ranks climbers by experience points earned from completing routes. Monthly shows XP earned this month; Yearly shows your total all-time XP.',
+    grade_points:
+        'Grade points use a pyramid: 3 sends at a lower grade equal 1 send at the next grade up, so repeating easy grades doesn’t beat harder sends. You see each climber’s top two grades and how many sends (e.g. 2x V6, 3x V5). Boulder and Ropes are scored separately.',
+    most_sends: 'This leaderboard category is not available yet. Check back later.',
+    monthly: 'Ranking is based on activity in the current month only.',
+    yearly: 'Ranking is based on activity in the current year.',
+    boulder: 'Only boulder completions count. Grades from VB through V10.',
+    rope: 'Only rope (sport) completions count. Grades from 5.b through 5.13+.',
+};
+
+function InfoIcon({ className }: { className?: string }) {
+    return (
+        <View className={cn('ml-1.5 w-4 h-4 rounded-full bg-white/30 items-center justify-center', className)}>
+            <Text className="text-white font-plus-jakarta-700 text-[10px]">i</Text>
+        </View>
+    );
+}
 
 interface LeaderboardUser {
     id: string;
@@ -46,6 +65,48 @@ interface LeaderboardData {
     userMonthlyRank: number | null;
     userTotalRank: number | null;
     currentMonth: string;
+}
+
+export type GradePointsType = 'boulder' | 'rope';
+
+interface GradePointsEntry {
+    user: LeaderboardUser;
+    gradePoints: number;
+    topGrades: Array<{ grade: string; count: number }>;
+}
+
+interface GradePointsData {
+    entries: GradePointsEntry[];
+    userRank: number | null;
+    currentMonth: string;
+    period: 'monthly' | 'yearly';
+    type: GradePointsType;
+}
+
+/** Renders top grades as stacked lines (e.g. "2x V6" then "3x V5"). Full control over layout/styling via props. */
+function GradePointsDisplay({
+    topGrades,
+    type,
+    textClassName = 'text-green-400 font-plus-jakarta-700 text-xs',
+    containerClassName,
+}: {
+    topGrades: Array<{ grade: string; count: number }>;
+    type: GradePointsType;
+    textClassName?: string;
+    containerClassName?: string;
+}) {
+    return (
+        <View className={cn('items-center justify-center', containerClassName)}>
+            {topGrades.map(({ grade, count }) => {
+                const display = type === 'boulder' ? grade.toUpperCase() : grade;
+                return (
+                    <Text key={grade} className={textClassName}>
+                        {count}x {display}
+                    </Text>
+                );
+            })}
+        </View>
+    );
 }
 
 // Level indicator component
@@ -161,10 +222,13 @@ function PodiumBlock({
     topThree,
     isMonthly,
     onPressUser,
+    valueLabel,
 }: {
     topThree: { user: LeaderboardUser; value: number }[];
     isMonthly: boolean;
     onPressUser?: (user: LeaderboardUser) => void;
+    /** When set, shown instead of "shortenXp(value) XP" (e.g. for grade points). Return a React node for full layout control. */
+    valueLabel?: (entry: { user: LeaderboardUser; value: number }) => React.ReactNode;
 }) {
     if (topThree.length === 0) return null;
 
@@ -221,10 +285,12 @@ function PodiumBlock({
                         >
                             {user.username || user.name || 'Anonymous'}
                         </Text>
-                        <View className="mt-1 bg-slate-900/70 rounded-full px-2 py-0.5 border border-green-400/50">
-                            <Text className="text-green-400 font-plus-jakarta-700 text-xs">
-                                {shortenXp(value)} XP
-                            </Text>
+                        <View className={cn("mt-1 bg-slate-900/70  px-2 py-0.5 border border-green-400/50", valueLabel ? 'rounded-md' : 'rounded-full')}>
+                            {valueLabel ? valueLabel({ user, value }) : (
+                                <Text className="text-green-400 font-plus-jakarta-700 text-xs">
+                                    {shortenXp(value)} XP
+                                </Text>
+                            )}
                         </View>
                     </SlotWrapper>
                 );
@@ -240,12 +306,18 @@ function LeaderboardRow({
     index,
     isMonthly,
     onPressUser,
+    valueText,
+    valueNode,
 }: {
     user: LeaderboardUser;
     xp: number;
     index: number;
     isMonthly: boolean;
     onPressUser?: (user: LeaderboardUser) => void;
+    /** When set, shown instead of XP (legacy string) */
+    valueText?: string;
+    /** When set, shown instead of XP (full control – e.g. GradePointsDisplay) */
+    valueNode?: React.ReactNode;
 }) {
     const medal = getMedalIcon(index);
     const style = getRowStyle(index, isMonthly);
@@ -281,11 +353,13 @@ function LeaderboardRow({
                 </Text>
             </View>
 
-            {/* XP */}
-            <View className="ml-2 bg-slate-900/60 rounded-full px-3 py-1 border border-green-400/50">
-                <Text className="text-green-400 font-plus-jakarta-700 text-sm">
-                    {shortenXp(xp)} XP
-                </Text>
+            {/* XP or custom value (e.g. grade points) */}
+            <View className={cn("ml-2 bg-slate-900/60 rounded-full px-3 py-1 border border-green-400/50 items-center justify-center", valueNode ? 'rounded-md' : 'rounded-full')} >
+                {valueNode ?? (
+                    <Text className="text-green-400 font-plus-jakarta-700 text-sm">
+                        {valueText ?? `${shortenXp(xp)} XP`}
+                    </Text>
+                )}
             </View>
         </Wrapper>
     );
@@ -297,11 +371,14 @@ function UserPositionCard({
     rank,
     xp,
     isMonthly,
+    valueNode,
 }: {
     user: any;
     rank: number | null;
     xp: number;
     isMonthly: boolean;
+    /** When set (e.g. GradePointsDisplay), shown instead of XP */
+    valueNode?: React.ReactNode;
 }) {
     if (rank === null) {
         return (
@@ -343,11 +420,13 @@ function UserPositionCard({
                 </Text>
             </View>
 
-            {/* XP */}
-            <View className="ml-2 bg-slate-900/60 rounded-full px-3 py-1 border border-green-400/50">
-                <Text className="text-green-400 font-plus-jakarta-700 text-sm">
-                    {shortenXp(xp)} XP
-                </Text>
+            {/* XP or grade points */}
+            <View className={cn("ml-2 bg-slate-900/60 rounded-full px-3 py-1 border border-green-400/50 items-center justify-center", valueNode ? 'rounded-md' : 'rounded-full')} >
+                {valueNode ?? (
+                    <Text className="text-green-400 font-plus-jakarta-700 text-sm">
+                        {shortenXp(xp)} XP
+                    </Text>
+                )}
             </View>
         </View>
     );
@@ -364,6 +443,12 @@ export default function LeaderboardScreen() {
     const [refreshing, setRefreshing] = useState(false);
     const [profileUserId, setProfileUserId] = useState<string | null>(null);
     const [profileInitialData, setProfileInitialData] = useState<UserProfilePopupInitialData | null>(null);
+
+    const [gradePointsType, setGradePointsType] = useState<GradePointsType>('boulder');
+    const [gradePointsData, setGradePointsData] = useState<GradePointsData | null>(null);
+    const [gradePointsLoading, setGradePointsLoading] = useState(false);
+    const [gradePointsError, setGradePointsError] = useState<string | null>(null);
+    const [infoModalKey, setInfoModalKey] = useState<string | null>(null);
 
     const openUserProfile = useCallback((u: LeaderboardUser) => {
         setProfileUserId(u.id);
@@ -392,18 +477,50 @@ export default function LeaderboardScreen() {
         }
     }, []);
 
+    const fetchGradePoints = useCallback(async () => {
+        try {
+            setGradePointsError(null);
+            setGradePointsLoading(true);
+            const response = await api.getLeaderboardGradePoints({
+                type: gradePointsType,
+                period: isMonthly ? 'monthly' : 'yearly',
+            });
+            setGradePointsData(response);
+        } catch (err) {
+            console.error('Error fetching grade-points leaderboard:', err);
+            setGradePointsError('Failed to load leaderboard');
+        } finally {
+            setGradePointsLoading(false);
+            setRefreshing(false);
+        }
+    }, [gradePointsType, isMonthly]);
+
     useEffect(() => {
         fetchLeaderboard();
     }, [fetchLeaderboard]);
 
+    useEffect(() => {
+        if (category === 'grade_points') {
+            fetchGradePoints();
+        }
+    }, [category, fetchGradePoints]);
+
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        fetchLeaderboard();
-    }, [fetchLeaderboard]);
+        if (category === 'grade_points') {
+            fetchGradePoints();
+        } else {
+            fetchLeaderboard();
+        }
+    }, [category, fetchLeaderboard, fetchGradePoints]);
 
     // Get current list based on mode (monthly vs yearly)
     const currentList = isMonthly ? data?.monthly || [] : data?.total || [];
     const userRank = isMonthly ? data?.userMonthlyRank : data?.userTotalRank;
+
+    const showingLoading = (category === 'xp' && isLoading) || (category === 'grade_points' && gradePointsLoading);
+    const showingError = (category === 'xp' && error) || (category === 'grade_points' && gradePointsError);
+    const retryFetch = category === 'grade_points' ? fetchGradePoints : fetchLeaderboard;
 
     // Get user's XP for position card
     const getUserXp = () => {
@@ -416,28 +533,10 @@ export default function LeaderboardScreen() {
         return entry?.totalXp || 0;
     };
 
-    if (isLoading) {
-        return (
-            <SafeScreen className="bg-black justify-center items-center">
-                <ActivityIndicator size="large" color="#fff" />
-                <Text className="text-white mt-4 font-plus-jakarta">Loading leaderboard...</Text>
-            </SafeScreen>
-        );
-    }
-
-    if (error) {
-        return (
-            <SafeScreen className="bg-black justify-center items-center p-6">
-                <Text className="text-red-500 text-lg mb-4 font-plus-jakarta-600">{error}</Text>
-                <TouchableOpacity
-                    onPress={fetchLeaderboard}
-                    className="bg-blue-500/25 border border-blue-500 rounded-lg px-4 py-2"
-                >
-                    <Text className="text-white font-plus-jakarta-600">Try Again</Text>
-                </TouchableOpacity>
-            </SafeScreen>
-        );
-    }
+    const currentUserGradePointsEntry =
+        category === 'grade_points' && gradePointsData && user
+            ? gradePointsData.entries.find((e) => e.user.id === user.id)
+            : null;
 
     return (
         <SafeScreen className="bg-black">
@@ -468,31 +567,59 @@ export default function LeaderboardScreen() {
                         className="mb-4 -mx-4 px-4"
                         contentContainerStyle={{ gap: 8 }}
                     >
-                        {LEADERBOARD_CATEGORIES.map((cat) => (
-                            <TouchableOpacity
-                                key={cat.id}
-                                onPress={() => setCategory(cat.id)}
-                                className={cn(
-                                    'px-4 py-2.5 rounded-full border',
-                                    category === cat.id
-                                        ? 'bg-white/15 border-white/50'
-                                        : 'bg-white/5 border-white/20'
-                                )}
-                            >
-                                <Text
+                        {LEADERBOARD_CATEGORIES.map((cat) => {
+                            const isSelected = category === cat.id;
+                            return (
+                                <TouchableOpacity
+                                    key={cat.id}
+                                    onPress={() => {
+                                        if (isSelected) setInfoModalKey(cat.id);
+                                        else setCategory(cat.id);
+                                    }}
                                     className={cn(
-                                        'font-plus-jakarta-600 text-sm',
-                                        category === cat.id ? 'text-white' : 'text-gray-400'
+                                        'flex-row items-center px-4 py-2.5 rounded-full border',
+                                        isSelected ? 'bg-white/15 border-white/50' : 'bg-white/5 border-white/20'
                                     )}
                                 >
-                                    {cat.label}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
+                                    <Text
+                                        className={cn(
+                                            'font-plus-jakarta-600 text-sm',
+                                            isSelected ? 'text-white' : 'text-gray-400'
+                                        )}
+                                    >
+                                        {cat.label}
+                                    </Text>
+                                    {isSelected && <InfoIcon />}
+                                </TouchableOpacity>
+                            );
+                        })}
                     </ScrollView>
 
-                    {/* User Position Section (only for XP) */}
-                    {category === 'xp' && (
+                    {/* Inline error: XP only; grade points shows error inside its section */}
+                    {showingError && category === 'xp' && (
+                        <View className="mb-6 py-6 items-center">
+                            <Text className="text-red-500 text-lg mb-4 font-plus-jakarta-600 text-center">
+                                {error}
+                            </Text>
+                            <TouchableOpacity
+                                onPress={retryFetch}
+                                className="bg-blue-500/25 border border-blue-500 rounded-lg px-4 py-2"
+                            >
+                                <Text className="text-white font-plus-jakarta-600">Try Again</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+
+                    {/* Inline loading: only for XP; grade points uses per-section loaders so toggles stay visible */}
+                    {category === 'xp' && showingLoading && !refreshing && !showingError && (
+                        <View className="py-12 items-center justify-center">
+                            <ActivityIndicator size="large" color="#fff" />
+                            <Text className="text-white mt-4 font-plus-jakarta">Loading leaderboard...</Text>
+                        </View>
+                    )}
+
+                    {/* User Position Section (XP) - when loaded and no error */}
+                    {!showingLoading && !showingError && category === 'xp' && (
                         <View className="mb-6">
                             <Text className="text-white text-lg font-plus-jakarta-600 mb-2">
                                 Your Position{' '}
@@ -509,8 +636,280 @@ export default function LeaderboardScreen() {
                         </View>
                     )}
 
-                    {/* Non-XP: Coming soon */}
-                    {category !== 'xp' && (
+                    {/* Grade Points: toggles always visible; only Your Position, Podium, and Rows show loading */}
+                    {category === 'grade_points' && (
+                        <>
+                            {/* Your Position: label always; card shows loader or data */}
+                            <View className="mb-6">
+                                <Text className="text-white text-lg font-plus-jakarta-600 mb-2">
+                                    Your Position{' '}
+                                    <Text className="text-gray-400 text-sm">
+                                        ({gradePointsType}, {isMonthly ? 'monthly' : 'yearly'})
+                                    </Text>
+                                </Text>
+                                {gradePointsLoading ? (
+                                    <View className="rounded-xl bg-white/5 border border-white/10 p-4 items-center justify-center min-h-[80px]">
+                                        <ActivityIndicator size="small" color="#fff" />
+                                    </View>
+                                ) : showingError && category === 'grade_points' ? (
+                                    <View className="rounded-xl bg-white/5 border border-white/10 p-4 items-center">
+                                        <Text className="text-red-500 text-sm font-plus-jakarta-600 mb-2">
+                                            {gradePointsError}
+                                        </Text>
+                                        <TouchableOpacity
+                                            onPress={fetchGradePoints}
+                                            className="bg-blue-500/25 border border-blue-500 rounded-lg px-3 py-2"
+                                        >
+                                            <Text className="text-white font-plus-jakarta-600 text-sm">Try Again</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                ) : gradePointsData && user ? (
+                                    <UserPositionCard
+                                        user={user}
+                                        rank={gradePointsData.userRank}
+                                        xp={0}
+                                        isMonthly={isMonthly}
+                                        valueNode={
+                                            currentUserGradePointsEntry ? (
+                                                <GradePointsDisplay
+                                                    topGrades={currentUserGradePointsEntry.topGrades}
+                                                    type={gradePointsType}
+                                                    textClassName="text-green-400 font-plus-jakarta-700 text-sm"
+                                                />
+                                            ) : undefined
+                                        }
+                                    />
+                                ) : (
+                                    <View className="rounded-xl bg-white/5 border border-white/10 p-4 items-center justify-center min-h-[80px]">
+                                        <ActivityIndicator size="small" color="#fff" />
+                                    </View>
+                                )}
+                            </View>
+                            {/* Date title + Boulder/Rope + Monthly/Yearly toggles - always visible */}
+                            <View className="flex-row items-center justify-between mb-4">
+
+                                <View className="flex-row gap-2 mb-6">
+                                    <View className="flex-row rounded-full bg-white/10 p-0.5">
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                if (gradePointsType === 'boulder') setInfoModalKey('boulder');
+                                                else {
+                                                    setGradePointsType('boulder');
+                                                    setShowAll(false);
+                                                }
+                                            }}
+                                            className={cn(
+                                                'flex-row items-center px-3 py-2 rounded-full',
+                                                gradePointsType === 'boulder' && 'bg-amber-500/50 border border-amber-500'
+                                            )}
+                                        >
+                                            <Text
+                                                className={cn(
+                                                    'font-plus-jakarta-600 text-sm',
+                                                    gradePointsType === 'boulder' ? 'text-white' : 'text-gray-400'
+                                                )}
+                                            >
+                                                Boulder
+                                            </Text>
+                                            {gradePointsType === 'boulder' && <InfoIcon className="bg-amber-400/40" />}
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                if (gradePointsType === 'rope') setInfoModalKey('rope');
+                                                else {
+                                                    setGradePointsType('rope');
+                                                    setShowAll(false);
+                                                }
+                                            }}
+                                            className={cn(
+                                                'flex-row items-center px-3 py-2 rounded-full',
+                                                gradePointsType === 'rope' && 'bg-amber-500/50 border border-amber-500'
+                                            )}
+                                        >
+                                            <Text
+                                                className={cn(
+                                                    'font-plus-jakarta-600 text-sm',
+                                                    gradePointsType === 'rope' ? 'text-white' : 'text-gray-400'
+                                                )}
+                                            >
+                                                Ropes
+                                            </Text>
+                                            {gradePointsType === 'rope' && <InfoIcon className="bg-amber-400/40" />}
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View className="flex-row rounded-full bg-white/10 p-0.5">
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                if (isMonthly) setInfoModalKey('monthly');
+                                                else {
+                                                    setIsMonthly(true);
+                                                    setShowAll(false);
+                                                }
+                                            }}
+                                            className={cn(
+                                                'flex-row items-center px-3 py-2 rounded-full',
+                                                isMonthly && 'bg-blue-500/50 border border-blue-500'
+                                            )}
+                                        >
+                                            <Text
+                                                className={cn(
+                                                    'font-plus-jakarta-600 text-sm',
+                                                    isMonthly ? 'text-white' : 'text-gray-400'
+                                                )}
+                                            >
+                                                {isMonthly ? 'This Month' : 'Monthly'}
+                                            </Text>
+                                            {isMonthly && <InfoIcon className="bg-blue-400/40" />}
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                if (!isMonthly) setInfoModalKey('yearly');
+                                                else {
+                                                    setIsMonthly(false);
+                                                    setShowAll(false);
+                                                }
+                                            }}
+                                            className={cn(
+                                                'flex-row items-center px-3 py-2 rounded-full',
+                                                !isMonthly && 'bg-purple-500/50 border border-purple-500'
+                                            )}
+                                        >
+                                            <Text
+                                                className={cn(
+                                                    'font-plus-jakarta-600 text-sm',
+                                                    !isMonthly ? 'text-white' : 'text-gray-400'
+                                                )}
+                                            >
+                                                {isMonthly ? 'Yearly' : 'This Year'}
+                                            </Text>
+                                            {!isMonthly && <InfoIcon className="bg-purple-400/40" />}
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                            {/* Podium + Rows: loader here only when loading; otherwise data or empty */}
+                            {gradePointsLoading ? (
+                                <View className="py-12 items-center justify-center">
+                                    <ActivityIndicator size="large" color="#fff" />
+                                    <Text className="text-white mt-3 font-plus-jakarta text-sm">Loading rankings...</Text>
+                                </View>
+                            ) : showingError && category === 'grade_points' ? (
+                                <View className="py-6 items-center">
+                                    <Text className="text-red-500 font-plus-jakarta-600 mb-2">{gradePointsError}</Text>
+                                    <TouchableOpacity
+                                        onPress={fetchGradePoints}
+                                        className="bg-blue-500/25 border border-blue-500 rounded-lg px-4 py-2"
+                                    >
+                                        <Text className="text-white font-plus-jakarta-600">Try Again</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            ) : gradePointsData?.entries.length === 0 ? (
+                                <View className="items-center py-8">
+                                    <Text className="text-2xl mb-2">📊</Text>
+                                    <Text className="text-white font-plus-jakarta-600">No data available</Text>
+                                    <Text className="text-gray-400 text-sm mt-1">
+                                        Start climbing to appear on the leaderboard!
+                                    </Text>
+                                </View>
+                            ) : gradePointsData ? (
+                                <View>
+                                    {gradePointsData.entries.length >= 3 && (
+                                        <PodiumBlock
+                                            onPressUser={openUserProfile}
+                                            topThree={gradePointsData.entries.slice(0, 3).map((e) => ({
+                                                user: e.user,
+                                                value: e.gradePoints,
+                                            }))}
+                                            isMonthly={isMonthly}
+                                            valueLabel={({ user: u }) => {
+                                                const entry = gradePointsData.entries.find((x) => x.user.id === u.id);
+                                                return entry ? (
+                                                    <GradePointsDisplay
+                                                        topGrades={entry.topGrades}
+                                                        type={gradePointsType}
+                                                        textClassName="text-green-400 font-plus-jakarta-700 text-xs"
+                                                    />
+                                                ) : null;
+                                            }}
+                                        />
+                                    )}
+                                    {gradePointsData.entries.length < 3 && gradePointsData.entries.length > 0 && (
+                                        <View className="gap-3 mb-4">
+                                            {gradePointsData.entries.map((entry, index) => (
+                                                <LeaderboardRow
+                                                    key={entry.user.id}
+                                                    user={entry.user}
+                                                    xp={0}
+                                                    index={index}
+                                                    isMonthly={isMonthly}
+                                                    onPressUser={openUserProfile}
+                                                    valueNode={
+                                                        <GradePointsDisplay
+                                                            topGrades={entry.topGrades}
+                                                            type={gradePointsType}
+                                                            textClassName="text-green-400 font-plus-jakarta-700 text-sm"
+                                                        />
+                                                    }
+                                                />
+                                            ))}
+                                        </View>
+                                    )}
+                                    {gradePointsData.entries.length >= 3 && (
+                                        <View className="gap-3">
+                                            {(showAll
+                                                ? gradePointsData.entries.slice(3)
+                                                : gradePointsData.entries.slice(3, 10)
+                                            ).map((entry, index) => {
+                                                const actualIndex = index + 3;
+                                                return (
+                                                    <LeaderboardRow
+                                                        key={entry.user.id}
+                                                        user={entry.user}
+                                                        xp={0}
+                                                        index={actualIndex}
+                                                        isMonthly={isMonthly}
+                                                        onPressUser={openUserProfile}
+                                                        valueNode={
+                                                            <GradePointsDisplay
+                                                                topGrades={entry.topGrades}
+                                                                type={gradePointsType}
+                                                                textClassName="text-green-400 font-plus-jakarta-700 text-sm"
+                                                            />
+                                                        }
+                                                    />
+                                                );
+                                            })}
+                                            {gradePointsData.entries.length > 10 && (
+                                                <TouchableOpacity
+                                                    onPress={() => setShowAll(!showAll)}
+                                                    className={cn(
+                                                        'mt-2 p-3 rounded-lg',
+                                                        isMonthly
+                                                            ? 'bg-blue-500/25 border border-blue-500'
+                                                            : 'bg-purple-500/25 border border-purple-500'
+                                                    )}
+                                                >
+                                                    <Text className="text-white text-center font-plus-jakarta-600">
+                                                        {showAll
+                                                            ? 'Show Less'
+                                                            : `Show All (${gradePointsData.entries.length})`}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            )}
+                                        </View>
+                                    )}
+                                </View>
+                            ) : (
+                                <View className="py-12 items-center justify-center">
+                                    <ActivityIndicator size="large" color="#fff" />
+                                    <Text className="text-white mt-3 font-plus-jakarta text-sm">Loading rankings...</Text>
+                                </View>
+                            )}
+                        </>
+                    )}
+
+                    {/* Other categories: Coming soon */}
+                    {category !== 'xp' && category !== 'grade_points' && (
                         <View className="items-center py-12 px-4">
                             <Text className="text-4xl mb-3">🏔️</Text>
                             <Text className="text-white font-plus-jakarta-600 text-lg text-center">
@@ -522,23 +921,22 @@ export default function LeaderboardScreen() {
                         </View>
                     )}
 
-                    {/* XP: Timeframe toggle and leaderboard */}
-                    {category === 'xp' && (
+                    {/* XP: Timeframe toggle and leaderboard (only when loaded, no loading/error) */}
+                    {!showingLoading && !showingError && category === 'xp' && (
                         <>
                             <View className="flex-row items-center justify-between mb-10">
-                                <Text className="text-white text-xl font-plus-jakarta-700">
-                                    {isMonthly
-                                        ? `${data?.currentMonth || 'Monthly'}. XP`
-                                        : `${new Date().getFullYear()} XP`}
-                                </Text>
+
                                 <View className="flex-row rounded-full bg-white/10 p-0.5">
                                     <TouchableOpacity
                                         onPress={() => {
-                                            setIsMonthly(true);
-                                            setShowAll(false);
+                                            if (isMonthly) setInfoModalKey('monthly');
+                                            else {
+                                                setIsMonthly(true);
+                                                setShowAll(false);
+                                            }
                                         }}
                                         className={cn(
-                                            'px-4 py-2 rounded-full',
+                                            'flex-row items-center px-4 py-2 rounded-full',
                                             isMonthly && 'bg-blue-500/50 border border-blue-500'
                                         )}
                                     >
@@ -550,14 +948,18 @@ export default function LeaderboardScreen() {
                                         >
                                             Monthly
                                         </Text>
+                                        {isMonthly && <InfoIcon className="bg-blue-400/40" />}
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         onPress={() => {
-                                            setIsMonthly(false);
-                                            setShowAll(false);
+                                            if (!isMonthly) setInfoModalKey('yearly');
+                                            else {
+                                                setIsMonthly(false);
+                                                setShowAll(false);
+                                            }
                                         }}
                                         className={cn(
-                                            'px-4 py-2 rounded-full',
+                                            'flex-row items-center px-4 py-2 rounded-full',
                                             !isMonthly && 'bg-purple-500/50 border border-purple-500'
                                         )}
                                     >
@@ -569,6 +971,7 @@ export default function LeaderboardScreen() {
                                         >
                                             Yearly
                                         </Text>
+                                        {!isMonthly && <InfoIcon className="bg-purple-400/40" />}
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -686,14 +1089,45 @@ export default function LeaderboardScreen() {
                     )}
                 </View>
             </ScrollView>
-            {profileUserId && (
-                <UserProfilePopup
-                    userId={profileUserId}
-                    initialData={profileInitialData ?? undefined}
-                    onClose={closeUserProfile}
-                />
-            )}
-        </SafeScreen>
+            {
+                profileUserId && (
+                    <UserProfilePopup
+                        userId={profileUserId}
+                        initialData={profileInitialData ?? undefined}
+                        onClose={closeUserProfile}
+                    />
+                )
+            }
+            <Modal
+                visible={infoModalKey != null}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setInfoModalKey(null)}
+            >
+                <Pressable
+                    className="flex-1 bg-black/60 justify-center items-center p-6"
+                    onPress={() => setInfoModalKey(null)}
+                >
+                    <Pressable
+                        className="bg-gray-900 border border-white/20 rounded-xl p-5 max-w-sm"
+                        onPress={(e) => e.stopPropagation()}
+                    >
+                        <Text className="text-white font-plus-jakarta-600 text-base mb-2">
+                            How it works
+                        </Text>
+                        <Text className="text-gray-300 font-plus-jakarta text-sm leading-5">
+                            {infoModalKey ? LEADERBOARD_INFO[infoModalKey] ?? '' : ''}
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => setInfoModalKey(null)}
+                            className="mt-4 bg-white/15 border border-white/30 rounded-lg py-2.5 items-center"
+                        >
+                            <Text className="text-white font-plus-jakarta-600 text-sm">Got it</Text>
+                        </TouchableOpacity>
+                    </Pressable>
+                </Pressable>
+            </Modal>
+        </SafeScreen >
     );
 }
 

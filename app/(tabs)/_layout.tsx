@@ -30,7 +30,7 @@ export default function TabLayout() {
           borderTopWidth: 1,
           height: 80,
           paddingBottom: 0,
-          paddingTop: 10,
+          paddingTop: 14,
         },
 
         tabBarIconStyle: {
@@ -48,17 +48,19 @@ export default function TabLayout() {
           title: 'Routes',
           tabBarIcon: ({ color, focused }) => (
             <Svg
-              stroke={focused ? Colors.tint : color}
+              width={42}
+              height={42}
+              fill="none"
               viewBox="0 0 24 24"
-              width={40}
-              height={40}
-              strokeWidth={focused ? 2 : 1.5}
-              className="size-8"
+              strokeWidth={1.5}
+              stroke={focused ? Colors.tint : color}
+              className="size-6"
+
             >
               <Path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"
+                d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
               />
             </Svg>
           ),
@@ -70,17 +72,24 @@ export default function TabLayout() {
           title: 'Dashboard',
           tabBarIcon: ({ color, focused }) => (
             <Svg
-              stroke={focused ? Colors.tint : color}
+              width={42}
+              height={42}
+              fill="none"
               viewBox="0 0 24 24"
-              width={32}
-              height={32}
-              strokeWidth={focused ? 2 : 1.5}
-              className="size-2"
+              strokeWidth={1.5}
+              stroke={focused ? Colors.tint : color}
+              className="size-6"
+
             >
               <Path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"
+                d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"
+              />
+              <Path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"
               />
             </Svg>
           ),
@@ -94,8 +103,8 @@ export default function TabLayout() {
             <Svg
               fill={focused ? Colors.tint : color}
               viewBox="0 0 256 256"
-              width={32}
-              height={32}
+              width={48}
+              height={48}
               className="size-6"
             >
               <Path d="M112.41,102.53a8,8,0,0,1,5.06-10.12l12-4A8,8,0,0,1,140,96v40a8,8,0,0,1-16,0V107.1l-1.47.49A8,8,0,0,1,112.41,102.53ZM248,208a8,8,0,0,1-8,8H16a8,8,0,0,1,0-16h8V104A16,16,0,0,1,40,88H80V56A16,16,0,0,1,96,40h64a16,16,0,0,1,16,16v72h40a16,16,0,0,1,16,16v56h8A8,8,0,0,1,248,208Zm-72-64v56h40V144ZM96,200h64V56H96Zm-56,0H80V104H40Z" />
@@ -108,11 +117,17 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
-            <FontAwesome
-              name="user"
-              size={32}
-              color={focused ? Colors.tint : color}
-            />
+            <Svg
+              width={42}
+              height={42}
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke={focused ? Colors.tint : color}
+              className="size-6"
+            >
+              <Path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </Svg>
           ),
         }}
       />
@@ -129,8 +144,8 @@ export default function TabLayout() {
               strokeLinecap="round"
               strokeLinejoin="round"
               fill="none"
-              width={32}
-              height={32}
+              width={42}
+              height={42}
             >
               <Path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
             </Svg>

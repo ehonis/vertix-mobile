@@ -316,6 +316,32 @@ class ApiService {
     return this.get(API_ENDPOINTS.LEADERBOARD);
   }
 
+  async getLeaderboardGradePoints(params: {
+    type: 'boulder' | 'rope';
+    period: 'monthly' | 'yearly';
+  }): Promise<{
+    entries: Array<{
+      user: {
+        id: string;
+        name: string | null;
+        username: string | null;
+        image: string | null;
+        totalXp: number;
+      };
+      gradePoints: number;
+      topGrades: Array<{ grade: string; count: number }>;
+    }>;
+    userRank: number | null;
+    currentMonth: string;
+    period: 'monthly' | 'yearly';
+    type: 'boulder' | 'rope';
+  }> {
+    return this.get(API_ENDPOINTS.LEADERBOARD_GRADE_POINTS, {
+      type: params.type,
+      period: params.period,
+    });
+  }
+
   // Public user profile (for leaderboard and elsewhere)
   async getPublicUserProfile(userId: string): Promise<{
     id: string;

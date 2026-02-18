@@ -47,6 +47,7 @@ export const API_ENDPOINTS = {
   
   // Leaderboard endpoints
   LEADERBOARD: '/api/mobile/leaderboard',
+  LEADERBOARD_GRADE_POINTS: '/api/mobile/leaderboard/grade-points',
 
   // Public user profile (append /:userId/profile)
   USER_PUBLIC_PROFILE: '/api/mobile/user',

@@ -28,19 +28,18 @@ export default function TabLayout() {
           backgroundColor: "#0a0f1a",
           borderTopColor: '#1f2937',
           borderTopWidth: 1,
-          height: 85,
-          paddingBottom: 10,
+          height: 80,
+          paddingBottom: 0,
           paddingTop: 10,
         },
-        tabBarLabelStyle: {
-          fontFamily: 'Barlow_500Medium',
-          fontSize: 14,
-          marginTop: 4, // Positive margin to create gap below icon
-        },
+
         tabBarIconStyle: {
           marginBottom: 0, // No bottom margin on icon
+          alignItems: 'center',
+          justifyContent: 'center',
         },
         headerShown: false,
+        tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
@@ -51,6 +50,8 @@ export default function TabLayout() {
             <Svg
               stroke={focused ? Colors.tint : color}
               viewBox="0 0 24 24"
+              width={40}
+              height={40}
               strokeWidth={focused ? 2 : 1.5}
               className="size-8"
             >
@@ -71,8 +72,10 @@ export default function TabLayout() {
             <Svg
               stroke={focused ? Colors.tint : color}
               viewBox="0 0 24 24"
+              width={32}
+              height={32}
               strokeWidth={focused ? 2 : 1.5}
-              className="size-6"
+              className="size-2"
             >
               <Path
                 strokeLinecap="round"
@@ -91,6 +94,8 @@ export default function TabLayout() {
             <Svg
               fill={focused ? Colors.tint : color}
               viewBox="0 0 256 256"
+              width={32}
+              height={32}
               className="size-6"
             >
               <Path d="M112.41,102.53a8,8,0,0,1,5.06-10.12l12-4A8,8,0,0,1,140,96v40a8,8,0,0,1-16,0V107.1l-1.47.49A8,8,0,0,1,112.41,102.53ZM248,208a8,8,0,0,1-8,8H16a8,8,0,0,1,0-16h8V104A16,16,0,0,1,40,88H80V56A16,16,0,0,1,96,40h64a16,16,0,0,1,16,16v72h40a16,16,0,0,1,16,16v56h8A8,8,0,0,1,248,208Zm-72-64v56h40V144ZM96,200h64V56H96Zm-56,0H80V104H40Z" />
@@ -105,7 +110,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <FontAwesome
               name="user"
-              size={20}
+              size={32}
               color={focused ? Colors.tint : color}
             />
           ),
@@ -124,7 +129,8 @@ export default function TabLayout() {
               strokeLinecap="round"
               strokeLinejoin="round"
               fill="none"
-              className="size-6"
+              width={32}
+              height={32}
             >
               <Path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
             </Svg>

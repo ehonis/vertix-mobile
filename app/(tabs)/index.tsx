@@ -468,7 +468,7 @@ export default function TabOneScreen() {
           return (
             <View className="bg-black border border-green-400 rounded-full px-3 py-2">
               <Text className="text-green-400 font-plus-jakarta-700 italic text-2xl">
-                {xpData.xp}xp
+                {xpData.xp}{' '}XP
               </Text>
             </View>
           );

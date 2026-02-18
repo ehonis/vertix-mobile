@@ -19,6 +19,7 @@ import {
     Vibration,
     View,
 } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
 // Optional expo-haptics import with fallback
 let Haptics: typeof import('expo-haptics') | null = null;
@@ -524,7 +525,23 @@ export default function LongPressRouteCard({
                         {xpDisplay}
                         {route.completed && (
                             <View className="bg-black border border-green-400 rounded-full p-4 py-2 flex items-center justify-center">
-                                <Text className="text-green-400 text-3xl font-plus-jakarta-700">✓</Text>
+                                <Svg
+
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    width={24}
+                                    height={24}
+                                    strokeWidth={4}
+                                    stroke="#22c55e"
+
+
+                                >
+                                    <Path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M4.5 12.75l6 6 9-13.5"
+                                    />
+                                </Svg>
                             </View>
                         )}
                     </View>

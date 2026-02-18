@@ -1,0 +1,34 @@
+---
+description: Distinctive, production-grade frontend interfaces; avoid generic AI aesthetics. Use when building web or mobile UI components, pages, or applications.
+alwaysApply: true
+---
+
+# Frontend Design
+
+Create distinctive, production-grade interfaces. Implement working code with clear aesthetic intent. Avoid generic "AI slop."
+
+## Design Thinking (Before Coding)
+
+- **Purpose**: What problem does this solve? Who uses it?
+- **Tone**: Pick a clear direction and commit—e.g. brutally minimal, maximalist, retro-futuristic, organic, luxury, playful, editorial, brutalist, art deco, soft pastel, industrial. Execute that direction precisely.
+- **Constraints**: Framework, performance, accessibility.
+- **Differentiation**: What makes this memorable? One thing someone will remember.
+
+Bold maximalism and refined minimalism both work when executed with intention.
+
+## Aesthetics Guidelines
+
+- **Typography**: Choose distinctive, characterful fonts. Avoid Arial, Inter, Roboto, generic system stacks. Pair a strong display font with a refined body font. Do not default to Space Grotesk or other overused choices.
+- **Color & theme**: Cohesive palette; use CSS variables (or theme tokens). Dominant colors with sharp accents beat timid, even distribution. Vary between light and dark when appropriate.
+- **Motion**: Use animation for impact—e.g. one strong page load with staggered reveals (animation-delay) rather than scattered micro-interactions. Prefer CSS for HTML; use Motion (or project equivalents) in React. Scroll and hover that feel intentional.
+- **Spatial composition**: Consider asymmetry, overlap, diagonal flow, grid-breaking elements, generous negative space or controlled density. Avoid predictable, template-like layouts.
+- **Backgrounds & detail**: Add atmosphere and depth—gradient meshes, noise/grain, geometric patterns, layered transparency, strong shadows, decorative borders where they fit the concept. Match complexity to the vision: maximalist = more elaborate code and effects; minimal = restraint, precision, spacing, and subtle detail.
+
+## Never Do
+
+- Overused font families (Inter, Roboto, Arial, generic system fonts).
+- Clichéd schemes (e.g. default purple gradients on white).
+- Predictable layouts and cookie-cutter component patterns.
+- Same design language every time—vary themes, fonts, and aesthetics by context.
+
+Match implementation complexity to the aesthetic. Make unexpected, context-specific choices so the result feels designed, not generated.

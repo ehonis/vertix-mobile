@@ -36,13 +36,10 @@ class ApiService {
       console.error('Error removing token:', error);
     }
   }
-// generic request method
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  // generic request method
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const token = await this.getToken();
-    
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
@@ -53,7 +50,7 @@ class ApiService {
     }
 
     const url = `${this.baseURL}${endpoint}`;
-    
+
     try {
       const response = await fetch(url, {
         ...options,
@@ -68,7 +65,9 @@ class ApiService {
         }
         const error = await response.json().catch(() => ({ message: 'Unknown error' }));
         // Preserve error structure for onboarding endpoint
-        const errorObj: any = new Error(error.message || error.error || `HTTP error! status: ${response.status}`);
+        const errorObj: any = new Error(
+          error.message || error.error || `HTTP error! status: ${response.status}`
+        );
         if (error.field) {
           errorObj.field = error.field;
           errorObj.message = error.message || error.error;
@@ -86,9 +85,7 @@ class ApiService {
   //generic get, post, put, delete methods
 
   async get<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
-    const queryString = params
-      ? '?' + new URLSearchParams(params).toString()
-      : '';
+    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
     return this.request<T>(endpoint + queryString, { method: 'GET' });
   }
 
@@ -125,7 +122,10 @@ class ApiService {
     await this.setToken(token);
   }
 
-  async signInWithOAuth(provider: string, accessToken: string): Promise<{ token: string; user: any }> {
+  async signInWithOAuth(
+    provider: string,
+    accessToken: string
+  ): Promise<{ token: string; user: any }> {
     const response = await this.post<{ token: string; user: any }>(
       API_ENDPOINTS.AUTH_MOBILE_SIGNIN,
       { provider, accessToken }
@@ -139,10 +139,10 @@ class ApiService {
   }
 
   async signInWithEmail(email: string): Promise<{ message: string }> {
-    return this.post<{ message: string }>(
-      API_ENDPOINTS.AUTH_MOBILE_SIGNIN,
-      { email, method: 'email' }
-    );
+    return this.post<{ message: string }>(API_ENDPOINTS.AUTH_MOBILE_SIGNIN, {
+      email,
+      method: 'email',
+    });
   }
 
   async getSession(): Promise<any> {
@@ -253,10 +253,7 @@ class ApiService {
     return this.post(API_ENDPOINTS.ROUTE_COMPLETE, data);
   }
 
-  async attemptRoute(data: {
-    userId: string;
-    routeId: string;
-  }): Promise<any> {
+  async attemptRoute(data: { userId: string; routeId: string }): Promise<any> {
     return this.post(API_ENDPOINTS.ROUTE_ATTEMPT, data);
   }
 
@@ -272,11 +269,7 @@ class ApiService {
     });
   }
 
-  async gradeRoute(data: {
-    userId: string;
-    routeId: string;
-    selectedGrade: string;
-  }): Promise<any> {
+  async gradeRoute(data: { userId: string; routeId: string; selectedGrade: string }): Promise<any> {
     return this.post(API_ENDPOINTS.ROUTE_GRADE, data);
   }
 
@@ -299,15 +292,42 @@ class ApiService {
 
   // Leaderboard methods
   async getLeaderboard(): Promise<{
-    monthly: { user: { id: string; name: string | null; username: string | null; image: string | null; totalXp: number }; xp: number }[];
-    total: { id: string; name: string | null; username: string | null; image: string | null; totalXp: number }[];
+    monthly: {
+      user: {
+        id: string;
+        name: string | null;
+        username: string | null;
+        image: string | null;
+        totalXp: number;
+      };
+      xp: number;
+    }[];
+    total: {
+      id: string;
+      name: string | null;
+      username: string | null;
+      image: string | null;
+      totalXp: number;
+    }[];
     userMonthlyRank: number | null;
     userTotalRank: number | null;
     currentMonth: string;
   }> {
     return this.get(API_ENDPOINTS.LEADERBOARD);
   }
+
+  // Public user profile (for leaderboard and elsewhere)
+  async getPublicUserProfile(userId: string): Promise<{
+    id: string;
+    username: string | null;
+    image: string | null;
+    totalXp: number;
+    highestRopeGrade: string | null;
+    highestBoulderGrade: string | null;
+    last5Completions: { grade: string; title: string; color: string }[];
+  }> {
+    return this.get(`${API_ENDPOINTS.USER_PUBLIC_PROFILE}/${userId}/profile`);
+  }
 }
 
 export const api = new ApiService();
-

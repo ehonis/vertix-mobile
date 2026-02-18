@@ -43,6 +43,9 @@ export function getGradeMapping(grade: string): string {
   }
   if (gradeLower.includes('5.feature')) {
     return '5.Feature';
+  }
+  if (gradeLower.includes('competition')) {
+    return 'Comp';
   } else {
     return grade;
   }
@@ -116,7 +119,10 @@ export function calculateCompletionXpForRoute({
   const newHighestGradeBonusXP = 250;
 
   const baseXp = getRouteXp(grade);
-  const isFeatureRoute = grade.toLowerCase() === 'vfeature' || grade.toLowerCase() === '5.feature';
+  const isFeatureRoute =
+    grade.toLowerCase() === 'vfeature' ||
+    grade.toLowerCase() === '5.feature' ||
+    grade.toLowerCase() === 'competition';
 
   if (isFeatureRoute && previousCompletions > 0) {
     return {

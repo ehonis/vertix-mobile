@@ -377,12 +377,12 @@ export default function RouteManagerScreen() {
         index * CARD_WIDTH,
         (index + 1) * CARD_WIDTH,
       ];
-      const opacity = scrollX.interpolate({
+      const opacity = scrollX.plus - interpolate({
         inputRange,
         outputRange: [0.3, 1, 0.3],
         extrapolate: 'clamp',
       });
-      const scale = scrollX.interpolate({
+      const scale = scrollX.plus - interpolate({
         inputRange,
         outputRange: [0.9, 1, 0.9],
         extrapolate: 'clamp',
@@ -417,10 +417,10 @@ export default function RouteManagerScreen() {
                 style={{ backgroundColor: route.color }}
               />
               <View>
-                <Text className="font-barlow-700 text-white">
+                <Text className="font-plus-jakarta-700 text-white">
                   {route.title || `Route ${route.routeId}`}
                 </Text>
-                <Text className="font-barlow text-sm text-slate-400">
+                <Text className="font-plus-jakarta text-sm text-slate-400">
                   {route.grade} · Tap to select for editing
                 </Text>
               </View>
@@ -591,321 +591,321 @@ export default function RouteManagerScreen() {
   return (
     <SafeScreen edges={['top', 'bottom']} className="bg-black">
       <View className="flex-1">
-      <View className="absolute left-0 top-4 z-10 px-4">
-        <TouchableOpacity onPress={() => router.back()} className="flex-row items-center gap-2 p-2">
-          <FontAwesome name="arrow-left" size={24} color={Colors.text} />
-          <Text className="text-lg font-barlow-700 text-white">Admin Center</Text>
-        </TouchableOpacity>
-      </View>
+        <View className="absolute left-0 top-4 z-10 px-4">
+          <TouchableOpacity onPress={() => router.back()} className="flex-row items-center gap-2 p-2">
+            <FontAwesome name="arrow-left" size={24} color={Colors.text} />
+            <Text className="text-lg font-plus-jakarta-700 text-white">Admin Center</Text>
+          </TouchableOpacity>
+        </View>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
-        className="flex-1"
-      >
-        <View className="flex overflow mt-48">
-          <View className="items-center justify-center">
-            {!selectedWall && (
-              <View className="z-10 m-2 flex w-full items-center">
-                <Text className="font-barlow-700 text-xl text-white">
-                  Tap on a wall to edit / create routes
-                </Text>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+          className="flex-1"
+        >
+          <View className="flex overflow mt-48">
+            <View className="items-center justify-center">
+              {!selectedWall && (
+                <View className="z-10 m-2 flex w-full items-center">
+                  <Text className="font-plus-jakarta-700 text-xl text-white">
+                    Tap on a wall to edit / create routes
+                  </Text>
+                </View>
+              )}
+              <View
+                className="relative w-full items-center rounded-lg border-2 border-white"
+                onLayout={handleContainerLayout}
+              >
+                <TopDown
+                  onData={handleWallSelection}
+                  initialSelection={selectedWall}
+                  onRouteSelect={handleRouteSelectFromMap}
+                  onViewBoxChange={handleViewBoxChange}
+                  routes={routes}
+                  mode={mode}
+                  selectedRouteId={selectedRouteId}
+                  onBackgroundTap={
+                    mode === 'edit' && selectedRouteId ? clearEditState : undefined
+                  }
+                />
+                {selectedWall && (
+                  <TouchableOpacity
+                    onPress={() => handleWallSelection(null)}
+                    className="absolute right-0 -top-16 z-10 rounded-full border-2 border-white p-2 px-3"
+                  >
+                    <FontAwesome name="times" size={20} color="white" />
+                  </TouchableOpacity>
+                )}
+                {selectedWall && (
+                  <TouchableOpacity
+                    onPress={cycleModes}
+                    className={cn(
+                      'absolute left-0 -top-16 z-10 rounded-full border-2 border-white px-3 py-2',
+                      mode === 'edit' ? 'bg-orange-400' : 'bg-green-500'
+                    )}
+                  >
+                    <Text className="font-plus-jakarta-700 text-sm uppercase text-white">
+                      {mode} mode
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                {selectedWall &&
+                  containerLayout &&
+                  (mode === 'create' || (mode === 'edit' && selectedRouteId)) && (
+                    <View className="absolute inset-0 z-10" poplus-jakartaEvents="box-none">
+                      <GestureDetector gesture={dotGesture}>
+                        <Animated.View
+                          className="h-8 w-8 items-center justify-center rounded-full border-4 border-white"
+                          style={[
+                            routeAnimatedStyle,
+                            {
+                              backgroundColor:
+                                mode === 'create'
+                                  ? '#22C55E'
+                                  : routes.find((r) => r.routeId === selectedRouteId)?.color ?? '#F59E0B',
+                            },
+                          ]}
+                        >
+                          <View
+                            className="h-4 w-4 rounded-full"
+                            style={{
+                              backgroundColor:
+                                mode === 'create'
+                                  ? '#22C55E'
+                                  : routes.find((r) => r.routeId === selectedRouteId)?.color ?? '#F59E0B',
+                              opacity: 0.5,
+                            }}
+                          />
+                        </Animated.View>
+                      </GestureDetector>
+                    </View>
+                  )}
+              </View>
+            </View>
+
+            {selectedWall && mode === 'edit' && routesLoading && (
+              <View className="mt-4 w-full px-4">
+                <Text className="font-plus-jakarta text-slate-400">Loading routes…</Text>
               </View>
             )}
-            <View
-              className="relative w-full items-center rounded-lg border-2 border-white"
-              onLayout={handleContainerLayout}
-            >
-              <TopDown
-                onData={handleWallSelection}
-                initialSelection={selectedWall}
-                onRouteSelect={handleRouteSelectFromMap}
-                onViewBoxChange={handleViewBoxChange}
-                routes={routes}
-                mode={mode}
-                selectedRouteId={selectedRouteId}
-                onBackgroundTap={
-                  mode === 'edit' && selectedRouteId ? clearEditState : undefined
-                }
-              />
-              {selectedWall && (
-                <TouchableOpacity
-                  onPress={() => handleWallSelection(null)}
-                  className="absolute right-0 -top-16 z-10 rounded-full border-2 border-white p-2 px-3"
-                >
-                  <FontAwesome name="times" size={20} color="white" />
-                </TouchableOpacity>
-              )}
-              {selectedWall && (
-                <TouchableOpacity
-                  onPress={cycleModes}
-                  className={cn(
-                    'absolute left-0 -top-16 z-10 rounded-full border-2 border-white px-3 py-2',
-                    mode === 'edit' ? 'bg-orange-400' : 'bg-green-500'
-                  )}
-                >
-                  <Text className="font-barlow-700 text-sm uppercase text-white">
-                    {mode} mode
-                  </Text>
-                </TouchableOpacity>
-              )}
-              {selectedWall &&
-                containerLayout &&
-                (mode === 'create' || (mode === 'edit' && selectedRouteId)) && (
-                  <View className="absolute inset-0 z-10" pointerEvents="box-none">
-                    <GestureDetector gesture={dotGesture}>
-                      <Animated.View
-                        className="h-8 w-8 items-center justify-center rounded-full border-4 border-white"
-                        style={[
-                          routeAnimatedStyle,
-                          {
-                            backgroundColor:
-                              mode === 'create'
-                                ? '#22C55E'
-                                : routes.find((r) => r.routeId === selectedRouteId)?.color ?? '#F59E0B',
-                          },
-                        ]}
-                      >
-                        <View
-                          className="h-4 w-4 rounded-full"
-                          style={{
-                            backgroundColor:
-                              mode === 'create'
-                                ? '#22C55E'
-                                : routes.find((r) => r.routeId === selectedRouteId)?.color ?? '#F59E0B',
-                            opacity: 0.5,
-                          }}
-                        />
-                      </Animated.View>
-                    </GestureDetector>
-                  </View>
-                )}
-            </View>
-          </View>
-
-          {selectedWall && mode === 'edit' && routesLoading && (
-            <View className="mt-4 w-full px-4">
-              <Text className="font-barlow text-slate-400">Loading routes…</Text>
-            </View>
-          )}
-          {selectedWall && mode === 'edit' && !routesLoading && routesError && (
-            <View className="mt-4 w-full px-4">
-              <Text className="font-barlow text-red-400">{routesError}</Text>
-            </View>
-          )}
-          {selectedWall && mode === 'edit' && !routesLoading && routes.length > 0 && (
-            <View className="mt-4 w-full px-2">
-              <Text className="font-barlow-700 mb-2 text-sm text-white">
-                Routes on this wall — swipe to browse
-              </Text>
-              <FlatList
-                ref={carouselRef}
-                data={routes}
-                renderItem={renderCarouselItem}
-                keyExtractor={(item) => item.routeId}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                pagingEnabled={false}
-                snapToOffsets={snapOffsets}
-                snapToAlignment="start"
-                decelerationRate={0.9}
-                scrollEventThrottle={16}
-                onScroll={handleCarouselScroll}
-                onMomentumScrollEnd={handleMomentumScrollEnd}
-                initialScrollIndex={0}
-                contentContainerStyle={{
-                  paddingHorizontal: PEEK_WIDTH,
-                  marginTop: 10,
-                }}
-                getItemLayout={(_, index) => ({
-                  length: CARD_WIDTH,
-                  offset: CARD_WIDTH * index,
-                  index,
-                })}
-              />
-              <View className="mt-4 flex-row gap-3">
-                <TouchableOpacity
-                  onPress={handleArchiveRoute}
-                  disabled={!selectedRouteId}
-                  className={cn(
-                    'flex-1 flex-row items-center justify-center gap-2 rounded-lg border-2 border-amber-500 py-3',
-                    selectedRouteId ? 'bg-amber-500/20' : 'border-slate-600 bg-slate-800/50 opacity-50'
-                  )}
-                >
-                  <FontAwesome name="archive" size={18} color={selectedRouteId ? '#F59E0B' : '#64748B'} />
-                  <Text
-                    className={cn(
-                      'font-barlow-700',
-                      selectedRouteId ? 'text-amber-400' : 'text-slate-500'
-                    )}
-                  >
-                    Archive
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleDeleteRoute}
-                  disabled={!selectedRouteId}
-                  className={cn(
-                    'flex-1 flex-row items-center justify-center gap-2 rounded-lg border-2 border-red-500 py-3',
-                    selectedRouteId ? 'bg-red-500/20' : 'border-slate-600 bg-slate-800/50 opacity-50'
-                  )}
-                >
-                  <FontAwesome name="trash" size={18} color={selectedRouteId ? '#EF4444' : '#64748B'} />
-                  <Text
-                    className={cn(
-                      'font-barlow-700',
-                      selectedRouteId ? 'text-red-400' : 'text-slate-500'
-                    )}
-                  >
-                    Delete
-                  </Text>
-                </TouchableOpacity>
+            {selectedWall && mode === 'edit' && !routesLoading && routesError && (
+              <View className="mt-4 w-full px-4">
+                <Text className="font-plus-jakarta text-red-400">{routesError}</Text>
               </View>
-            </View>
-          )}
-
-          {mode === 'create' && selectedWall && (
-            <View className="mx-4 mb-6 mt-4 gap-4 rounded-lg bg-slate-900 p-4">
-              <Text className="font-barlow-700 text-lg text-white">New route</Text>
-
-              <View>
-                <Text className="font-barlow-700 mb-2 text-sm text-white">
-                  Name <Text className="font-barlow text-slate-400">(optional)</Text>
+            )}
+            {selectedWall && mode === 'edit' && !routesLoading && routes.length > 0 && (
+              <View className="mt-4 w-full px-2">
+                <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">
+                  Routes on this wall — swipe to browse
                 </Text>
-                <TextInput
-                  className="rounded-lg bg-slate-800 px-4 py-3 font-barlow text-white"
-                  placeholder="Route name"
-                  placeholderTextColor="#9CA3AF"
-                  value={createName}
-                  onChangeText={setCreateName}
-                  autoCapitalize="sentences"
-                />
-              </View>
-
-              <View>
-                <Text className="font-barlow-700 mb-2 text-sm text-white">Color</Text>
-                <ScrollView
+                <FlatList
+                  ref={carouselRef}
+                  data={routes}
+                  renderItem={renderCarouselItem}
+                  keyExtractor={(item) => item.routeId}
                   horizontal
                   showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ gap: 8 }}
-                >
-                  {COLOR_OPTIONS.map((c) => {
-                    const selected = createColor === c.name;
-                    const light = c.name === 'white' || c.name === 'yellow';
-                    return (
-                      <TouchableOpacity
-                        key={c.name}
-                        onPress={() => setCreateColor(c.name)}
-                        className={cn(
-                          'h-9 w-9 rounded-full',
-                          selected ? 'border-2 border-white' : light && 'border border-slate-500'
-                        )}
-                        style={{ backgroundColor: c.hex }}
-                      />
-                    );
+                  pagingEnabled={false}
+                  snapToOffsets={snapOffsets}
+                  snapToAlignment="start"
+                  decelerationRate={0.9}
+                  scrollEventThrottle={16}
+                  onScroll={handleCarouselScroll}
+                  onMomentumScrollEnd={handleMomentumScrollEnd}
+                  initialScrollIndex={0}
+                  contentContainerStyle={{
+                    paddingHorizontal: PEEK_WIDTH,
+                    marginTop: 10,
+                  }}
+                  getItemLayout={(_, index) => ({
+                    length: CARD_WIDTH,
+                    offset: CARD_WIDTH * index,
+                    index,
                   })}
-                </ScrollView>
+                />
+                <View className="mt-4 flex-row gap-3">
+                  <TouchableOpacity
+                    onPress={handleArchiveRoute}
+                    disabled={!selectedRouteId}
+                    className={cn(
+                      'flex-1 flex-row items-center justify-center gap-2 rounded-lg border-2 border-amber-500 py-3',
+                      selectedRouteId ? 'bg-amber-500/20' : 'border-slate-600 bg-slate-800/50 opacity-50'
+                    )}
+                  >
+                    <FontAwesome name="archive" size={18} color={selectedRouteId ? '#F59E0B' : '#64748B'} />
+                    <Text
+                      className={cn(
+                        'font-plus-jakarta-700',
+                        selectedRouteId ? 'text-amber-400' : 'text-slate-500'
+                      )}
+                    >
+                      Archive
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleDeleteRoute}
+                    disabled={!selectedRouteId}
+                    className={cn(
+                      'flex-1 flex-row items-center justify-center gap-2 rounded-lg border-2 border-red-500 py-3',
+                      selectedRouteId ? 'bg-red-500/20' : 'border-slate-600 bg-slate-800/50 opacity-50'
+                    )}
+                  >
+                    <FontAwesome name="trash" size={18} color={selectedRouteId ? '#EF4444' : '#64748B'} />
+                    <Text
+                      className={cn(
+                        'font-plus-jakarta-700',
+                        selectedRouteId ? 'text-red-400' : 'text-slate-500'
+                      )}
+                    >
+                      Delete
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
+            )}
 
-              <View>
-                <Text className="font-barlow-700 mb-2 text-sm text-white">Grade</Text>
-                {routeType === 'boulder' ? (
+            {mode === 'create' && selectedWall && (
+              <View className="mx-4 mb-6 mt-4 gap-4 rounded-lg bg-slate-900 p-4">
+                <Text className="font-plus-jakarta-700 text-lg text-white">New route</Text>
+
+                <View>
+                  <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">
+                    Name <Text className="font-plus-jakarta text-slate-400">(optional)</Text>
+                  </Text>
+                  <TextInput
+                    className="rounded-lg bg-slate-800 px-4 py-3 font-plus-jakarta text-white"
+                    placeholder="Route name"
+                    placeholderTextColor="#9CA3AF"
+                    value={createName}
+                    onChangeText={setCreateName}
+                    autoCapitalize="sentences"
+                  />
+                </View>
+
+                <View>
+                  <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Color</Text>
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={{ gap: 8 }}
                   >
-                    {BOULDER_GRADES.map((g) => {
-                      const label =
-                        g === 'vfeature' ? 'vFEATURE' : g === 'vb' ? 'VB' : g.toUpperCase();
-                      const selected = createGrade === g;
+                    {COLOR_OPTIONS.map((c) => {
+                      const selected = createColor === c.name;
+                      const light = c.name === 'white' || c.name === 'yellow';
                       return (
                         <TouchableOpacity
-                          key={g}
-                          onPress={() => setCreateGrade(g)}
+                          key={c.name}
+                          onPress={() => setCreateColor(c.name)}
                           className={cn(
-                            'rounded-lg px-3 py-2',
-                            selected ? 'bg-green-600' : 'bg-slate-800'
+                            'h-9 w-9 rounded-full',
+                            selected ? 'border-2 border-white' : light && 'border border-slate-500'
                           )}
-                        >
-                          <Text className="font-barlow-700 text-sm text-white">{label}</Text>
-                        </TouchableOpacity>
+                          style={{ backgroundColor: c.hex }}
+                        />
                       );
                     })}
                   </ScrollView>
-                ) : (
-                  <View className="gap-3">
+                </View>
+
+                <View>
+                  <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Grade</Text>
+                  {routeType === 'boulder' ? (
                     <ScrollView
                       horizontal
                       showsHorizontalScrollIndicator={false}
                       contentContainerStyle={{ gap: 8 }}
                     >
-                      {ROPE_BASE_GRADES.map((g) => {
-                        const label = g === '5.feature' ? '5.FEATURE' : g;
-                        const selected = createRopeBase === g;
+                      {BOULDER_GRADES.map((g) => {
+                        const label =
+                          g === 'vfeature' ? 'vFEATURE' : g === 'vb' ? 'VB' : g.toUpperCase();
+                        const selected = createGrade === g;
                         return (
                           <TouchableOpacity
                             key={g}
-                            onPress={() => handleRopeBase(g)}
+                            onPress={() => setCreateGrade(g)}
                             className={cn(
                               'rounded-lg px-3 py-2',
                               selected ? 'bg-green-600' : 'bg-slate-800'
                             )}
                           >
-                            <Text className="font-barlow-700 text-sm text-white">{label}</Text>
+                            <Text className="font-plus-jakarta-700 text-sm text-white">{label}</Text>
                           </TouchableOpacity>
                         );
                       })}
                     </ScrollView>
-                    {ROPE_BASES_WITH_MODIFIER.includes(createRopeBase) && (
-                      <View className="flex-row gap-2">
-                        {ROPE_MODIFIERS.map((m) => {
-                          const label = m === '' ? 'none' : m;
-                          if (createRopeBase === '5.8' && m === '-') return null;
-                          if (createRopeBase === '5.9' && m === '-') return null;
-
-                          const selected = createRopeModifier === m;
+                  ) : (
+                    <View className="gap-3">
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ gap: 8 }}
+                      >
+                        {ROPE_BASE_GRADES.map((g) => {
+                          const label = g === '5.feature' ? '5.FEATURE' : g;
+                          const selected = createRopeBase === g;
                           return (
                             <TouchableOpacity
-                              key={m || 'none'}
-                              onPress={() => handleRopeModifier(m)}
+                              key={g}
+                              onPress={() => handleRopeBase(g)}
                               className={cn(
                                 'rounded-lg px-3 py-2',
                                 selected ? 'bg-green-600' : 'bg-slate-800'
                               )}
                             >
-                              <Text className="font-barlow-700 text-sm text-white">{label}</Text>
+                              <Text className="font-plus-jakarta-700 text-sm text-white">{label}</Text>
                             </TouchableOpacity>
                           );
                         })}
-                      </View>
-                    )}
-                  </View>
-                )}
-              </View>
-            </View>
-          )}
-        </View>
-      </KeyboardAvoidingView>
+                      </ScrollView>
+                      {ROPE_BASES_WITH_MODIFIER.includes(createRopeBase) && (
+                        <View className="flex-row gap-2">
+                          {ROPE_MODIFIERS.map((m) => {
+                            const label = m === '' ? 'none' : m;
+                            if (createRopeBase === '5.8' && m === '-') return null;
+                            if (createRopeBase === '5.9' && m === '-') return null;
 
-      {mode === 'edit' && selectedRouteId && editPopupVisible && (() => {
-        const routeToEdit = routes.find((r) => r.routeId === selectedRouteId);
-        if (!routeToEdit) return null;
-        return (
-          <RouteEditPopup
-            route={routeToEdit}
-            onCancel={() => setEditPopupVisible(false)}
-            onSave={(updated) => {
-              setRoutes((prev) =>
-                prev.map((r) =>
-                  r.routeId === selectedRouteId ? { ...r, ...updated } : r
-                )
-              );
-              setEditPopupVisible(false);
-            }}
-          />
-        );
-      })()}
+                            const selected = createRopeModifier === m;
+                            return (
+                              <TouchableOpacity
+                                key={m || 'none'}
+                                onPress={() => handleRopeModifier(m)}
+                                className={cn(
+                                  'rounded-lg px-3 py-2',
+                                  selected ? 'bg-green-600' : 'bg-slate-800'
+                                )}
+                              >
+                                <Text className="font-plus-jakarta-700 text-sm text-white">{label}</Text>
+                              </TouchableOpacity>
+                            );
+                          })}
+                        </View>
+                      )}
+                    </View>
+                  )}
+                </View>
+              </View>
+            )}
+          </View>
+        </KeyboardAvoidingView>
+
+        {mode === 'edit' && selectedRouteId && editPopupVisible && (() => {
+          const routeToEdit = routes.find((r) => r.routeId === selectedRouteId);
+          if (!routeToEdit) return null;
+          return (
+            <RouteEditPopup
+              route={routeToEdit}
+              onCancel={() => setEditPopupVisible(false)}
+              onSave={(updated) => {
+                setRoutes((prev) =>
+                  prev.map((r) =>
+                    r.routeId === selectedRouteId ? { ...r, ...updated } : r
+                  )
+                );
+                setEditPopupVisible(false);
+              }}
+            />
+          );
+        })()}
       </View>
     </SafeScreen>
   );

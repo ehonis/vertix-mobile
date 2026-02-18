@@ -21,6 +21,12 @@ export const API_ENDPOINTS = {
   USER_XP: '/api/user/xp',
   USER_PROFILE: '/api/user/profile',
   USER_ONBOARDING: '/api/user/onboarding',
+
+  // User settings endpoints
+  USER_SETTINGS_USERNAME_CHECK: '/api/user/settings/userNameCheck',
+  USER_SETTINGS_IMAGE_UPLOAD: '/api/user/settings/imageUpload',
+  USER_SETTINGS_REMOVE_IMAGE: '/api/user/settings/removeImage',
+  USER_SETTINGS_UPLOAD_ONBOARDING: '/api/user/settings/uploadOnboarding',
   
   // Route endpoints
   ROUTES_SEARCH: '/api/routes/search-routes',

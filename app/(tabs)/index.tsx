@@ -81,7 +81,7 @@ export default function TabOneScreen() {
   const scrollX = useRef(new Animated.Value(0)).current;
   const carouselRef = useRef<FlatList>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  
+
   // Track if we're currently in a momentum scroll to prevent race conditions
   const isScrollingRef = useRef(false);
 
@@ -467,7 +467,7 @@ export default function TabOneScreen() {
         if (xpData.xp > 0) {
           return (
             <View className="bg-black border border-green-400 rounded-full px-3 py-2">
-              <Text className="text-green-400 font-barlow-700 italic text-2xl">
+              <Text className="text-green-400 font-plus-jakarta-700 italic text-2xl">
                 {xpData.xp}xp
               </Text>
             </View>
@@ -527,7 +527,7 @@ export default function TabOneScreen() {
                 alignItems: 'center',
               }}
             >
-              <Text className="text-white text-2xl mb-4 font-barlow-700 text-center">
+              <Text className="text-white text-2xl mb-4 font-plus-jakarta-700 text-center">
                 {selectedWall ? formatWallName(selectedWall) : 'Gym Map'}
               </Text>
             </Animated.View>
@@ -589,7 +589,7 @@ export default function TabOneScreen() {
         {/* Helper text when no wall selected - outside blue box */}
         {!selectedWall && (
           <View className="items-center">
-            <Text className="text-gray-400 text-sm font-barlow text-center">
+            <Text className="text-gray-400 text-sm font-plus-jakarta text-center">
               Tap a wall section to view routes
             </Text>
           </View>
@@ -602,7 +602,7 @@ export default function TabOneScreen() {
       <View className="px-2 mt-2">
         {/* {selectedWall && (
           <View className="items-center">
-            <Text className="text-white text-xl font-barlow-600 mt-3 text-start">
+            <Text className="text-white text-xl font-plus-jakarta-600 mt-3 text-start">
               Routes Sorted Left to Right
             </Text>
           </View>

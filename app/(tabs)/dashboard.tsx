@@ -198,7 +198,7 @@ export default function DashboardScreen() {
               strokeLinejoin="round"
             />
           </Svg>
-          <Text className="text-white text-xs font-barlow mt-1">Edit</Text>
+          <Text className="text-white text-xs font-plus-jakarta mt-1">Edit</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
@@ -219,7 +219,7 @@ export default function DashboardScreen() {
               strokeLinejoin="round"
             />
           </Svg>
-          <Text className="text-white text-xs font-barlow mt-1">Delete</Text>
+          <Text className="text-white text-xs font-plus-jakarta mt-1">Delete</Text>
         </TouchableOpacity>
       </View>
     );
@@ -334,302 +334,302 @@ export default function DashboardScreen() {
 
   return (
     <SafeScreen className="bg-black">
-    <ScrollView
-      className="flex-1"
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
-      }
-    >
-      <View className="p-5 pt-0 gap-2 items-center">
-        {/* User Profile Section - ImageNamePlate Style */}
-        <View className="w-full items-start  py-4 relative">
-          {/* Profile Picture - positioned with negative margin */}
-          <View className="relative -mb-16 z-10">
-            {user?.image ? (
-              <Image
-                source={{ uri: user.image }}
-                className="w-36 h-36 rounded-full border-4 border-slate-900"
-              />
-            ) : (
-              <View className="w-36 h-36 rounded-full border-4 border-slate-900 bg-slate-700" />
-            )}
-          </View>
-
-          {/* Name and ID Plate - overlaps with image */}
-          <TouchableOpacity
-            onPress={() => router.push('/(tabs)/profile')}
-            className="bg-slate-900 w-full rounded-lg mt-12 p-6 px-4 relative flex-row justify-between items-center"
-            activeOpacity={0.7}
-          >
-            <View className="flex-1">
-              <Text className="text-white font-barlow-700 text-2xl text-start">
-                {user?.name || 'User'}
-              </Text>
-              <Text className="text-gray-400 font-barlow-500 text-start text-sm">
-                @{user?.username || user?.id}
-              </Text>
-            </View>
-            <View className="font-barlow text-white flex flex-col justify-center items-center gap-1">
-              <Text className="font-barlow-600 text-lg text-white">
-                Highest Grade
-              </Text>
-              <View className="flex-row gap-3">
-                <Text className="text-white font-barlow">
-                  {user?.highestRopeGrade || 'n/a'}
-                </Text>
-                <View className="bg-white rounded-full h-8 w-0.5" />
-                <Text className="text-white font-barlow">
-                  {user?.highestBoulderGrade || 'n/a'}
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {/* XP Level Display - matches web styling with -mt-2 overlap */}
-        <View className="bg-slate-900 rounded-lg p-4 w-full -mt-2">
-          <View className="flex-row items-center gap-3">
-            <Text
-              className={`text-5xl font-barlow-700 ${accentColors.text} -mt-1`}
-            >
-              {currentLevel}
-            </Text>
-            <View className="flex-1">
-              <View className="flex-row justify-between mb-1">
-                <Text className="text-gray-300 text-sm font-barlow">
-                  {totalXp} XP
-                </Text>
-                <Text className="text-gray-300 text-sm font-barlow">
-                  {xpToNextLevel} to next level
-                </Text>
-              </View>
-              <View className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
-                <View
-                  className={`h-full ${accentColors.progress} rounded-full`}
-                  style={{
-                    width: `${Math.min(100, Math.max(0, progressPercent))}%`,
-                  }}
+      <ScrollView
+        className="flex-1"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
+        }
+      >
+        <View className="p-5 pt-0 gap-2 items-center">
+          {/* User Profile Section - ImageNamePlate Style */}
+          <View className="w-full items-start  py-4 relative">
+            {/* Profile Picture - positioned with negative margin */}
+            <View className="relative -mb-16 z-10">
+              {user?.image ? (
+                <Image
+                  source={{ uri: user.image }}
+                  className="w-36 h-36 rounded-full border-4 border-slate-900"
                 />
+              ) : (
+                <View className="w-36 h-36 rounded-full border-4 border-slate-900 bg-slate-700" />
+              )}
+            </View>
+
+            {/* Name and ID Plate - overlaps with image */}
+            <TouchableOpacity
+              onPress={() => router.push('/(tabs)/profile')}
+              className="bg-slate-900 w-full rounded-lg mt-12 p-6 px-4 relative flex-row justify-between items-center"
+              activeOpacity={0.7}
+            >
+              <View className="flex-1">
+                <Text className="text-white font-plus-jakarta-700 text-2xl text-start">
+                  {user?.name || 'User'}
+                </Text>
+                <Text className="text-gray-400 font-plus-jakarta-500 text-start text-sm">
+                  @{user?.username || user?.id}
+                </Text>
               </View>
-              <View className="flex-row justify-between mt-1">
-                <Text className="text-gray-400 text-xs font-barlow">
-                  Level {currentLevel}
+              <View className="font-plus-jakarta text-white flex flex-col justify-center items-center gap-1">
+                <Text className="font-plus-jakarta-600 text-lg text-white">
+                  Highest Grade
                 </Text>
-                <Text className="text-gray-400 text-xs font-barlow">
-                  Level {currentLevel + 1}
-                </Text>
+                <View className="flex-row gap-3">
+                  <Text className="text-white font-plus-jakarta">
+                    {user?.highestRopeGrade || 'n/a'}
+                  </Text>
+                  <View className="bg-white rounded-full h-8 w-0.5" />
+                  <Text className="text-white font-plus-jakarta">
+                    {user?.highestBoulderGrade || 'n/a'}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* XP Level Display - matches web styling with -mt-2 overlap */}
+          <View className="bg-slate-900 rounded-lg p-4 w-full -mt-2">
+            <View className="flex-row items-center gap-3">
+              <Text
+                className={`text-5xl font-plus-jakarta-700 ${accentColors.text} -mt-1`}
+              >
+                {currentLevel}
+              </Text>
+              <View className="flex-1">
+                <View className="flex-row justify-between mb-1">
+                  <Text className="text-gray-300 text-sm font-plus-jakarta">
+                    {totalXp} XP
+                  </Text>
+                  <Text className="text-gray-300 text-sm font-plus-jakarta">
+                    {xpToNextLevel} to next level
+                  </Text>
+                </View>
+                <View className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                  <View
+                    className={`h-full ${accentColors.progress} rounded-full`}
+                    style={{
+                      width: `${Math.min(100, Math.max(0, progressPercent))}%`,
+                    }}
+                  />
+                </View>
+                <View className="flex-row justify-between mt-1">
+                  <Text className="text-gray-400 text-xs font-plus-jakarta">
+                    Level {currentLevel}
+                  </Text>
+                  <Text className="text-gray-400 text-xs font-plus-jakarta">
+                    Level {currentLevel + 1}
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
-        </View>
 
-        {/* Recent Activity */}
-        <View className="w-full">
-          <View className="flex-col my-3">
-            <Text className="text-white text-2xl font-barlow-700">
-              Recent Tix & Attempts
-            </Text>
-            <Text className="text-gray-400 font-barlow text-sm">
-              Swipe to edit or delete a completion or attempt.
-            </Text>
-          </View>
-          <ScrollView className="bg-slate-900 rounded-lg px-3 py-2 gap-3 max-h-96 overflow-y-scroll">
-            {allActivities.length === 0 ? (
-              <Text className="text-gray-400 text-center py-8 font-barlow">
-                No activity yet. Start climbing!
+          {/* Recent Activity */}
+          <View className="w-full">
+            <View className="flex-col my-3">
+              <Text className="text-white text-2xl font-plus-jakarta-700">
+                Recent Tix & Attempts
               </Text>
-            ) : (
-              Object.entries(groupedActivities).map(([date, activities]) => (
-                <View key={date} className="flex-col gap-2">
-                  {/* Date separator */}
-                  <View className="flex-row items-center gap-2">
-                    <View className="h-px bg-gray-500 flex-1" />
-                    <Text className="text-gray-400 font-barlow-500 text-lg px-2">
-                      {date}
-                    </Text>
-                    <View className="h-px bg-gray-500 flex-1" />
-                  </View>
+              <Text className="text-gray-400 font-plus-jakarta text-sm">
+                Swipe to edit or delete a completion or attempt.
+              </Text>
+            </View>
+            <ScrollView className="bg-slate-900 rounded-lg px-3 py-2 gap-3 max-h-96 overflow-y-scroll">
+              {allActivities.length === 0 ? (
+                <Text className="text-gray-400 text-center py-8 font-plus-jakarta">
+                  No activity yet. Start climbing!
+                </Text>
+              ) : (
+                Object.entries(groupedActivities).map(([date, activities]) => (
+                  <View key={date} className="flex-col gap-2">
+                    {/* Date separator */}
+                    <View className="flex-row items-center gap-2">
+                      <View className="h-px bg-gray-500 flex-1" />
+                      <Text className="text-gray-400 font-plus-jakarta-500 text-lg px-2">
+                        {date}
+                      </Text>
+                      <View className="h-px bg-gray-500 flex-1" />
+                    </View>
 
-                  {/* Activities for this date */}
-                  {activities.map((activity, index) => {
-                    const isCompletion = activity.type === 'completion';
-                    const route = isCompletion
-                      ? (activity as Completion).route
-                      : (activity as Attempt).route;
-                    const activityDate = new Date(activity.date);
-                    const activityType = isCompletion ? 'Tick' : 'Attempt';
-                    const completion = isCompletion
-                      ? (activity as Completion)
-                      : null;
-                    const key = `${activity.type}-${activity.id}-${index}`;
+                    {/* Activities for this date */}
+                    {activities.map((activity, index) => {
+                      const isCompletion = activity.type === 'completion';
+                      const route = isCompletion
+                        ? (activity as Completion).route
+                        : (activity as Attempt).route;
+                      const activityDate = new Date(activity.date);
+                      const activityType = isCompletion ? 'Tick' : 'Attempt';
+                      const completion = isCompletion
+                        ? (activity as Completion)
+                        : null;
+                      const key = `${activity.type}-${activity.id}-${index}`;
 
-                    const content = (
-                      <View
-                        className={cn(
-                          'flex-row justify-between items-center rounded-md p-2 relative',
-                          getRouteTileStyles(route.color)
-                        )}
-                        style={{
-                          backgroundColor: '#0f172a', // Solid slate-900 background to hide buttons
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {/* Solid background overlay to ensure buttons don't show through */}
+                      const content = (
                         <View
-                          className="absolute inset-0 bg-slate-900 rounded-md"
-                          style={{ zIndex: 0 }}
-                        />
-                        <View
-                          className="flex-col flex-1 relative"
-                          style={{ zIndex: 1 }}
+                          className={cn(
+                            'flex-row justify-between items-center rounded-md p-2 relative',
+                            getRouteTileStyles(route.color)
+                          )}
+                          style={{
+                            backgroundColor: '#0f172a', // Solid slate-900 background to hide buttons
+                            overflow: 'hidden',
+                          }}
                         >
-                          <Text
-                            className="text-white text-lg font-barlow-700"
-                            numberOfLines={1}
+                          {/* Solid background overlay to ensure buttons don't show through */}
+                          <View
+                            className="absolute inset-0 bg-slate-900 rounded-md"
+                            style={{ zIndex: 0 }}
+                          />
+                          <View
+                            className="flex-col flex-1 relative"
+                            style={{ zIndex: 1 }}
                           >
-                            {route.title}
-                          </Text>
-                          <Text className="text-gray-300 font-barlow">
-                            {route.grade}
-                          </Text>
-                          <Text className="text-gray-400 text-xs font-barlow">
-                            {activityType}
+                            <Text
+                              className="text-white text-lg font-plus-jakarta-700"
+                              numberOfLines={1}
+                            >
+                              {route.title}
+                            </Text>
+                            <Text className="text-gray-300 font-plus-jakarta">
+                              {route.grade}
+                            </Text>
+                            <Text className="text-gray-400 text-xs font-plus-jakarta">
+                              {activityType}
+                            </Text>
+                          </View>
+                          <Text
+                            className="text-gray-300 font-plus-jakarta relative"
+                            style={{ zIndex: 1 }}
+                          >
+                            {activityDate.toLocaleTimeString('en-US', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
                           </Text>
                         </View>
-                        <Text
-                          className="text-gray-300 font-barlow relative"
-                          style={{ zIndex: 1 }}
-                        >
-                          {activityDate.toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </Text>
-                      </View>
-                    );
-
-                    // Allow swipe on both completions and attempts
-                    if (isCompletion && completion) {
-                      return (
-                        <Swipeable
-                          key={key}
-                          ref={(ref) => {
-                            if (ref) {
-                              swipeableRefs.current[
-                                `completion-${completion.id}`
-                              ] = ref;
-                            }
-                          }}
-                          renderLeftActions={() =>
-                            renderLeftActions(completion, 'completion')
-                          }
-                          leftThreshold={40}
-                        >
-                          {content}
-                        </Swipeable>
                       );
-                    }
 
-                    if (!isCompletion) {
-                      const attempt = activity as Attempt;
-                      return (
-                        <Swipeable
-                          key={key}
-                          ref={(ref) => {
-                            if (ref) {
-                              swipeableRefs.current[`attempt-${attempt.id}`] =
-                                ref;
+                      // Allow swipe on both completions and attempts
+                      if (isCompletion && completion) {
+                        return (
+                          <Swipeable
+                            key={key}
+                            ref={(ref) => {
+                              if (ref) {
+                                swipeableRefs.current[
+                                  `completion-${completion.id}`
+                                ] = ref;
+                              }
+                            }}
+                            renderLeftActions={() =>
+                              renderLeftActions(completion, 'completion')
                             }
-                          }}
-                          renderLeftActions={() =>
-                            renderLeftActions(attempt, 'attempt')
-                          }
-                          leftThreshold={40}
-                        >
-                          {content}
-                        </Swipeable>
-                      );
-                    }
+                            leftThreshold={40}
+                          >
+                            {content}
+                          </Swipeable>
+                        );
+                      }
 
-                    return <View key={key}>{content}</View>;
-                  })}
-                </View>
-              ))
-            )}
-          </ScrollView>
-        </View>
-      </View>
+                      if (!isCompletion) {
+                        const attempt = activity as Attempt;
+                        return (
+                          <Swipeable
+                            key={key}
+                            ref={(ref) => {
+                              if (ref) {
+                                swipeableRefs.current[`attempt-${attempt.id}`] =
+                                  ref;
+                              }
+                            }}
+                            renderLeftActions={() =>
+                              renderLeftActions(attempt, 'attempt')
+                            }
+                            leftThreshold={40}
+                          >
+                            {content}
+                          </Swipeable>
+                        );
+                      }
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        visible={showDeleteConfirm}
-        transparent
-        animationType="fade"
-        onRequestClose={() => {
-          setShowDeleteConfirm(false);
-          setCompletionToDelete(null);
-          setAttemptToDelete(null);
-        }}
-      >
-        <View className="flex-1 bg-black/50 justify-center items-center p-6">
-          <View className="bg-slate-900 rounded-lg p-6 w-full max-w-sm border-2 border-red-500">
-            <Text className="text-white text-2xl font-barlow-700 mb-2">
-              Delete {completionToDelete ? 'Completion' : 'Attempt'}?
-            </Text>
-            <Text className="text-gray-300 font-barlow mb-6">
-              Are you sure you want to delete this{' '}
-              {completionToDelete ? 'completion' : 'attempt'}? This action
-              cannot be undone.
-            </Text>
-            {(completionToDelete || attemptToDelete) && (
-              <View className="bg-slate-800 rounded-lg p-3 mb-6">
-                <Text className="text-white font-barlow-600">
-                  {completionToDelete
-                    ? completionToDelete.route.title
-                    : attemptToDelete?.route.title}
-                </Text>
-                <Text className="text-gray-400 font-barlow text-sm">
-                  {completionToDelete
-                    ? completionToDelete.route.grade
-                    : attemptToDelete?.route.grade}
-                </Text>
-              </View>
-            )}
-            <View className="flex-row gap-3">
-              <TouchableOpacity
-                onPress={() => {
-                  setShowDeleteConfirm(false);
-                  setCompletionToDelete(null);
-                  setAttemptToDelete(null);
-                }}
-                disabled={isDeleting}
-                className={cn(
-                  'flex-1 bg-gray-600 px-4 py-3 rounded-lg',
-                  isDeleting && 'opacity-50'
-                )}
-              >
-                <Text className="text-white text-center font-barlow-600">
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={confirmDelete}
-                disabled={isDeleting}
-                className={cn(
-                  'flex-1 bg-red-500 px-4 py-3 rounded-lg flex-row justify-center items-center gap-2',
-                  isDeleting && 'opacity-50'
-                )}
-              >
-                {isDeleting && <ActivityIndicator size="small" color="#fff" />}
-                <Text className="text-white text-center font-barlow-600">
-                  {isDeleting ? 'Deleting...' : 'Delete'}
-                </Text>
-              </TouchableOpacity>
-            </View>
+                      return <View key={key}>{content}</View>;
+                    })}
+                  </View>
+                ))
+              )}
+            </ScrollView>
           </View>
         </View>
-      </Modal>
-    </ScrollView>
+
+        {/* Delete Confirmation Modal */}
+        <Modal
+          visible={showDeleteConfirm}
+          transparent
+          animationType="fade"
+          onRequestClose={() => {
+            setShowDeleteConfirm(false);
+            setCompletionToDelete(null);
+            setAttemptToDelete(null);
+          }}
+        >
+          <View className="flex-1 bg-black/50 justify-center items-center p-6">
+            <View className="bg-slate-900 rounded-lg p-6 w-full max-w-sm border-2 border-red-500">
+              <Text className="text-white text-2xl font-plus-jakarta-700 mb-2">
+                Delete {completionToDelete ? 'Completion' : 'Attempt'}?
+              </Text>
+              <Text className="text-gray-300 font-plus-jakarta mb-6">
+                Are you sure you want to delete this{' '}
+                {completionToDelete ? 'completion' : 'attempt'}? This action
+                cannot be undone.
+              </Text>
+              {(completionToDelete || attemptToDelete) && (
+                <View className="bg-slate-800 rounded-lg p-3 mb-6">
+                  <Text className="text-white font-plus-jakarta-600">
+                    {completionToDelete
+                      ? completionToDelete.route.title
+                      : attemptToDelete?.route.title}
+                  </Text>
+                  <Text className="text-gray-400 font-plus-jakarta text-sm">
+                    {completionToDelete
+                      ? completionToDelete.route.grade
+                      : attemptToDelete?.route.grade}
+                  </Text>
+                </View>
+              )}
+              <View className="flex-row gap-3">
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowDeleteConfirm(false);
+                    setCompletionToDelete(null);
+                    setAttemptToDelete(null);
+                  }}
+                  disabled={isDeleting}
+                  className={cn(
+                    'flex-1 bg-gray-600 px-4 py-3 rounded-lg',
+                    isDeleting && 'opacity-50'
+                  )}
+                >
+                  <Text className="text-white text-center font-plus-jakarta-600">
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={confirmDelete}
+                  disabled={isDeleting}
+                  className={cn(
+                    'flex-1 bg-red-500 px-4 py-3 rounded-lg flex-row justify-center items-center gap-2',
+                    isDeleting && 'opacity-50'
+                  )}
+                >
+                  {isDeleting && <ActivityIndicator size="small" color="#fff" />}
+                  <Text className="text-white text-center font-plus-jakarta-600">
+                    {isDeleting ? 'Deleting...' : 'Delete'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </ScrollView>
     </SafeScreen>
   );
 }

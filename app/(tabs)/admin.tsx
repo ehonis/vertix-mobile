@@ -22,25 +22,25 @@ export default function AdminScreen() {
 
   return (
     <SafeScreen className="bg-black">
-    <ScrollView
-      className="flex-1"
-      contentContainerClassName="px-5 pt-5"
-    >
-      <Text className="text-white text-2xl font-barlow-700 mb-3">
-        Admin Center
-      </Text>
-
-      <TouchableOpacity
-        onPress={() => router.push('/route-manager')}
-        activeOpacity={0.7}
-        className="flex bg-slate-900 rounded-xl p-6 items-center"
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="px-5 pt-5"
       >
-
-        <Text className="text-white font-barlow-700 text-xl ">
-          Route Manager
+        <Text className="text-white text-2xl font-plus-jakarta-700 mb-3">
+          Admin Center
         </Text>
-      </TouchableOpacity>
-    </ScrollView>
+
+        <TouchableOpacity
+          onPress={() => router.push('/route-manager')}
+          activeOpacity={0.7}
+          className="flex bg-slate-900 rounded-xl p-6 items-center"
+        >
+
+          <Text className="text-white font-plus-jakarta-700 text-xl ">
+            Route Manager
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
     </SafeScreen>
   );
 }

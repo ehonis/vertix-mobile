@@ -186,6 +186,36 @@ class ApiService {
     return this.post(API_ENDPOINTS.USER_ONBOARDING, data);
   }
 
+  // User settings methods
+  async checkUsernameAvailability(username: string): Promise<{ available: boolean }> {
+    return this.get<{ available: boolean }>(API_ENDPOINTS.USER_SETTINGS_USERNAME_CHECK, {
+      username,
+    });
+  }
+
+  async uploadProfileImage(userId: string, newImage: string): Promise<{ message: string }> {
+    return this.post<{ message: string }>(API_ENDPOINTS.USER_SETTINGS_IMAGE_UPLOAD, {
+      userId,
+      newImage,
+    });
+  }
+
+  async removeProfileImage(userId: string): Promise<{ message: string }> {
+    return this.post<{ message: string }>(API_ENDPOINTS.USER_SETTINGS_REMOVE_IMAGE, {
+      userId,
+    });
+  }
+
+  async saveProfileSettings(payload: {
+    id: string;
+    name: string;
+    username: string;
+    tag: string;
+    privacy?: boolean;
+  }): Promise<any> {
+    return this.post(API_ENDPOINTS.USER_SETTINGS_UPLOAD_ONBOARDING, payload);
+  }
+
   // Route methods
   async searchRoutes(params: {
     text?: string;

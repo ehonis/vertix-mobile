@@ -1351,11 +1351,11 @@ export function Legend({ showWhenSelected = false }: { showWhenSelected?: boolea
     <View className="flex-row justify-center items-center gap-6 mt-3">
       <View className="flex-row items-center gap-2">
         <View className="w-4 h-4 rounded-sm bg-[#1447E6]" />
-        <Text className="text-gray-300 text-xs font-barlow">Rope</Text>
+        <Text className="text-gray-300 text-xs font-plus-jakarta">Rope</Text>
       </View>
       <View className="flex-row items-center gap-2">
         <View className="w-4 h-4 rounded-sm bg-[#8200DB]" />
-        <Text className="text-gray-300 text-xs font-barlow">Boulder</Text>
+        <Text className="text-gray-300 text-xs font-plus-jakarta">Boulder</Text>
       </View>
       <View className="flex-row items-center gap-2">
         {/* Roof pattern preview using SVG */}
@@ -1390,7 +1390,7 @@ export function Legend({ showWhenSelected = false }: { showWhenSelected?: boolea
             rx="2"
           />
         </Svg>
-        <Text className="text-gray-300 text-xs font-barlow">Roof</Text>
+        <Text className="text-gray-300 text-xs font-plus-jakarta">Roof</Text>
       </View>
     </View>
   );
@@ -1627,7 +1627,7 @@ export default function TopDown({
       {/* {selectedPart && (
         <View className="absolute top-0 left-0 z-20 m-2">
           <View className="bg-black/80 border border-gray-500 rounded-lg px-3 py-2">
-            <Text className="text-white text-sm font-barlow-700">
+            <Text className="text-white text-sm font-plus-jakarta-700">
               {formatWallName(selectedPart)}
             </Text>
           </View>

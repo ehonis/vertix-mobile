@@ -1,9 +1,9 @@
 import {
-  Barlow_400Regular,
-  Barlow_500Medium,
-  Barlow_600SemiBold,
-  Barlow_700Bold,
-} from '@expo-google-fonts/barlow';
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+} from '@expo-google-fonts/plus-jakarta-sans';
 import { Jost_700Bold } from '@expo-google-fonts/jost';
 
 import {
@@ -47,10 +47,10 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    Barlow_400Regular: Barlow_400Regular,
-    Barlow_500Medium: Barlow_500Medium,
-    Barlow_600SemiBold: Barlow_600SemiBold,
-    Barlow_700Bold: Barlow_700Bold,
+    PlusJakartaSans_400Regular: PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium: PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold: PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold: PlusJakartaSans_700Bold,
     Jost_700Bold: Jost_700Bold,
   });
 
@@ -244,6 +244,13 @@ function RootLayoutNav() {
           <Stack.Screen name="signin" options={{ headerShown: false }} />
           <Stack.Screen name="onboarding" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="settings"
+            options={{
+              headerShown: false,
+              presentation: 'card',
+            }}
+          />
           <Stack.Screen
             name="route-manager"
             options={{

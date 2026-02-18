@@ -141,179 +141,178 @@ export default function OnboardingScreen() {
 
   return (
     <SafeScreen edges={['top', 'bottom']} className="bg-black">
-    <ScrollView
-      contentContainerClassName="flex-grow justify-center p-4"
-      className="flex-1"
-    >
-      <View className="w-full max-w-sm mx-auto">
-        <Text className="text-3xl text-white font-barlow-700 mb-2">
-          Complete Your Profile
-        </Text>
-        <Text className="text-gray-400 mb-6 font-barlow">
-          We need a few more details to get you started
-        </Text>
+      <ScrollView
+        contentContainerClassName="flex-grow justify-center p-4"
+        className="flex-1"
+      >
+        <View className="w-full max-w-sm mx-auto">
+          <Text className="text-3xl text-white font-plus-jakarta-700 mb-2">
+            Complete Your Profile
+          </Text>
+          <Text className="text-gray-400 mb-6 font-plus-jakarta">
+            We need a few more details to get you started
+          </Text>
 
-        <View className="bg-slate-800 rounded-xl p-6 gap-4">
-          {/* Name Field */}
-          <View>
-            <Text className="text-white text-sm font-barlow mb-2">Name *</Text>
-            <TextInput
-              className="bg-gray-700 text-white rounded-lg px-4 py-3 font-barlow"
-              placeholder="Your full name"
-              placeholderTextColor="#9CA3AF"
-              value={formData.name}
-              onChangeText={(text) => setFormData({ ...formData, name: text })}
-            />
-            {errors.name && (
-              <Text className="text-red-400 text-sm mt-1 font-barlow">
-                {errors.name}
-              </Text>
-            )}
-          </View>
-
-          {/* Username Field */}
-          <View>
-            <Text className="text-white text-sm font-barlow mb-2">
-              Username *
-            </Text>
-            <TextInput
-              className="bg-gray-700 text-white rounded-lg px-4 py-3 font-barlow"
-              placeholder="Choose a username"
-              placeholderTextColor="#9CA3AF"
-              value={formData.username}
-              onChangeText={(text) =>
-                setFormData({ ...formData, username: text.toLowerCase() })
-              }
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            {errors.username && (
-              <Text className="text-red-400 text-sm mt-1 font-barlow">
-                {errors.username}
-              </Text>
-            )}
-            <Text className="text-gray-500 text-xs mt-1 font-barlow">
-              Letters, numbers, underscores, and hyphens only
-            </Text>
-          </View>
-
-          {/* Phone Number (read-only for phone users) */}
-          {isPhoneUser && user?.phoneNumber && (
+          <View className="bg-slate-800 rounded-xl p-6 gap-4">
+            {/* Name Field */}
             <View>
-              <Text className="text-white text-sm font-barlow mb-2">
-                Phone Number
-              </Text>
+              <Text className="text-white text-sm font-plus-jakarta mb-2">Name *</Text>
               <TextInput
-                className="bg-gray-800 text-gray-400 rounded-lg px-4 py-3 font-barlow"
-                value={formatPhoneForDisplay(user.phoneNumber)}
-                editable={false}
-              />
-              <Text className="text-gray-500 text-xs mt-1 font-barlow">
-                Verified phone number from sign-up
-              </Text>
-            </View>
-          )}
-
-          {/* Email (read-only for phone users, editable for OAuth as account recovery) */}
-          {isPhoneUser ? (
-            <View>
-              <Text className="text-white text-sm font-barlow mb-2">
-                Email (Optional)
-              </Text>
-              <TextInput
-                className="bg-gray-700 text-white rounded-lg px-4 py-3 font-barlow"
-                placeholder="email@example.com"
+                className="bg-gray-700 text-white rounded-lg px-4 py-3 font-plus-jakarta"
+                placeholder="Your full name"
                 placeholderTextColor="#9CA3AF"
-                value={formData.email}
-                onChangeText={(text) => {
-                  setFormData({ ...formData, email: text });
-                  setErrors({});
-                }}
-                keyboardType="email-address"
+                value={formData.name}
+                onChangeText={(text) => setFormData({ ...formData, name: text })}
+              />
+              {errors.name && (
+                <Text className="text-red-400 text-sm mt-1 font-plus-jakarta">
+                  {errors.name}
+                </Text>
+              )}
+            </View>
+
+            {/* Username Field */}
+            <View>
+              <Text className="text-white text-sm font-plus-jakarta mb-2">
+                Username *
+              </Text>
+              <TextInput
+                className="bg-gray-700 text-white rounded-lg px-4 py-3 font-plus-jakarta"
+                placeholder="Choose a username"
+                placeholderTextColor="#9CA3AF"
+                value={formData.username}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, username: text.toLowerCase() })
+                }
                 autoCapitalize="none"
                 autoCorrect={false}
               />
-              {errors.email && (
-                <Text className="text-red-400 text-sm mt-1 font-barlow">
-                  {errors.email}
+              {errors.username && (
+                <Text className="text-red-400 text-sm mt-1 font-plus-jakarta">
+                  {errors.username}
                 </Text>
               )}
-              <Text className="text-gray-500 text-xs mt-1 font-barlow">
-                Add an email for account recovery
+              <Text className="text-gray-500 text-xs mt-1 font-plus-jakarta">
+                Letters, numbers, underscores, and hyphens only
               </Text>
             </View>
-          ) : (
-            <View>
-              <Text className="text-white text-sm font-barlow mb-2">Email</Text>
-              <TextInput
-                className="bg-gray-800 text-gray-400 rounded-lg px-4 py-3 font-barlow"
-                value={formData.email}
-                editable={false}
-              />
-              <Text className="text-gray-500 text-xs mt-1 font-barlow">
-                Email from your OAuth account
-              </Text>
-            </View>
-          )}
 
-          <TouchableOpacity
-            className={`bg-blue-600 rounded-lg py-3 px-4 items-center justify-center ${
-              isLoading ? 'opacity-60' : ''
-            }`}
-            onPress={handleSubmit}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-<Text className="text-white text-base font-barlow-600">
-              Complete Setup
-            </Text>
+            {/* Phone Number (read-only for phone users) */}
+            {isPhoneUser && user?.phoneNumber && (
+              <View>
+                <Text className="text-white text-sm font-plus-jakarta mb-2">
+                  Phone Number
+                </Text>
+                <TextInput
+                  className="bg-gray-800 text-gray-400 rounded-lg px-4 py-3 font-plus-jakarta"
+                  value={formatPhoneForDisplay(user.phoneNumber)}
+                  editable={false}
+                />
+                <Text className="text-gray-500 text-xs mt-1 font-plus-jakarta">
+                  Verified phone number from sign-up
+                </Text>
+              </View>
             )}
-          </TouchableOpacity>
 
-          {/* Debug: Clear Auth Button */}
-          <TouchableOpacity
-            className="bg-red-600 rounded-lg py-2 px-4 items-center justify-center mt-4"
-            onPress={async () => {
-              Alert.alert(
-                'Clear Auth Data',
-                'This will sign you out and clear all authentication data. Are you sure?',
-                [
-                  {
-                    text: 'Cancel',
-                    style: 'cancel',
-                  },
-                  {
-                    text: 'Clear',
-                    style: 'destructive',
-                    onPress: async () => {
-                      try {
-                        // Clear SecureStore
-                        await SecureStore.deleteItemAsync('auth_token');
-                        await SecureStore.deleteItemAsync('user_data');
-                        // Sign out via context
-                        await signOut();
-                        // Navigate to sign in
-                        router.replace('/signin');
-                        Alert.alert('Success', 'Auth data cleared!');
-                      } catch (error) {
-                        console.error('Clear auth error:', error);
-                        Alert.alert('Error', 'Failed to clear auth data');
-                      }
+            {/* Email (read-only for phone users, editable for OAuth as account recovery) */}
+            {isPhoneUser ? (
+              <View>
+                <Text className="text-white text-sm font-plus-jakarta mb-2">
+                  Email (Optional)
+                </Text>
+                <TextInput
+                  className="bg-gray-700 text-white rounded-lg px-4 py-3 font-plus-jakarta"
+                  placeholder="email@example.com"
+                  placeholderTextColor="#9CA3AF"
+                  value={formData.email}
+                  onChangeText={(text) => {
+                    setFormData({ ...formData, email: text });
+                    setErrors({});
+                  }}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                {errors.email && (
+                  <Text className="text-red-400 text-sm mt-1 font-plus-jakarta">
+                    {errors.email}
+                  </Text>
+                )}
+                <Text className="text-gray-500 text-xs mt-1 font-plus-jakarta">
+                  Add an email for account recovery
+                </Text>
+              </View>
+            ) : (
+              <View>
+                <Text className="text-white text-sm font-plus-jakarta mb-2">Email</Text>
+                <TextInput
+                  className="bg-gray-800 text-gray-400 rounded-lg px-4 py-3 font-plus-jakarta"
+                  value={formData.email}
+                  editable={false}
+                />
+                <Text className="text-gray-500 text-xs mt-1 font-plus-jakarta">
+                  Email from your OAuth account
+                </Text>
+              </View>
+            )}
+
+            <TouchableOpacity
+              className={`bg-blue-600 rounded-lg py-3 px-4 items-center justify-center ${isLoading ? 'opacity-60' : ''
+                }`}
+              onPress={handleSubmit}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text className="text-white text-base font-plus-jakarta-600">
+                  Complete Setup
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            {/* Debug: Clear Auth Button */}
+            <TouchableOpacity
+              className="bg-red-600 rounded-lg py-2 px-4 items-center justify-center mt-4"
+              onPress={async () => {
+                Alert.alert(
+                  'Clear Auth Data',
+                  'This will sign you out and clear all authentication data. Are you sure?',
+                  [
+                    {
+                      text: 'Cancel',
+                      style: 'cancel',
                     },
-                  },
-                ]
-              );
-            }}
-          >
-            <Text className="text-white text-sm font-barlow-600">
-              🔧 Debug: Clear Auth & Sign Out
-            </Text>
-          </TouchableOpacity>
+                    {
+                      text: 'Clear',
+                      style: 'destructive',
+                      onPress: async () => {
+                        try {
+                          // Clear SecureStore
+                          await SecureStore.deleteItemAsync('auth_token');
+                          await SecureStore.deleteItemAsync('user_data');
+                          // Sign out via context
+                          await signOut();
+                          // Navigate to sign in
+                          router.replace('/signin');
+                          Alert.alert('Success', 'Auth data cleared!');
+                        } catch (error) {
+                          console.error('Clear auth error:', error);
+                          Alert.alert('Error', 'Failed to clear auth data');
+                        }
+                      },
+                    },
+                  ]
+                );
+              }}
+            >
+              <Text className="text-white text-sm font-plus-jakarta-600">
+                🔧 Debug: Clear Auth & Sign Out
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
     </SafeScreen>
   );
 }

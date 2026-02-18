@@ -524,7 +524,7 @@ export default function LongPressRouteCard({
                         {xpDisplay}
                         {route.completed && (
                             <View className="bg-black border border-green-400 rounded-full p-4 py-2 flex items-center justify-center">
-                                <Text className="text-green-400 text-3xl font-barlow-700">✓</Text>
+                                <Text className="text-green-400 text-3xl font-plus-jakarta-700">✓</Text>
                             </View>
                         )}
                     </View>
@@ -559,7 +559,7 @@ export default function LongPressRouteCard({
                         {/* Large Grade Background (semi-transparent) */}
                         <View className="absolute inset-0 justify-center items-center">
                             <Text
-                                className="text-white font-barlow-700"
+                                className="text-white font-plus-jakarta-700"
                                 style={{
                                     fontSize: 120,
                                     opacity: 0.15,
@@ -573,7 +573,7 @@ export default function LongPressRouteCard({
                         {/* Centered Route Content */}
                         <View className="flex-1 justify-center items-center z-10 px-4">
                             <Text
-                                className="text-white text-3xl font-barlow-700 text-center"
+                                className="text-white text-3xl font-plus-jakarta-700 text-center"
                                 numberOfLines={2}
                                 style={{
                                     textShadowColor: 'rgba(0, 0, 0, 0.75)',
@@ -640,7 +640,7 @@ export default function LongPressRouteCard({
                         />
 
                         {/* Button text */}
-                        <Text className="text-white text-lg font-barlow-700 z-10">
+                        <Text className="text-white text-lg font-plus-jakarta-700 z-10">
                             {isLongPressing && !isCompleting && !showSuccessCheck
                                 ? 'Hold to flash...'
                                 : 'Hold to Flash'}

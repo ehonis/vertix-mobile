@@ -204,39 +204,39 @@ export default function TestingScreen() {
   return (
     <ScrollView className="flex-1 bg-black p-4">
       <View className="mb-6">
-        <Text className="text-white text-2xl font-barlow-700 mb-2">
+        <Text className="text-white text-2xl font-plus-jakarta-700 mb-2">
           Animation Testing
         </Text>
-        <Text className="text-gray-400 text-sm font-barlow">
+        <Text className="text-gray-400 text-sm font-plus-jakarta">
           Test XP notifications and animations without affecting the database.
         </Text>
       </View>
 
       {/* Current XP Status */}
       <View className="bg-slate-800 rounded-xl p-4 mb-6">
-        <Text className="text-gray-400 text-xs font-barlow mb-2">CURRENT STATUS</Text>
+        <Text className="text-gray-400 text-xs font-plus-jakarta mb-2">CURRENT STATUS</Text>
         <View className="flex-row justify-between">
           <View>
-            <Text className="text-white text-lg font-barlow-500">Level {currentLevel}</Text>
-            <Text className="text-gray-400 text-sm font-barlow">{currentXp} Total XP</Text>
+            <Text className="text-white text-lg font-plus-jakarta-500">Level {currentLevel}</Text>
+            <Text className="text-gray-400 text-sm font-plus-jakarta">{currentXp} Total XP</Text>
           </View>
           <View className="items-end">
-            <Text className="text-blue-400 text-lg font-barlow-500">{xpToNextLevel} XP</Text>
-            <Text className="text-gray-400 text-sm font-barlow">to next level</Text>
+            <Text className="text-blue-400 text-lg font-plus-jakarta-500">{xpToNextLevel} XP</Text>
+            <Text className="text-gray-400 text-sm font-plus-jakarta">to next level</Text>
           </View>
         </View>
       </View>
 
       {/* XP Trigger Buttons */}
       <View className="mb-6">
-        <Text className="text-white text-lg font-barlow-600 mb-3">XP Triggers</Text>
+        <Text className="text-white text-lg font-plus-jakarta-600 mb-3">XP Triggers</Text>
         <View className="gap-3">
           <Animated.View style={buttonAnimatedStyle}>
             <TouchableOpacity
               onPress={handleSmallXpGain}
               className="bg-green-600 rounded-lg py-3 px-4 items-center"
             >
-              <Text className="text-white text-base font-barlow-500">+50 XP (Small Gain)</Text>
+              <Text className="text-white text-base font-plus-jakarta-500">+50 XP (Small Gain)</Text>
             </TouchableOpacity>
           </Animated.View>
 
@@ -244,49 +244,49 @@ export default function TestingScreen() {
             onPress={handleMediumXpGain}
             className="bg-blue-600 rounded-lg py-3 px-4 items-center"
           >
-            <Text className="text-white text-base font-barlow-500">+200 XP (Medium Gain)</Text>
+            <Text className="text-white text-base font-plus-jakarta-500">+200 XP (Medium Gain)</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={handleLevelUp}
             className="bg-yellow-600 rounded-lg py-3 px-4 items-center"
           >
-            <Text className="text-white text-base font-barlow-500">Level Up!</Text>
+            <Text className="text-white text-base font-plus-jakarta-500">Level Up!</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={handleMultiLevelUp}
             className="bg-red-600 rounded-lg py-3 px-4 items-center"
           >
-            <Text className="text-white text-base font-barlow-500">Multi Level Up (+2)</Text>
+            <Text className="text-white text-base font-plus-jakarta-500">Multi Level Up (+2)</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       {/* Notification Triggers */}
       <View className="mb-6">
-        <Text className="text-white text-lg font-barlow-600 mb-3">Notifications</Text>
+        <Text className="text-white text-lg font-plus-jakarta-600 mb-3">Notifications</Text>
         <View className="flex-row gap-3">
           <TouchableOpacity
             onPress={handleSuccessNotification}
             className="flex-1 bg-green-600/30 border border-green-500 rounded-lg py-3 px-4 items-center"
           >
-            <Text className="text-green-400 text-base font-barlow-500">Success</Text>
+            <Text className="text-green-400 text-base font-plus-jakarta-500">Success</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={handleErrorNotification}
             className="flex-1 bg-red-600/30 border border-red-500 rounded-lg py-3 px-4 items-center"
           >
-            <Text className="text-red-400 text-base font-barlow-500">Error</Text>
+            <Text className="text-red-400 text-base font-plus-jakarta-500">Error</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       {/* Long Press Route Card Test */}
       <View className="mb-6">
-        <Text className="text-white text-lg font-barlow-600 mb-3">Long Press Route Card</Text>
-        <Text className="text-gray-400 text-xs font-barlow mb-3">
+        <Text className="text-white text-lg font-plus-jakarta-600 mb-3">Long Press Route Card</Text>
+        <Text className="text-gray-400 text-xs font-plus-jakarta mb-3">
           Tap to "open popup" • Hold to quick complete as flash
         </Text>
         <View className="mb-3">
@@ -297,7 +297,7 @@ export default function TestingScreen() {
             xpDisplay={
               !mockRouteCompleted ? (
                 <View className="bg-black border border-green-400 rounded-full px-2 py-1">
-                  <Text className="text-green-400 text-base font-barlow-700 italic">
+                  <Text className="text-green-400 text-base font-plus-jakarta-700 italic">
                     69xp
                   </Text>
                 </View>
@@ -309,18 +309,18 @@ export default function TestingScreen() {
           onPress={resetMockLongPressRoute}
           className="bg-gray-700 rounded-lg py-2 px-4 items-center"
         >
-          <Text className="text-gray-300 text-sm font-barlow-500">Reset Route</Text>
+          <Text className="text-gray-300 text-sm font-plus-jakarta-500">Reset Route</Text>
         </TouchableOpacity>
       </View>
 
       {/* Mock Route Popup */}
       <View className="mb-6">
-        <Text className="text-white text-lg font-barlow-600 mb-3">Mock Route Popup</Text>
+        <Text className="text-white text-lg font-plus-jakarta-600 mb-3">Mock Route Popup</Text>
         <TouchableOpacity
           onPress={() => setShowMockPopup(true)}
           className="bg-purple-600 rounded-lg py-3 px-4 items-center"
         >
-          <Text className="text-white text-base font-barlow-500">Open Mock Route</Text>
+          <Text className="text-white text-base font-plus-jakarta-500">Open Mock Route</Text>
         </TouchableOpacity>
       </View>
 
@@ -334,14 +334,14 @@ export default function TestingScreen() {
         <View className="flex-1 justify-end bg-black/50">
           <View className="bg-slate-900 rounded-t-3xl p-6">
             <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-white text-xl font-barlow-700">Mock Route</Text>
+              <Text className="text-white text-xl font-plus-jakarta-700">Mock Route</Text>
               <TouchableOpacity onPress={() => setShowMockPopup(false)}>
-                <Text className="text-gray-400 text-base font-barlow">Close</Text>
+                <Text className="text-gray-400 text-base font-plus-jakarta">Close</Text>
               </TouchableOpacity>
             </View>
 
             {/* Grade Selector */}
-            <Text className="text-gray-400 text-sm font-barlow mb-2">Select Grade:</Text>
+            <Text className="text-gray-400 text-sm font-plus-jakarta mb-2">Select Grade:</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
               <View className="flex-row gap-2">
                 {MOCK_GRADES.map((grade) => (
@@ -356,7 +356,7 @@ export default function TestingScreen() {
                       : 'bg-gray-700'
                       }`}
                   >
-                    <Text className="text-white text-sm font-barlow-500">{grade.label}</Text>
+                    <Text className="text-white text-sm font-plus-jakarta-500">{grade.label}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -365,16 +365,16 @@ export default function TestingScreen() {
             {/* Route Stats */}
             <View className="bg-slate-800 rounded-lg p-4 mb-4">
               <View className="flex-row justify-between mb-2">
-                <Text className="text-gray-400 font-barlow">Completions:</Text>
-                <Text className="text-white font-barlow-500">{mockCompletions}</Text>
+                <Text className="text-gray-400 font-plus-jakarta">Completions:</Text>
+                <Text className="text-white font-plus-jakarta-500">{mockCompletions}</Text>
               </View>
               <View className="flex-row justify-between mb-2">
-                <Text className="text-gray-400 font-barlow">Attempts:</Text>
-                <Text className="text-white font-barlow-500">{mockAttempts}</Text>
+                <Text className="text-gray-400 font-plus-jakarta">Attempts:</Text>
+                <Text className="text-white font-plus-jakarta-500">{mockAttempts}</Text>
               </View>
               <View className="flex-row justify-between">
-                <Text className="text-gray-400 font-barlow">Base XP:</Text>
-                <Text className="text-green-400 font-barlow-500">{selectedGrade.xp} XP</Text>
+                <Text className="text-gray-400 font-plus-jakarta">Base XP:</Text>
+                <Text className="text-green-400 font-plus-jakarta-500">{selectedGrade.xp} XP</Text>
               </View>
             </View>
 
@@ -384,7 +384,7 @@ export default function TestingScreen() {
               className={`flex-row items-center justify-between p-4 rounded-lg mb-4 ${isFlash ? 'bg-yellow-600/30 border border-yellow-500' : 'bg-gray-700'
                 }`}
             >
-              <Text className="text-white font-barlow-500">Flash (First Try)</Text>
+              <Text className="text-white font-plus-jakarta-500">Flash (First Try)</Text>
               <View
                 className={`w-6 h-6 rounded-full ${isFlash ? 'bg-yellow-500' : 'bg-gray-500'}`}
               />
@@ -396,21 +396,21 @@ export default function TestingScreen() {
                 onPress={handleMockComplete}
                 className="bg-green-600 rounded-lg py-4 items-center"
               >
-                <Text className="text-white text-lg font-barlow-700">Complete Route</Text>
+                <Text className="text-white text-lg font-plus-jakarta-700">Complete Route</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={handleMockAttempt}
                 className="bg-blue-600 rounded-lg py-4 items-center"
               >
-                <Text className="text-white text-lg font-barlow-700">Log Attempt</Text>
+                <Text className="text-white text-lg font-plus-jakarta-700">Log Attempt</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={resetMockRoute}
                 className="bg-gray-700 rounded-lg py-3 items-center"
               >
-                <Text className="text-gray-300 text-base font-barlow-500">Reset Stats</Text>
+                <Text className="text-gray-300 text-base font-plus-jakarta-500">Reset Stats</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -419,7 +419,7 @@ export default function TestingScreen() {
 
       {/* Info Note */}
       <View className="bg-slate-800/50 rounded-lg p-4 mb-8">
-        <Text className="text-gray-400 text-xs font-barlow text-center">
+        <Text className="text-gray-400 text-xs font-plus-jakarta text-center">
           This tab is for testing only. No data is sent to the server.
           {'\n'}All XP gains here are local and reset when you restart the app.
         </Text>

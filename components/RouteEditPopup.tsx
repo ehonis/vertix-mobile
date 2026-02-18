@@ -165,17 +165,17 @@ export default function RouteEditPopup({ route, onCancel, onSave }: RouteEditPop
                 </Svg>
               </TouchableOpacity>
 
-              <Text className="font-barlow-700 mb-4 text-lg text-white">Edit route</Text>
-              <Text className="font-barlow mb-4 text-sm text-slate-400">
+              <Text className="font-plus-jakarta-700 mb-4 text-lg text-white">Edit route</Text>
+              <Text className="font-plus-jakarta mb-4 text-sm text-slate-400">
                 Position (x, y) is edited on the map.
               </Text>
 
               <ScrollView className="max-h-96" showsVerticalScrollIndicator={false}>
                 <View className="gap-4">
                   <View>
-                    <Text className="font-barlow-700 mb-2 text-sm text-white">Title</Text>
+                    <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Title</Text>
                     <TextInput
-                      className="rounded-lg bg-slate-800 px-4 py-3 font-barlow text-white"
+                      className="rounded-lg bg-slate-800 px-4 py-3 font-plus-jakarta text-white"
                       placeholder="Route name"
                       placeholderTextColor="#9CA3AF"
                       value={editTitle}
@@ -185,12 +185,12 @@ export default function RouteEditPopup({ route, onCancel, onSave }: RouteEditPop
                   </View>
 
                   <View>
-                    <Text className="font-barlow-700 mb-2 text-sm text-white">Wall</Text>
+                    <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Wall</Text>
                     <TouchableOpacity
                       onPress={() => setShowWallPicker(!showWallPicker)}
                       className="rounded-lg border border-slate-600 bg-slate-800 px-4 py-3"
                     >
-                      <Text className="font-barlow text-white">
+                      <Text className="font-plus-jakarta text-white">
                         {formatWallName(editLocation)}
                       </Text>
                     </TouchableOpacity>
@@ -215,8 +215,8 @@ export default function RouteEditPopup({ route, onCancel, onSave }: RouteEditPop
                           >
                             <Text
                               className={cn(
-                                'font-barlow',
-                                editLocation === loc ? 'font-barlow-700 text-white' : 'text-slate-300'
+                                'font-plus-jakarta',
+                                editLocation === loc ? 'font-plus-jakarta-700 text-white' : 'text-slate-300'
                               )}
                             >
                               {formatWallName(loc)}
@@ -228,7 +228,7 @@ export default function RouteEditPopup({ route, onCancel, onSave }: RouteEditPop
                   </View>
 
                   <View>
-                    <Text className="font-barlow-700 mb-2 text-sm text-white">Color</Text>
+                    <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Color</Text>
                     <ScrollView
                       horizontal
                       showsHorizontalScrollIndicator={false}
@@ -253,7 +253,7 @@ export default function RouteEditPopup({ route, onCancel, onSave }: RouteEditPop
                   </View>
 
                   <View>
-                    <Text className="font-barlow-700 mb-2 text-sm text-white">Grade</Text>
+                    <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Grade</Text>
                     {isRope ? (
                       <View className="gap-3">
                         <ScrollView
@@ -272,7 +272,7 @@ export default function RouteEditPopup({ route, onCancel, onSave }: RouteEditPop
                                   selected ? 'bg-green-600' : 'bg-slate-800'
                                 )}
                               >
-                                <Text className="font-barlow-700 text-sm text-white">
+                                <Text className="font-plus-jakarta-700 text-sm text-white">
                                   {g === '5.feature' ? '5.FEATURE' : g}
                                 </Text>
                               </TouchableOpacity>
@@ -294,7 +294,7 @@ export default function RouteEditPopup({ route, onCancel, onSave }: RouteEditPop
                                     selected ? 'bg-green-600' : 'bg-slate-800'
                                   )}
                                 >
-                                  <Text className="font-barlow-700 text-sm text-white">
+                                  <Text className="font-plus-jakarta-700 text-sm text-white">
                                     {m === '' ? 'none' : m}
                                   </Text>
                                 </TouchableOpacity>
@@ -322,7 +322,7 @@ export default function RouteEditPopup({ route, onCancel, onSave }: RouteEditPop
                                 selected ? 'bg-green-600' : 'bg-slate-800'
                               )}
                             >
-                              <Text className="font-barlow-700 text-sm text-white">{label}</Text>
+                              <Text className="font-plus-jakarta-700 text-sm text-white">{label}</Text>
                             </TouchableOpacity>
                           );
                         })}
@@ -335,13 +335,13 @@ export default function RouteEditPopup({ route, onCancel, onSave }: RouteEditPop
                       onPress={onCancel}
                       className="flex-1 items-center rounded-lg border border-slate-500 bg-slate-800 py-3"
                     >
-                      <Text className="font-barlow-700 text-white">Cancel</Text>
+                      <Text className="font-plus-jakarta-700 text-white">Cancel</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={handleSave}
                       className="flex-1 items-center rounded-lg bg-green-600 py-3"
                     >
-                      <Text className="font-barlow-700 text-white">Save</Text>
+                      <Text className="font-plus-jakarta-700 text-white">Save</Text>
                     </TouchableOpacity>
                   </View>
                 </View>

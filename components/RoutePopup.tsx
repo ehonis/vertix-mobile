@@ -355,7 +355,7 @@ export default function RoutePopup({
                 )}
               >
                 <View className="flex-row items-center gap-2">
-                  <Text className="text-green-400 text-xl font-barlow-700 italic">
+                  <Text className="text-green-400 text-xl font-plus-jakarta-700 italic">
                     {currentXp.xp}xp
                   </Text>
                   <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
@@ -372,10 +372,10 @@ export default function RoutePopup({
                 {isXpExpanded && (
                   <View className="mt-2 gap-1">
                     <View className="flex-row justify-between">
-                      <Text className="text-gray-300 text-xs font-barlow">
+                      <Text className="text-gray-300 text-xs font-plus-jakarta">
                         Base XP:
                       </Text>
-                      <Text className="text-green-400 text-xs font-barlow-700">
+                      <Text className="text-green-400 text-xs font-plus-jakarta-700">
                         {currentXp.baseXp} XP
                       </Text>
                     </View>
@@ -384,12 +384,12 @@ export default function RoutePopup({
                         key={extrapolated.type}
                         className="flex-row justify-between"
                       >
-                        <Text className="text-gray-300 text-xs font-barlow">
+                        <Text className="text-gray-300 text-xs font-plus-jakarta">
                           {extrapolated.type}:
                         </Text>
                         <Text
                           className={cn(
-                            'text-xs font-barlow-700',
+                            'text-xs font-plus-jakarta-700',
                             extrapolated.xp > 0
                               ? 'text-green-400'
                               : 'text-red-400'
@@ -446,19 +446,19 @@ export default function RoutePopup({
                 )}
                 <View className="flex-1">
                   <Text
-                    className="text-white text-3xl font-barlow-700"
+                    className="text-white text-3xl font-plus-jakarta-700"
                     numberOfLines={1}
                   >
                     {name}
                   </Text>
-                  <Text className="text-gray-300 text-xl italic font-barlow">
+                  <Text className="text-gray-300 text-xl italic font-plus-jakarta">
                     {gradeMapped}
                   </Text>
                   {grade.toLowerCase() !== 'vfeature' &&
                     grade.toLowerCase() !== '5.feature' && (
-                      <Text className="text-gray-400 text-sm font-barlow mt-1">
+                      <Text className="text-gray-400 text-sm font-plus-jakarta mt-1">
                         Community Grade:{' '}
-                        <Text className="font-barlow-700">
+                        <Text className="font-plus-jakarta-700">
                           {frontendCommunityGrade === 'none' ||
                             !frontendCommunityGrade
                             ? 'N/A'
@@ -471,7 +471,7 @@ export default function RoutePopup({
 
               {!user ? (
                 <View className="items-center gap-4">
-                  <Text className="text-white text-lg text-center font-barlow">
+                  <Text className="text-white text-lg text-center font-plus-jakarta">
                     To complete or attempt this route you must be signed in
                   </Text>
                 </View>
@@ -491,7 +491,7 @@ export default function RoutePopup({
                           ) : (
                             <>
                               <Text
-                                className="text-white text-xl font-barlow-600"
+                                className="text-white text-xl font-plus-jakarta-600"
                                 style={{ opacity: showAttemptSuccess ? 0 : 1 }}
                               >
                                 Attempt
@@ -532,7 +532,7 @@ export default function RoutePopup({
                           )}
                         </TouchableOpacity>
                         {frontendAttempts > 0 && (
-                          <Text className="text-gray-400 text-sm font-barlow">
+                          <Text className="text-gray-400 text-sm font-plus-jakarta">
                             {frontendAttempts} attempt
                             {frontendAttempts !== 1 ? 's' : ''}
                           </Text>
@@ -550,7 +550,7 @@ export default function RoutePopup({
                           ) : (
                             <>
                               <Text
-                                className="text-white text-xl font-barlow-600"
+                                className="text-white text-xl font-plus-jakarta-600"
                                 style={{ opacity: showCompleteSuccess ? 0 : 1 }}
                               >
                                 Complete
@@ -591,7 +591,7 @@ export default function RoutePopup({
                           )}
                         </TouchableOpacity>
                         {(frontendCompletions > 0 || isFrontendCompleted) && (
-                          <Text className="text-gray-400 text-sm font-barlow">
+                          <Text className="text-gray-400 text-sm font-plus-jakarta">
                             {frontendCompletions} send
                             {frontendCompletions !== 1 ? 's' : ''}
                           </Text>
@@ -604,7 +604,7 @@ export default function RoutePopup({
                       grade.toLowerCase() !== 'vfeature' &&
                       grade.toLowerCase() !== '5.feature' && (
                         <View className="items-center gap-3 mt-4">
-                          <Text className="text-white text-lg font-barlow-600">
+                          <Text className="text-white text-lg font-plus-jakarta-600">
                             Grade it Yourself!
                           </Text>
                           <View className="w-full">
@@ -621,7 +621,7 @@ export default function RoutePopup({
                             >
                               <Text
                                 className={cn(
-                                  'font-barlow-600',
+                                  'font-plus-jakarta-600',
                                   selectedGrade
                                     ? 'text-green-400'
                                     : 'text-gray-400'
@@ -672,7 +672,7 @@ export default function RoutePopup({
                                     >
                                       <Text
                                         className={cn(
-                                          'font-barlow-600',
+                                          'font-plus-jakarta-600',
                                           selectedGrade === gradeOption
                                             ? 'text-green-400'
                                             : 'text-white'
@@ -697,7 +697,7 @@ export default function RoutePopup({
                               ) : (
                                 <>
                                   <Text
-                                    className="text-white text-lg font-barlow-600"
+                                    className="text-white text-lg font-plus-jakarta-600"
                                     style={{ opacity: showGradeSuccess ? 0 : 1 }}
                                   >
                                     Submit
@@ -743,9 +743,9 @@ export default function RoutePopup({
 
                     {userGrade && (
                       <View className="items-center mt-4">
-                        <Text className="text-white text-center font-barlow">
+                        <Text className="text-white text-center font-plus-jakarta">
                           You graded this climb a{' '}
-                          <Text className="font-barlow-700">
+                          <Text className="font-plus-jakarta-700">
                             {userGrade.toUpperCase()}
                           </Text>
                         </Text>
@@ -754,7 +754,7 @@ export default function RoutePopup({
 
                     {/* Options */}
                     <View className="mt-4">
-                      <Text className="text-white text-lg font-barlow-600 mb-3">
+                      <Text className="text-white text-lg font-plus-jakarta-600 mb-3">
                         Options
                       </Text>
                       <View className="bg-gray-600/45 border border-gray-300 p-4 rounded-lg gap-4">
@@ -795,7 +795,7 @@ export default function RoutePopup({
                             disabled={isToday}
                             className="flex-1"
                           >
-                            <Text className="text-white font-barlow">
+                            <Text className="text-white font-plus-jakarta">
                               Completion Date is{' '}
                               {isToday ? (
                                 <Text className="text-green-400">Today</Text>
@@ -864,13 +864,13 @@ export default function RoutePopup({
                   onPress={() => setShowDatePicker(false)}
                   className="px-6 py-2"
                 >
-                  <Text className="text-gray-400 font-barlow">Cancel</Text>
+                  <Text className="text-gray-400 font-plus-jakarta">Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => setShowDatePicker(false)}
                   className="px-6 py-2 bg-green-500 rounded-lg"
                 >
-                  <Text className="text-white font-barlow-600">Done</Text>
+                  <Text className="text-white font-plus-jakarta-600">Done</Text>
                 </TouchableOpacity>
               </View>
             </View>

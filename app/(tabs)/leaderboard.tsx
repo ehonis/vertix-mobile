@@ -58,7 +58,7 @@ function LevelIndicator({ xp, size = 'sm' }: { xp: number; size?: 'xs' | 'sm' | 
 
     return (
         <View className={`${sizeClasses[size]} rounded-full border-2 ${colors.border} bg-gray-900/80 items-center justify-center`}>
-            <Text className={`${colors.text} font-barlow-700`}>{level}</Text>
+            <Text className={`${colors.text} font-plus-jakarta-700`}>{level}</Text>
         </View>
     );
 }
@@ -155,7 +155,7 @@ function LeaderboardRow({
                 {medal ? (
                     <Text className="text-xl">{medal}</Text>
                 ) : (
-                    <Text className={`font-barlow-700 ${style.rankColor}`}>#{index + 1}</Text>
+                    <Text className={`font-plus-jakarta-700 ${style.rankColor}`}>#{index + 1}</Text>
                 )}
             </View>
 
@@ -170,14 +170,14 @@ function LeaderboardRow({
                 ) : (
                     <DefaultAvatar />
                 )}
-                <Text className="text-white text-xs font-barlow-600 flex-1" numberOfLines={1}>
+                <Text className="text-white text-xs font-plus-jakarta-600 flex-1" numberOfLines={1}>
                     {user.username || user.name || 'Anonymous'}
                 </Text>
             </View>
 
             {/* XP */}
             <View className="ml-2 bg-slate-900/60 rounded-full px-3 py-1 border border-green-400/50">
-                <Text className="text-green-400 font-barlow-700 text-sm">
+                <Text className="text-green-400 font-plus-jakarta-700 text-sm">
                     {shortenXp(xp)} XP
                 </Text>
             </View>
@@ -201,7 +201,7 @@ function UserPositionCard({
         return (
             <View className={`${isMonthly ? 'bg-blue-500/25 border-blue-500' : 'bg-purple-500/25 border-purple-500'} border rounded-lg p-4 items-center`}>
                 <Text className="text-2xl mb-2">📊</Text>
-                <Text className="text-white font-barlow-600">
+                <Text className="text-white font-plus-jakarta-600">
                     {isMonthly ? 'No data for this month' : 'No ranking data'}
                 </Text>
                 <Text className="text-gray-400 text-sm mt-1">Start climbing to appear on the leaderboard!</Text>
@@ -219,7 +219,7 @@ function UserPositionCard({
             {/* Rank */}
             <View className="w-14 flex-row items-center gap-1">
                 {medal && <Text className="text-2xl">{medal}</Text>}
-                <Text className={`font-barlow-700 ${style.rankColor}`}>#{rank + 1}</Text>
+                <Text className={`font-plus-jakarta-700 ${style.rankColor}`}>#{rank + 1}</Text>
             </View>
 
             {/* User info */}
@@ -233,14 +233,14 @@ function UserPositionCard({
                 ) : (
                     <DefaultAvatar />
                 )}
-                <Text className="text-white text-xs font-barlow-600 flex-1" numberOfLines={1}>
+                <Text className="text-white text-xs font-plus-jakarta-600 flex-1" numberOfLines={1}>
                     {user.username || user.name || 'You'}
                 </Text>
             </View>
 
             {/* XP */}
             <View className="ml-2 bg-slate-900/60 rounded-full px-3 py-1 border border-green-400/50">
-                <Text className="text-green-400 font-barlow-700 text-sm">
+                <Text className="text-green-400 font-plus-jakarta-700 text-sm">
                     {shortenXp(xp)} XP
                 </Text>
             </View>
@@ -300,7 +300,7 @@ export default function LeaderboardScreen() {
         return (
             <SafeScreen className="bg-black justify-center items-center">
                 <ActivityIndicator size="large" color="#fff" />
-                <Text className="text-white mt-4 font-barlow">Loading leaderboard...</Text>
+                <Text className="text-white mt-4 font-plus-jakarta">Loading leaderboard...</Text>
             </SafeScreen>
         );
     }
@@ -308,12 +308,12 @@ export default function LeaderboardScreen() {
     if (error) {
         return (
             <SafeScreen className="bg-black justify-center items-center p-6">
-                <Text className="text-red-500 text-lg mb-4 font-barlow-600">{error}</Text>
+                <Text className="text-red-500 text-lg mb-4 font-plus-jakarta-600">{error}</Text>
                 <TouchableOpacity
                     onPress={fetchLeaderboard}
                     className="bg-blue-500/25 border border-blue-500 rounded-lg px-4 py-2"
                 >
-                    <Text className="text-white font-barlow-600">Try Again</Text>
+                    <Text className="text-white font-plus-jakarta-600">Try Again</Text>
                 </TouchableOpacity>
             </SafeScreen>
         );
@@ -321,111 +321,111 @@ export default function LeaderboardScreen() {
 
     return (
         <SafeScreen className="bg-black">
-        <ScrollView
-            className="flex-1"
-            refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
-            }
-        >
-            <View className="p-4">
-                {/* Header */}
-                <View className="flex-row items-end justify-between mb-4">
-                    <View>
-                        <Text className="text-white text-3xl font-barlow-700 italic">
-                            Leaderboard
-                        </Text>
-                        <View className="h-1 bg-white rounded-full mt-1" />
+            <ScrollView
+                className="flex-1"
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
+                }
+            >
+                <View className="p-4">
+                    {/* Header */}
+                    <View className="flex-row items-end justify-between mb-4">
+                        <View>
+                            <Text className="text-white text-3xl font-plus-jakarta-700 italic">
+                                Leaderboard
+                            </Text>
+                            <View className="h-1 bg-white rounded-full mt-1" />
+                        </View>
+                        <Svg viewBox="0 0 256 256" className="w-10 h-10" fill="white">
+                            <Path d="M112.41,102.53a8,8,0,0,1,5.06-10.12l12-4A8,8,0,0,1,140,96v40a8,8,0,0,1-16,0V107.1l-1.47.49A8,8,0,0,1,112.41,102.53ZM248,208a8,8,0,0,1-8,8H16a8,8,0,0,1,0-16h8V104A16,16,0,0,1,40,88H80V56A16,16,0,0,1,96,40h64a16,16,0,0,1,16,16v72h40a16,16,0,0,1,16,16v56h8A8,8,0,0,1,248,208Zm-72-64v56h40V144ZM96,200h64V56H96Zm-56,0H80V104H40Z" />
+                        </Svg>
                     </View>
-                    <Svg viewBox="0 0 256 256" className="w-10 h-10" fill="white">
-                        <Path d="M112.41,102.53a8,8,0,0,1,5.06-10.12l12-4A8,8,0,0,1,140,96v40a8,8,0,0,1-16,0V107.1l-1.47.49A8,8,0,0,1,112.41,102.53ZM248,208a8,8,0,0,1-8,8H16a8,8,0,0,1,0-16h8V104A16,16,0,0,1,40,88H80V56A16,16,0,0,1,96,40h64a16,16,0,0,1,16,16v72h40a16,16,0,0,1,16,16v56h8A8,8,0,0,1,248,208Zm-72-64v56h40V144ZM96,200h64V56H96Zm-56,0H80V104H40Z" />
-                    </Svg>
-                </View>
 
-                {/* User Position Section */}
-                <View className="mb-6">
-                    <Text className="text-white text-lg font-barlow-600 mb-2">
-                        Your Position{' '}
-                        <Text className="text-gray-400 text-sm">
-                            ({isMonthly ? 'monthly' : 'total'})
+                    {/* User Position Section */}
+                    <View className="mb-6">
+                        <Text className="text-white text-lg font-plus-jakarta-600 mb-2">
+                            Your Position{' '}
+                            <Text className="text-gray-400 text-sm">
+                                ({isMonthly ? 'monthly' : 'total'})
+                            </Text>
                         </Text>
-                    </Text>
-                    <UserPositionCard
-                        user={user}
-                        rank={userRank ?? null}
-                        xp={getUserXp()}
-                        isMonthly={isMonthly}
-                    />
-                </View>
-
-                {/* Toggle and Title */}
-                <View className="flex-row items-center justify-between mb-4">
-                    <Text className="text-white text-xl font-barlow-700">
-                        {isMonthly ? `${data?.currentMonth || 'Monthly'}. XP` : 'Total XP'}
-                    </Text>
-                    <TouchableOpacity
-                        onPress={() => {
-                            setIsMonthly(!isMonthly);
-                            setShowAll(false);
-                        }}
-                        className={`px-4 py-2 rounded-full ${isMonthly
-                            ? 'bg-blue-500/35 border border-blue-500'
-                            : 'bg-purple-500/35 border border-purple-500'
-                            }`}
-                    >
-                        <Text className="text-white font-barlow-600">
-                            {isMonthly ? 'Monthly' : 'Total'}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Leaderboard List */}
-                {currentList.length === 0 ? (
-                    <View className="items-center py-8">
-                        <Text className="text-2xl mb-2">📊</Text>
-                        <Text className="text-white font-barlow-600">No data available</Text>
-                        <Text className="text-gray-400 text-sm mt-1">
-                            Start climbing to appear on the leaderboard!
-                        </Text>
+                        <UserPositionCard
+                            user={user}
+                            rank={userRank ?? null}
+                            xp={getUserXp()}
+                            isMonthly={isMonthly}
+                        />
                     </View>
-                ) : (
-                    <View className="gap-3">
-                        {displayList.map((entry, index) => {
-                            const entryUser = isMonthly
-                                ? (entry as MonthlyEntry).user
-                                : (entry as LeaderboardUser);
-                            const entryXp = isMonthly
-                                ? (entry as MonthlyEntry).xp
-                                : (entry as LeaderboardUser).totalXp;
 
-                            return (
-                                <LeaderboardRow
-                                    key={entryUser.id}
-                                    user={entryUser}
-                                    xp={entryXp}
-                                    index={index}
-                                    isMonthly={isMonthly}
-                                />
-                            );
-                        })}
-
-                        {/* Show More/Less Button */}
-                        {currentList.length > 10 && (
-                            <TouchableOpacity
-                                onPress={() => setShowAll(!showAll)}
-                                className={`mt-2 p-3 rounded-lg ${isMonthly
-                                    ? 'bg-blue-500/25 border border-blue-500'
-                                    : 'bg-purple-500/25 border border-purple-500'
-                                    }`}
-                            >
-                                <Text className="text-white text-center font-barlow-600">
-                                    {showAll ? 'Show Less' : `Show All (${currentList.length})`}
-                                </Text>
-                            </TouchableOpacity>
-                        )}
+                    {/* Toggle and Title */}
+                    <View className="flex-row items-center justify-between mb-4">
+                        <Text className="text-white text-xl font-plus-jakarta-700">
+                            {isMonthly ? `${data?.currentMonth || 'Monthly'}. XP` : 'Total XP'}
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setIsMonthly(!isMonthly);
+                                setShowAll(false);
+                            }}
+                            className={`px-4 py-2 rounded-full ${isMonthly
+                                ? 'bg-blue-500/35 border border-blue-500'
+                                : 'bg-purple-500/35 border border-purple-500'
+                                }`}
+                        >
+                            <Text className="text-white font-plus-jakarta-600">
+                                {isMonthly ? 'Monthly' : 'Total'}
+                            </Text>
+                        </TouchableOpacity>
                     </View>
-                )}
-            </View>
-        </ScrollView>
+
+                    {/* Leaderboard List */}
+                    {currentList.length === 0 ? (
+                        <View className="items-center py-8">
+                            <Text className="text-2xl mb-2">📊</Text>
+                            <Text className="text-white font-plus-jakarta-600">No data available</Text>
+                            <Text className="text-gray-400 text-sm mt-1">
+                                Start climbing to appear on the leaderboard!
+                            </Text>
+                        </View>
+                    ) : (
+                        <View className="gap-3">
+                            {displayList.map((entry, index) => {
+                                const entryUser = isMonthly
+                                    ? (entry as MonthlyEntry).user
+                                    : (entry as LeaderboardUser);
+                                const entryXp = isMonthly
+                                    ? (entry as MonthlyEntry).xp
+                                    : (entry as LeaderboardUser).totalXp;
+
+                                return (
+                                    <LeaderboardRow
+                                        key={entryUser.id}
+                                        user={entryUser}
+                                        xp={entryXp}
+                                        index={index}
+                                        isMonthly={isMonthly}
+                                    />
+                                );
+                            })}
+
+                            {/* Show More/Less Button */}
+                            {currentList.length > 10 && (
+                                <TouchableOpacity
+                                    onPress={() => setShowAll(!showAll)}
+                                    className={`mt-2 p-3 rounded-lg ${isMonthly
+                                        ? 'bg-blue-500/25 border border-blue-500'
+                                        : 'bg-purple-500/25 border border-purple-500'
+                                        }`}
+                                >
+                                    <Text className="text-white text-center font-plus-jakarta-600">
+                                        {showAll ? 'Show Less' : `Show All (${currentList.length})`}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    )}
+                </View>
+            </ScrollView>
         </SafeScreen>
     );
 }

@@ -49,7 +49,7 @@ export default function Notification() {
       className={`absolute bottom-4 left-4 w-72 max-h-16 rounded-md border px-3 py-2 z-50 ${bgClass}`}
       style={animatedStyle}
     >
-      <Text className="text-white font-barlow-700 text-sm flex-1">
+      <Text className="text-white font-plus-jakarta-700 text-sm flex-1">
         {notification.message}
       </Text>
     </Animated.View>

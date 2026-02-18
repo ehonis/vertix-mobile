@@ -3,13 +3,13 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
-    Easing,
-    interpolate,
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
-    withSequence,
-    withTiming,
+  Easing,
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 
@@ -289,7 +289,7 @@ export default function XpLevelBar({ xpData, onComplete }: XpLevelBarProps) {
               <View className="w-11 h-11 rounded-full bg-gray-900/80 border-2 border-gray-500 items-center justify-center">
                 <Animated.View style={levelScaleStyle}>
                   <Text
-                    className="text-xl font-barlow-700"
+                    className="text-xl font-plus-jakarta-700"
                     style={{ color: accentColors.text }}
                   >
                     {currentLevel}
@@ -299,7 +299,7 @@ export default function XpLevelBar({ xpData, onComplete }: XpLevelBarProps) {
 
               {/* Progress bar */}
               <View className="flex-1">
-                <Text className="text-xs text-gray-300 font-barlow text-right mb-1">
+                <Text className="text-xs text-gray-300 font-plus-jakarta text-right mb-1">
                   {xpToNext} XP to next
                 </Text>
                 <View className="h-3 bg-gray-700 rounded-full overflow-hidden">
@@ -315,7 +315,7 @@ export default function XpLevelBar({ xpData, onComplete }: XpLevelBarProps) {
 
               {/* XP gained */}
               <Text
-                className="text-sm font-barlow-700"
+                className="text-sm font-plus-jakarta-700"
                 style={{ color: accentColors.xpGained }}
               >
                 +{xpData.totalXp} XP
@@ -347,16 +347,16 @@ export default function XpLevelBar({ xpData, onComplete }: XpLevelBarProps) {
               {/* XP breakdown */}
               {xpData.xpExtrapolated.length > 0 && (
                 <View className="mb-3">
-                  <Text className="text-xs text-gray-400 font-barlow mb-2">
+                  <Text className="text-xs text-gray-400 font-plus-jakarta mb-2">
                     XP Breakdown:
                   </Text>
                   {xpData.xpExtrapolated.map((item, index) => (
                     <View key={index} className="flex-row justify-between mb-1">
-                      <Text className="text-xs text-gray-300 font-barlow">
+                      <Text className="text-xs text-gray-300 font-plus-jakarta">
                         {item.type}:
                       </Text>
                       <Text
-                        className="text-xs font-barlow-500"
+                        className="text-xs font-plus-jakarta-500"
                         style={{
                           color: item.xp > 0 ? accentColors.xpGained : '#f87171',
                         }}
@@ -371,14 +371,14 @@ export default function XpLevelBar({ xpData, onComplete }: XpLevelBarProps) {
 
               {/* Base XP */}
               <View className="mb-3">
-                <Text className="text-xs text-gray-400 font-barlow">Base XP:</Text>
-                <Text className="text-sm text-gray-300 font-barlow">
+                <Text className="text-xs text-gray-400 font-plus-jakarta">Base XP:</Text>
+                <Text className="text-sm text-gray-300 font-plus-jakarta">
                   {xpData.baseXp} XP
                 </Text>
               </View>
 
               {/* Current stats */}
-              <Text className="text-xs text-gray-400 font-barlow text-center">
+              <Text className="text-xs text-gray-400 font-plus-jakarta text-center">
                 Total: {xpData.currentXp} XP • Level: {xpData.currentLevel}
               </Text>
             </View>

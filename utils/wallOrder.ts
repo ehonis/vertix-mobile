@@ -10,22 +10,55 @@ export interface RouteWithOrder {
 type Axis = "x" | "y";
 type Direction = "asc" | "desc";
 
-/**
- * High-level segment: "Between these y (or x) coords, order by increasing (or decreasing) x (or y)."
- * Segments are in display order (first segment = first in list).
- */
-export interface RangeOrderSegment {
-  /** Range on this axis (viewBox coords from TopDown). */
-  range: { axis: Axis; min: number; max: number };
-  /** Within this range, order by this axis and direction. */
-  orderBy: { axis: Axis; dir: Direction };
+/** Box in viewBox coords: xMin ≤ x ≤ xMax and yMin ≤ y ≤ yMax. */
+export interface OrderArea {
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
 }
+
+/**
+ * High-level segment: "Between these y (or x) coords, or inside this box, order by increasing (or decreasing) x (or y)."
+ * Segments are in display order (first segment = first in list).
+ * Use either range (1D band) or area (2D box)—not both.
+ */
+export type RangeOrderSegment =
+  | {
+      range: { axis: Axis; min: number; max: number };
+      orderBy: { axis: Axis; dir: Direction };
+    }
+  | {
+      area: OrderArea;
+      orderBy: { axis: Axis; dir: Direction };
+    };
 
 const AXIS_MAX = 500; // viewBox-ish; used to invert for desc
 
-function rangeContains(route: RouteWithOrder, range: RangeOrderSegment["range"]): boolean {
+function rangeContains(
+  route: RouteWithOrder,
+  range: { axis: Axis; min: number; max: number }
+): boolean {
   const v = range.axis === "x" ? route.x : route.y;
   return typeof v === "number" && v >= range.min && v <= range.max;
+}
+
+function areaContains(route: RouteWithOrder, area: OrderArea): boolean {
+  const x = route.x;
+  const y = route.y;
+  return (
+    typeof x === "number" &&
+    typeof y === "number" &&
+    x >= area.xMin &&
+    x <= area.xMax &&
+    y >= area.yMin &&
+    y <= area.yMax
+  );
+}
+
+function segmentContains(route: RouteWithOrder, segment: RangeOrderSegment): boolean {
+  if ("range" in segment) return rangeContains(route, segment.range);
+  return areaContains(route, segment.area);
 }
 
 function positionKey(route: RouteWithOrder, orderBy: RangeOrderSegment["orderBy"]): number {
@@ -43,7 +76,7 @@ export function getOrderKeyByRangeSegments(
   route: RouteWithOrder,
   segments: RangeOrderSegment[]
 ): number {
-  const idx = segments.findIndex(s => rangeContains(route, s.range));
+  const idx = segments.findIndex(s => segmentContains(route, s));
   const segment = idx >= 0 ? segments[idx] : null;
   const segmentKey = idx >= 0 ? idx * 1e6 : 1e9;
   const pos = segment ? positionKey(route, segment.orderBy) : 0;
@@ -79,7 +112,24 @@ export function getOrderKey(route: RouteWithOrder, wall: Locations, index: numbe
         ]);
       }
       case "ropeSouth":
-        return -x!;
+        return getOrderKeyByRangeSegments(route, [
+          {
+            area: { xMin: 160, xMax: 200, yMin: 170, yMax: 200 },
+            orderBy: { axis: "y", dir: "desc" },
+          },
+          {
+            area: { xMin: 135, xMax: 186, yMin: 114, yMax: 169 },
+            orderBy: { axis: "x", dir: "desc" },
+          },
+          {
+            area: { xMin: 99, xMax: 134, yMin: 114, yMax: 142 },
+            orderBy: { axis: "x", dir: "desc" },
+          },
+          {
+            area: { xMin: 90, xMax: 108, yMin: 143, yMax: 200 },
+            orderBy: { axis: "y", dir: "asc" },
+          },
+        ]);
       case "ropeNorthWest":
         // Example: between these y coords order by x; between other y coords order by y, etc.
         return getOrderKeyByRangeSegments(route, [

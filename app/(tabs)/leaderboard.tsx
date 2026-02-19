@@ -1,4 +1,5 @@
 import SafeScreen from '@/components/SafeScreen';
+import SegmentedPillToggle from '@/components/SegmentedPillToggle';
 import UserProfilePopup, { UserProfilePopupInitialData } from '@/components/UserProfilePopup';
 import { useAuth } from '@/contexts/AuthContext';
 import { useXp } from '@/contexts/XpContext';
@@ -648,7 +649,7 @@ export default function LeaderboardScreen() {
                                     </Text>
                                 </Text>
                                 {gradePointsLoading ? (
-                                    <View className="rounded-xl bg-white/5 border border-white/10 p-4 items-center justify-center min-h-[80px]">
+                                    <View className="rounded-xl bg-white/5 border border-white/10 p-4 items-center justify-center min-h-[69px]">
                                         <ActivityIndicator size="small" color="#fff" />
                                     </View>
                                 ) : showingError && category === 'grade_points' ? (
@@ -689,102 +690,40 @@ export default function LeaderboardScreen() {
                             <View className="flex-row items-center justify-between mb-4">
 
                                 <View className="flex-row gap-2 mb-6">
-                                    <View className="flex-row rounded-full bg-white/10 p-0.5">
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                if (gradePointsType === 'boulder') setInfoModalKey('boulder');
-                                                else {
-                                                    setGradePointsType('boulder');
-                                                    setShowAll(false);
-                                                }
-                                            }}
-                                            className={cn(
-                                                'flex-row items-center px-3 py-2 rounded-full',
-                                                gradePointsType === 'boulder' && 'bg-amber-500/50 border border-amber-500'
-                                            )}
-                                        >
-                                            <Text
-                                                className={cn(
-                                                    'font-plus-jakarta-600 text-sm',
-                                                    gradePointsType === 'boulder' ? 'text-white' : 'text-gray-400'
-                                                )}
-                                            >
-                                                Boulder
-                                            </Text>
-                                            {gradePointsType === 'boulder' && <InfoIcon className="bg-amber-400/40" />}
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                if (gradePointsType === 'rope') setInfoModalKey('rope');
-                                                else {
-                                                    setGradePointsType('rope');
-                                                    setShowAll(false);
-                                                }
-                                            }}
-                                            className={cn(
-                                                'flex-row items-center px-3 py-2 rounded-full',
-                                                gradePointsType === 'rope' && 'bg-amber-500/50 border border-amber-500'
-                                            )}
-                                        >
-                                            <Text
-                                                className={cn(
-                                                    'font-plus-jakarta-600 text-sm',
-                                                    gradePointsType === 'rope' ? 'text-white' : 'text-gray-400'
-                                                )}
-                                            >
-                                                Ropes
-                                            </Text>
-                                            {gradePointsType === 'rope' && <InfoIcon className="bg-amber-400/40" />}
-                                        </TouchableOpacity>
-                                    </View>
-                                    <View className="flex-row rounded-full bg-white/10 p-0.5">
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                if (isMonthly) setInfoModalKey('monthly');
-                                                else {
-                                                    setIsMonthly(true);
-                                                    setShowAll(false);
-                                                }
-                                            }}
-                                            className={cn(
-                                                'flex-row items-center px-3 py-2 rounded-full',
-                                                isMonthly && 'bg-blue-500/50 border border-blue-500'
-                                            )}
-                                        >
-                                            <Text
-                                                className={cn(
-                                                    'font-plus-jakarta-600 text-sm',
-                                                    isMonthly ? 'text-white' : 'text-gray-400'
-                                                )}
-                                            >
-                                                {isMonthly ? 'This Month' : 'Monthly'}
-                                            </Text>
-                                            {isMonthly && <InfoIcon className="bg-blue-400/40" />}
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                if (!isMonthly) setInfoModalKey('yearly');
-                                                else {
-                                                    setIsMonthly(false);
-                                                    setShowAll(false);
-                                                }
-                                            }}
-                                            className={cn(
-                                                'flex-row items-center px-3 py-2 rounded-full',
-                                                !isMonthly && 'bg-purple-500/50 border border-purple-500'
-                                            )}
-                                        >
-                                            <Text
-                                                className={cn(
-                                                    'font-plus-jakarta-600 text-sm',
-                                                    !isMonthly ? 'text-white' : 'text-gray-400'
-                                                )}
-                                            >
-                                                {isMonthly ? 'Yearly' : 'This Year'}
-                                            </Text>
-                                            {!isMonthly && <InfoIcon className="bg-purple-400/40" />}
-                                        </TouchableOpacity>
-                                    </View>
+                                    <SegmentedPillToggle
+                                        options={[
+                                            { value: 'boulder', label: 'Boulder' },
+                                            { value: 'rope', label: 'Ropes' },
+                                        ]}
+                                        value={gradePointsType}
+                                        onChange={(v) => {
+                                            setGradePointsType(v as GradePointsType);
+                                            setShowAll(false);
+                                        }}
+                                        optionStyles={[
+                                            { activeBg: 'bg-amber-500/50', activeBorder: 'border-amber-500' },
+                                            { activeBg: 'bg-amber-500/50', activeBorder: 'border-amber-500' },
+                                        ]}
+                                        showInfoIcon
+                                        onSelectedPress={(v) => setInfoModalKey(v)}
+                                    />
+                                    <SegmentedPillToggle
+                                        options={[
+                                            { value: 'monthly', label: 'This Month' },
+                                            { value: 'yearly', label: 'This Year' },
+                                        ]}
+                                        value={isMonthly ? 'monthly' : 'yearly'}
+                                        onChange={(v) => {
+                                            setIsMonthly(v === 'monthly');
+                                            setShowAll(false);
+                                        }}
+                                        optionStyles={[
+                                            { activeBg: 'bg-blue-500/50', activeBorder: 'border-blue-500' },
+                                            { activeBg: 'bg-purple-500/50', activeBorder: 'border-purple-500' },
+                                        ]}
+                                        showInfoIcon
+                                        onSelectedPress={(v) => setInfoModalKey(v)}
+                                    />
                                 </View>
                             </View>
                             {/* Podium + Rows: loader here only when loading; otherwise data or empty */}
@@ -926,54 +865,24 @@ export default function LeaderboardScreen() {
                         <>
                             <View className="flex-row items-center justify-between mb-10">
 
-                                <View className="flex-row rounded-full bg-white/10 p-0.5">
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            if (isMonthly) setInfoModalKey('monthly');
-                                            else {
-                                                setIsMonthly(true);
-                                                setShowAll(false);
-                                            }
-                                        }}
-                                        className={cn(
-                                            'flex-row items-center px-4 py-2 rounded-full',
-                                            isMonthly && 'bg-blue-500/50 border border-blue-500'
-                                        )}
-                                    >
-                                        <Text
-                                            className={cn(
-                                                'font-plus-jakarta-600 text-sm',
-                                                isMonthly ? 'text-white' : 'text-gray-400'
-                                            )}
-                                        >
-                                            Monthly
-                                        </Text>
-                                        {isMonthly && <InfoIcon className="bg-blue-400/40" />}
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            if (!isMonthly) setInfoModalKey('yearly');
-                                            else {
-                                                setIsMonthly(false);
-                                                setShowAll(false);
-                                            }
-                                        }}
-                                        className={cn(
-                                            'flex-row items-center px-4 py-2 rounded-full',
-                                            !isMonthly && 'bg-purple-500/50 border border-purple-500'
-                                        )}
-                                    >
-                                        <Text
-                                            className={cn(
-                                                'font-plus-jakarta-600 text-sm',
-                                                !isMonthly ? 'text-white' : 'text-gray-400'
-                                            )}
-                                        >
-                                            Yearly
-                                        </Text>
-                                        {!isMonthly && <InfoIcon className="bg-purple-400/40" />}
-                                    </TouchableOpacity>
-                                </View>
+                                <SegmentedPillToggle
+                                    options={[
+                                        { value: 'monthly', label: 'Monthly' },
+                                        { value: 'yearly', label: 'Yearly' },
+                                    ]}
+                                    value={isMonthly ? 'monthly' : 'yearly'}
+                                    onChange={(v) => {
+                                        setIsMonthly(v === 'monthly');
+                                        setShowAll(false);
+                                    }}
+                                    optionStyles={[
+                                        { activeBg: 'bg-blue-500/50', activeBorder: 'border-blue-500' },
+                                        { activeBg: 'bg-purple-500/50', activeBorder: 'border-purple-500' },
+                                    ]}
+                                    optionClassName="px-4 py-2"
+                                    showInfoIcon
+                                    onSelectedPress={(v) => setInfoModalKey(v)}
+                                />
                             </View>
 
                             {/* Podium (top 3) + List (4+) */}

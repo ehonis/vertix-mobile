@@ -1,7 +1,10 @@
+import EditProfileForm from '@/components/EditProfileForm';
 import SafeScreen from '@/components/SafeScreen';
+import SegmentedPillToggle from '@/components/SegmentedPillToggle';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { cn } from '@/utils/cn';
+import { getRouteGradeCounts } from '@/utils/gradePyramid';
 import { getLevelForXp, getXpForLevel } from '@/utils/routes';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -17,6 +20,7 @@ import {
   View,
 } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
+import { BarChart, PieChart } from 'react-native-gifted-charts';
 import Svg, { Path } from 'react-native-svg';
 
 interface Completion {
@@ -51,8 +55,9 @@ interface Attempt {
 }
 
 export default function DashboardScreen() {
-  const { user, refreshSession } = useAuth();
+  const { user, refreshSession, signOut } = useAuth();
   const router = useRouter();
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
   const [completions, setCompletions] = useState<Completion[]>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -63,6 +68,7 @@ export default function DashboardScreen() {
   const [attemptToDelete, setAttemptToDelete] = useState<Attempt | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [isBoulder, setIsBoulder] = useState(false);
   const swipeableRefs = useRef<Record<string, Swipeable | null>>({});
 
   useEffect(() => {
@@ -118,6 +124,12 @@ export default function DashboardScreen() {
     setAttemptToDelete(attempt);
     setCompletionToDelete(null);
     setShowDeleteConfirm(true);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    setSettingsModalVisible(false);
+    router.replace('/signin');
   };
 
   const confirmDelete = async () => {
@@ -248,6 +260,22 @@ export default function DashboardScreen() {
     gradeCounts[grade] = (gradeCounts[grade] || 0) + 1;
   });
 
+  // Grade pyramid: counts by grade for boulder vs rope (matches web).
+  // Pass the user's highest grade as the forced upper bound so the chart always
+  // extends to their highest grade even when completion data uses a different format.
+  const { boulderGradeCounts, ropeGradeCounts } = getRouteGradeCounts(completions, {
+    highestRopeGrade: user?.highestRopeGrade ?? null,
+    highestBoulderGrade: user?.highestBoulderGrade ?? null,
+  });
+  const displayedGradeCounts = isBoulder ? boulderGradeCounts : ropeGradeCounts;
+  const barChartData = displayedGradeCounts.map((d) => ({
+    value: d.count,
+    label: d.grade,
+  }));
+  // Match web pyramid: semi-transparent fill + solid outline
+  const barColor = isBoulder ? '#a855f7' : '#3b82f6';
+  const barColorFill = isBoulder ? '#a855f740' : '#3b82f640'; // ~25% opacity
+
   // Recent activity (last 20 items) - grouped by date
   const allActivities = [
     ...completions.map((c) => ({
@@ -340,7 +368,10 @@ export default function DashboardScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
         }
       >
-        <View className="p-5 pt-0 gap-2 items-center">
+        <View className="p-8 pt-0 gap-2 items-center">
+          {/* Header with settings gear */}
+
+
           {/* User Profile Section - ImageNamePlate Style */}
           <View className="w-full items-start  py-4 relative">
             {/* Profile Picture - positioned with negative margin */}
@@ -354,11 +385,32 @@ export default function DashboardScreen() {
                 <View className="w-36 h-36 rounded-full border-4 border-slate-900 bg-slate-700" />
               )}
             </View>
+            <View className="absolute top-10 right-0 w-full flex-row justify-end items-center py-2">
+              <TouchableOpacity
+                onPress={() => setSettingsModalVisible(true)}
+                className="p-2"
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              >
+                <Svg
+                  width={42}
+                  height={42}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <Path d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" />
+                  <Path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </Svg>
+              </TouchableOpacity>
+            </View>
 
             {/* Name and ID Plate - overlaps with image */}
             <TouchableOpacity
-              onPress={() => router.push('/(tabs)/profile')}
-              className="bg-slate-900 w-full rounded-lg mt-12 p-6 px-4 relative flex-row justify-between items-center"
+              onPress={() => setSettingsModalVisible(true)}
+              className="bg-slate-900 w-full rounded-t-lg mt-12 p-6 px-4 relative flex-row justify-between items-center"
               activeOpacity={0.7}
             >
               <View className="flex-1">
@@ -384,13 +436,14 @@ export default function DashboardScreen() {
                 </View>
               </View>
             </TouchableOpacity>
+
           </View>
 
           {/* XP Level Display - matches web styling with -mt-2 overlap */}
-          <View className="bg-slate-900 rounded-lg p-4 w-full -mt-2">
-            <View className="flex-row items-center gap-3">
+          <View className="bg-slate-900 rounded-b-lg p-4 w-full -mt-10">
+            <View className="flex-row items-center gap-3 bg-gray-800 rounded-lg p-4">
               <Text
-                className={`text-5xl font-plus-jakarta-700 ${accentColors.text} -mt-1`}
+                className={`text-5xl font-plus-jakarta-700 ${accentColors.text} mt-2`}
               >
                 {currentLevel}
               </Text>
@@ -421,6 +474,122 @@ export default function DashboardScreen() {
                 </View>
               </View>
             </View>
+          </View>
+
+          {/* Sends by category: pie chart + total raw sends + percentages */}
+          <View className="bg-slate-900 rounded-lg p-4 w-full mt-2">
+            <Text className="text-white text-xl font-plus-jakarta-700 mb-3">
+              Sends by category
+            </Text>
+            {(() => {
+              const boulderCount = completions.filter((c) => c.route?.type === 'BOULDER').length;
+              const ropeCount = completions.filter((c) => c.route?.type === 'ROPE').length;
+              const total = boulderCount + ropeCount;
+              const boulderPct = total ? Math.round((boulderCount / total) * 100) : 0;
+              const ropePct = total ? Math.round((ropeCount / total) * 100) : 0;
+              if (total === 0) {
+                return (
+                  <Text className="text-gray-400 text-center py-8 font-plus-jakarta">
+                    No sends yet.
+                  </Text>
+                );
+              }
+              const pieData = [
+                { value: boulderCount, color: '#a855f7', text: `Boulder ${boulderCount}` },
+                { value: ropeCount, color: '#3b82f6', text: `Rope ${ropeCount}` },
+              ].filter((d) => d.value > 0);
+              if (pieData.length === 0) return null;
+              return (
+                <View className="items-center">
+                  <View className="relative">
+                    <PieChart
+                      data={pieData}
+                      donut
+                      radius={72}
+
+                      innerRadius={44}
+                      innerCircleColor="rgba(15,23,42,0.95)"
+                      centerLabelComponent={() => (
+                        <View className="items-center justify-center">
+                          <Text className="text-white font-plus-jakarta-700 text-lg">{total}</Text>
+                          <Text className="text-gray-400 font-plus-jakarta text-xs">sends</Text>
+                        </View>
+                      )}
+                    />
+                  </View>
+                  <View className="flex-row gap-6 mt-3">
+                    <View className="flex-row items-center gap-1.5">
+                      <View className="w-3 h-3 rounded-full bg-purple-500" />
+                      <Text className="text-gray-300 font-plus-jakarta text-sm">
+                        Boulder {boulderCount} ({boulderPct}%)
+                      </Text>
+                    </View>
+                    <View className="flex-row items-center gap-1.5">
+                      <View className="w-3 h-3 rounded-full bg-blue-500" />
+                      <Text className="text-gray-300 font-plus-jakarta text-sm">
+                        Rope {ropeCount} ({ropePct}%)
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              );
+            })()}
+          </View>
+
+          {/* Tix by Grade - pyramid chart */}
+          <View className="bg-slate-900 rounded-lg p-4 w-full mt-2">
+            <View className="flex-row justify-between items-center mb-3">
+              <View className="flex-col items-start gap-0.5">
+                <Text className="text-white text-xl font-plus-jakarta-700">
+                  Tix by Grade
+                </Text>
+                <Text className="text-gray-400 text-xs font-plus-jakarta">Swipe to view all grades</Text>
+              </View>
+              <SegmentedPillToggle
+                options={[
+                  { value: 'rope', label: 'Rope' },
+                  { value: 'boulder', label: 'Boulder' },
+                ]}
+                value={isBoulder ? 'boulder' : 'rope'}
+                onChange={(v) => setIsBoulder(v === 'boulder')}
+                optionStyles={[
+                  { activeBg: 'bg-blue-500/50', activeBorder: 'border-blue-500' },
+                  { activeBg: 'bg-purple-500/50', activeBorder: 'border-purple-500' },
+                ]}
+              />
+            </View>
+            {displayedGradeCounts.length === 0 ? (
+              <Text className="text-gray-400 text-center py-8 font-plus-jakarta">
+                No ticks for this type yet.
+              </Text>
+            ) : (
+              <View style={{ height: 275 }} className="w-full overflow-hidden">
+                <BarChart
+                  data={barChartData}
+                  frontColor={barColorFill}
+                  barBorderColor={barColor}
+                  barBorderWidth={1}
+                  barBorderTopRightRadius={10}
+                  barBorderTopLeftRadius={10}
+                  barBorderBottomRightRadius={0}
+                  barBorderBottomLeftRadius={0}
+                  noOfSections={5}
+                  barWidth={32}
+                  spacing={10}
+                  rotateLabel
+                  hideRules
+                  adjustToWidth={false}
+                  xAxisColor="#fff"
+                  yAxisColor="#fff"
+                  showYAxisIndices
+                  showXAxisIndices
+                  yAxisIndicesColor="#fff"
+                  xAxisIndicesColor="#fff"
+                  yAxisTextStyle={{ color: '#fff' }}
+                  xAxisLabelTextStyle={{ color: '#fff' }}
+                />
+              </View>
+            )}
           </View>
 
           {/* Recent Activity */}
@@ -559,6 +728,64 @@ export default function DashboardScreen() {
             </ScrollView>
           </View>
         </View>
+
+        {/* Settings / Profile Modal */}
+        <Modal
+          visible={settingsModalVisible}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setSettingsModalVisible(false)}
+        >
+          <View className="flex-1 bg-black/70 justify-end">
+            <View
+              className="bg-black rounded-t-2xl"
+              style={{ height: '90%' }}
+            >
+              <View className="flex-row justify-between items-center p-4 border-b border-slate-800">
+                <Text className="text-white text-2xl font-plus-jakarta-600">
+                  Settings
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setSettingsModalVisible(false)}
+                  className="p-2"
+                  hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                >
+                  <Svg
+                    width={24}
+                    height={24}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="white"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <Path d="M18 6L6 18M6 6l12 12" />
+                  </Svg>
+                </TouchableOpacity>
+              </View>
+              <ScrollView className="flex-1 p-6" contentContainerStyle={{ paddingBottom: 32 }}>
+                {/* Editable profile form (name, username, photo, tag, visibility) */}
+                <EditProfileForm />
+
+                {user && (
+                  <>
+
+                    {/* Sign Out */}
+                    <TouchableOpacity
+                      onPress={handleSignOut}
+                      className="bg-red-600 rounded-xl py-4 px-6 items-center"
+                    >
+                      <Text className="text-white text-base font-plus-jakarta-600">
+                        Sign Out
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
 
         {/* Delete Confirmation Modal */}
         <Modal

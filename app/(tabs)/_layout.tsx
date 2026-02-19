@@ -1,11 +1,18 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { BlurView } from 'expo-blur';
+import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Image, View } from 'react-native';
+import { Image, Platform, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
+
+const isIOS = Platform.OS === 'ios';
+const useGlassTabBar = isIOS && isGlassEffectAPIAvailable();
+const useBlurTabBar = isIOS && !useGlassTabBar;
+const useFrostedTabBar = useGlassTabBar || useBlurTabBar;
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -26,14 +33,30 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors.tint,
         tabBarInactiveTintColor: Colors.tabIconDefault,
         tabBarStyle: {
-          backgroundColor: "#0a0f1a",
-          borderTopColor: '#1f2937',
-          borderTopWidth: 1,
+          backgroundColor: useFrostedTabBar ? 'transparent' : '#0a0f1a',
+          borderTopColor: useFrostedTabBar ? 'transparent' : '#1f2937',
+          borderTopWidth: useFrostedTabBar ? 0 : 1,
           height: 80,
           paddingBottom: 0,
           paddingTop: 14,
+          ...(useFrostedTabBar && { position: 'absolute' as const }),
         },
-
+        ...(useFrostedTabBar && {
+          tabBarBackground: () =>
+            useGlassTabBar ? (
+              <GlassView
+                style={StyleSheet.absoluteFill}
+                glassEffectStyle="regular"
+                tintColor="#0a0f1a"
+              />
+            ) : (
+              <BlurView
+                intensity={60}
+                tint="dark"
+                style={StyleSheet.absoluteFill}
+              />
+            ),
+        }),
         tabBarIconStyle: {
           marginBottom: 0, // No bottom margin on icon
           alignItems: 'center',

@@ -578,7 +578,7 @@ export default function LongPressRouteCard({
                             <Text
                                 className="text-white font-plus-jakarta-700"
                                 style={{
-                                    fontSize: 120,
+                                    fontSize: 100,
                                     opacity: 0.15,
                                     fontWeight: '700',
                                 }}

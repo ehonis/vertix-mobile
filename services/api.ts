@@ -269,6 +269,31 @@ class ApiService {
     });
   }
 
+  async updateRoute(data: {
+    routeId: string;
+    newTitle?: string;
+    newType?: string;
+    newGrade?: string;
+    newDate?: string | null;
+    newLocation?: string;
+    newX?: number;
+    newY?: number;
+  }): Promise<{ message: string }> {
+    return this.patch<{ message: string }>(API_ENDPOINTS.ROUTE_UPDATE, data);
+  }
+
+  async createRoute(payload: {
+    title?: string;
+    grade: string;
+    color: string;
+    location: string;
+    type: 'BOULDER' | 'ROPE';
+    x: number;
+    y: number;
+  }): Promise<{ data: { id: string; title: string; grade: string; color: string; type: string; location: string; x: number | null; y: number | null } }> {
+    return this.post(API_ENDPOINTS.ROUTE_CREATE, payload);
+  }
+
   async gradeRoute(data: { userId: string; routeId: string; selectedGrade: string }): Promise<any> {
     return this.post(API_ENDPOINTS.ROUTE_GRADE, data);
   }

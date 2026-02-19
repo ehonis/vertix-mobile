@@ -1,3 +1,4 @@
+import { getRouteDisplayColor } from '@/constants/routeColors';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Text, View } from 'react-native';
 import Svg, { Circle, Defs, G, Pattern, Polygon, Rect, Line as SvgLine, Text as SvgText } from 'react-native-svg';
@@ -1181,6 +1182,7 @@ function Compass() {
 // ============================================================================
 
 const ROUTE_R = 2;
+const ROUTE_R_SELECTED = 2.5;
 const ROUTE_STROKE = '#FFFFFF';
 const ROUTE_STROKE_WIDTH = 0.75;
 const ROUTE_SELECTED_SCALE = 1.5;
@@ -1220,6 +1222,7 @@ function MapRoute({
   }, [isSelected, scaleAnim]);
 
   const transform = `translate(${route.x}, ${route.y}) scale(${scale}) translate(${-route.x}, ${-route.y})`;
+  const circleR = isSelected ? ROUTE_R_SELECTED : ROUTE_R;
 
   return (
     <G transform={transform}>
@@ -1234,8 +1237,8 @@ function MapRoute({
       <Circle
         cx={route.x}
         cy={route.y}
-        r={ROUTE_R}
-        fill={route.color}
+        r={circleR}
+        fill={getRouteDisplayColor(route.color)}
         stroke={ROUTE_STROKE}
         strokeWidth={ROUTE_STROKE_WIDTH}
         onPress={onPress}

@@ -82,7 +82,12 @@ export default function SegmentedPillToggle({
 
   const handlePress = (optionValue: string) => {
     if (optionValue === value) {
-      onSelectedPress?.(optionValue);
+      if (showInfoIcon) {
+        onSelectedPress?.(optionValue);
+      } else {
+        const other = options.find((o) => o.value !== value);
+        if (other) onChange(other.value);
+      }
     } else {
       onChange(optionValue);
     }
@@ -95,13 +100,16 @@ export default function SegmentedPillToggle({
   }));
 
   const rowHeight = layouts[0]?.height ?? 40;
-  const currentStyle = selectedIndex >= 0 ? optionStyles[selectedIndex] : null;
-
+  const currentStyle = selectedIndex >= 0 && optionStyles[selectedIndex] != null
+    ? optionStyles[selectedIndex]
+    : null;
   const padding = 2; // match p-0.5 (2px) so pill aligns with option content area
 
+  const pillReady = layouts.length === options.length && currentStyle != null;
+
   return (
-    <View className={cn('flex-row rounded-full bg-white/10 p-0.5', className)}>
-      {layouts.length === options.length && currentStyle && (
+    <View className={cn('flex-row self-start rounded-full bg-white/10 p-0.5', className)}>
+      {pillReady && (
         <Animated.View
           pointerEvents="none"
           style={[
@@ -115,14 +123,13 @@ export default function SegmentedPillToggle({
           ]}
           className={cn(
             'rounded-full border',
-            currentStyle.activeBg,
-            currentStyle.activeBorder
+            currentStyle!.activeBg,
+            currentStyle!.activeBorder
           )}
         />
       )}
       {options.map((option, index) => {
         const isSelected = option.value === value;
-        const style = optionStyles[index];
         return (
           <TouchableOpacity
             key={option.value}
@@ -130,7 +137,7 @@ export default function SegmentedPillToggle({
             onPress={() => handlePress(option.value)}
             activeOpacity={0.7}
             className={cn(
-              'flex-row items-center rounded-full border border-transparent',
+              'flex-row items-center justify-center rounded-full border border-transparent',
               optionClassName
             )}
           >

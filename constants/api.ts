@@ -38,7 +38,9 @@ export const API_ENDPOINTS = {
   ROUTE_GRADE: '/api/mobile/routes/grade',
   ROUTE_DELETE: '/api/routes/edit/delete-route',
   ROUTE_ARCHIVE: '/api/routes/edit/archive-route',
-  
+  ROUTE_UPDATE: '/api/routes/edit/updateRoute',
+  ROUTE_CREATE: '/api/mobile/routes/create',
+
   // Dashboard endpoints
   DASHBOARD_COMPLETIONS: '/api/mobile/dashboard/completions',
   DASHBOARD_ATTEMPTS: '/api/mobile/dashboard/attempts',

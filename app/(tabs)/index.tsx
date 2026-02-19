@@ -1,7 +1,7 @@
 import LongPressRouteCard from '@/components/LongPressRouteCard';
 import RoutePopup from '@/components/RoutePopup';
 import SafeScreen from '@/components/SafeScreen';
-import TopDown, { Legend, Locations } from '@/components/TopDown';
+import TopDown, { Legend, Locations, type RouteDefinition } from '@/components/TopDown';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 import { cn } from '@/utils/cn';
@@ -10,13 +10,16 @@ import {
   findCommunityGradeForRoute,
   isGradeHigher
 } from '@/utils/routes';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { sortRoutesByWall } from '@/utils/wallOrder';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
   Dimensions,
   Easing,
   FlatList,
+  RefreshControl,
+  ScrollView,
   Text,
   TouchableOpacity,
   View
@@ -64,6 +67,9 @@ interface Route {
   communityGrades?: CommunityGrade[];
   bonusXp?: number | null;
   isArchive?: boolean;
+  x?: number | null;
+  y?: number | null;
+  order?: number | null;
 }
 
 export default function TabOneScreen() {
@@ -76,6 +82,7 @@ export default function TabOneScreen() {
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
 
   const [showRoutes, setShowRoutes] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Carousel scroll tracking
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -105,7 +112,7 @@ export default function TabOneScreen() {
       const filtered = allRoutes.filter(
         (route) => route.location === selectedWall
       );
-      setRoutes(filtered);
+      setRoutes(sortRoutesByWall(filtered, selectedWall));
       setShowRoutes(true);
 
       // Animate map height to 65% (carousel takes 35%)
@@ -224,12 +231,53 @@ export default function TabOneScreen() {
       setError('Failed to load routes');
     } finally {
       setIsLoading(false);
+      setRefreshing(false);
     }
   };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchRoutes();
+  }, [user]);
 
   const handleWallSelection = (wall: Locations | null) => {
     setSelectedWall(wall);
   };
+
+  /** Routes in RouteDefinition shape for TopDown; TopDown only renders dots for items with x and y */
+  const routesForMap = useMemo((): RouteDefinition[] => {
+    if (!selectedWall) return [];
+    return routes.map((r) => ({
+      routeId: r.id,
+      title: r.title,
+      grade: r.grade,
+      color: r.color,
+      type: (r.type === 'ROPE' || r.type === 'BOULDER' ? r.type : 'BOULDER') as 'BOULDER' | 'ROPE',
+      location: r.location as Locations,
+      x: typeof r.x === 'number' ? r.x : undefined,
+      y: typeof r.y === 'number' ? r.y : undefined,
+    }));
+  }, [selectedWall, routes]);
+
+  const handleRouteSelectFromMap = useCallback(
+    (routeId: string) => {
+      const route = routes.find((r) => r.id === routeId);
+      if (!route) return;
+      const index = routes.findIndex((r) => r.id === routeId);
+      if (index < 0) return;
+      const alreadySelected = activeIndex === index;
+      if (alreadySelected) {
+        setSelectedRoute(route);
+      } else {
+        setActiveIndex(index);
+        carouselRef.current?.scrollToOffset({
+          offset: index * CARD_WIDTH,
+          animated: true,
+        });
+      }
+    },
+    [routes, activeIndex]
+  );
 
   const handleRoutePress = (route: Route) => {
     setSelectedRoute(route);
@@ -502,11 +550,21 @@ export default function TabOneScreen() {
 
   // Unified layout with consistent width and animated height
   return (
-    <SafeScreen className="flex  py-5 bg-black">
-
+    <SafeScreen className="flex py-5 bg-black">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#fff"
+          />
+        }
+      >
       <Animated.View
-        className="justify-start items-center overflow-hidden  px-2"
-
+        className="justify-start items-center overflow-hidden px-2"
       >
         {/* Map title - shows wall name when selected, "Gym Map" when not */}
 
@@ -581,6 +639,10 @@ export default function TabOneScreen() {
             <TopDown
               onData={handleWallSelection}
               initialSelection={selectedWall}
+              routes={routesForMap}
+              selectedRouteId={routes[activeIndex]?.id ?? null}
+              onRouteSelect={handleRouteSelectFromMap}
+              mode="view"
             />
           </View>
 
@@ -633,36 +695,64 @@ export default function TabOneScreen() {
                 </TouchableOpacity>
               </View>
             ) : showRoutes && routes.length > 0 ? (
-              <FlatList
-                ref={carouselRef}
-                data={routes}
-                renderItem={renderCarouselItem}
-                keyExtractor={(item) => item.id}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                pagingEnabled={false}
-                snapToOffsets={snapOffsets}
-                snapToAlignment="start"
-                decelerationRate={0.9}
-                scrollEventThrottle={16}
-                onScroll={handleScroll}
-                onMomentumScrollEnd={handleMomentumScrollEnd}
-                initialScrollIndex={0}
-                bounces={false}
-                contentContainerStyle={{
-                  paddingHorizontal: PEEK_WIDTH,
-                  marginTop: 10
-                }}
-                getItemLayout={(data, index) => ({
-                  length: CARD_WIDTH,
-                  offset: CARD_WIDTH * index,
-                  index,
-                })}
-              />
+              <>
+                <FlatList
+                  ref={carouselRef}
+                  data={routes}
+                  renderItem={renderCarouselItem}
+                  keyExtractor={(item) => item.id}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  pagingEnabled={false}
+                  snapToOffsets={snapOffsets}
+                  snapToAlignment="start"
+                  decelerationRate={0.9}
+                  scrollEventThrottle={16}
+                  onScroll={handleScroll}
+                  onMomentumScrollEnd={handleMomentumScrollEnd}
+                  initialScrollIndex={0}
+                  bounces={false}
+                  contentContainerStyle={{
+                    paddingHorizontal: PEEK_WIDTH,
+                    marginTop: 10
+                  }}
+                  getItemLayout={(data, index) => ({
+                    length: CARD_WIDTH,
+                    offset: CARD_WIDTH * index,
+                    index,
+                  })}
+                />
+                <View className="mt-3 flex-row items-center justify-center gap-2">
+                  {routes.map((_, index) => {
+                    const isActive = activeIndex === index;
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() => {
+                          if (isActive) {
+                            setSelectedRoute(routes[index]);
+                          } else {
+                            carouselRef.current?.scrollToOffset({
+                              offset: index * CARD_WIDTH,
+                              animated: true,
+                            });
+                            setActiveIndex(index);
+                          }
+                        }}
+                        className={cn(
+                          'rounded-full',
+                          isActive ? 'h-3.5 w-3.5 bg-white' : 'h-2 w-2 bg-slate-500/60'
+                        )}
+                      />
+                    );
+                  })}
+                </View>
+              </>
             ) : null}
           </Animated.View>
         )}
       </View>
+      </ScrollView>
 
       {/* Route Popup */}
       {selectedRoute &&

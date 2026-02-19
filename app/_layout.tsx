@@ -256,6 +256,7 @@ function RootLayoutNav() {
             options={{
               headerShown: false,
               presentation: 'card',
+              gestureEnabled: false,
             }}
           />
           <Stack.Screen name="modal" options={{ presentation: 'modal' }} />

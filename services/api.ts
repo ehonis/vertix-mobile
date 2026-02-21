@@ -298,6 +298,18 @@ class ApiService {
     return this.post(API_ENDPOINTS.ROUTE_GRADE, data);
   }
 
+  async runManualBountyFill(): Promise<any> {
+    return this.post(API_ENDPOINTS.BOUNTY_RUN_MANUAL);
+  }
+
+  async addManualBounty(routeId: string): Promise<any> {
+    return this.post(API_ENDPOINTS.BOUNTY_ADD_MANUAL, { routeId });
+  }
+
+  async getRouteBountyStatus(routeId: string): Promise<{ hasActiveBounty: boolean; activeBounty?: { id: string; startedAt: string } | null }> {
+    return this.get(API_ENDPOINTS.BOUNTY_STATUS, { routeId });
+  }
+
   // Dashboard methods
   async getDashboardCompletions(): Promise<{ data: any[] }> {
     return this.get<{ data: any[] }>(API_ENDPOINTS.DASHBOARD_COMPLETIONS);

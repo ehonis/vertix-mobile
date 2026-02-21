@@ -1,22 +1,26 @@
 import type { Locations, RouteDefinition } from '@/components/TopDown';
 import { ROUTE_COLOR_OPTIONS } from '@/constants/routeColors';
+import { api } from '@/services/api';
 import { cn } from '@/utils/cn';
-import { BlurView } from 'expo-blur';
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  Alert,
   Animated,
+  Dimensions,
   KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const BOULDER_GRADES = ['competition', 'vfeature', 'vb', 'v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10'];
 const ROPE_BASE_GRADES = ['competition', '5.feature', '5.B', '5.7', '5.8', '5.9', '5.10', '5.11', '5.12', '5.13'];
@@ -72,30 +76,58 @@ export default function RouteEditPopup({ route, onCancel, onSave }: RouteEditPop
     route.grade?.startsWith('5') ? parseRopeGrade(route.grade).modifier : ''
   );
   const [showWallPicker, setShowWallPicker] = useState(false);
+  const [hasActiveBounty, setHasActiveBounty] = useState(false);
+  const [isBountyStatusLoading, setIsBountyStatusLoading] = useState(true);
+  const [isAddingBounty, setIsAddingBounty] = useState(false);
+  const insets = useSafeAreaInsets();
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const sheetTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
-  const modalOpacity = useRef(new Animated.Value(0)).current;
-  const modalScale = useRef(new Animated.Value(0.95)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(backdropOpacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.spring(sheetTranslateY, {
+        toValue: 0,
+        tension: 300,
+        friction: 28,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [backdropOpacity, sheetTranslateY]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setIsBountyStatusLoading(true);
+    api
+      .getRouteBountyStatus(route.routeId)
+      .then((res) => {
+        if (!cancelled) {
+          setHasActiveBounty(!!res?.hasActiveBounty);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setHasActiveBounty(false);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsBountyStatusLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [route.routeId]);
 
   const isRope = editLocation.startsWith('rope') || editLocation === 'ABWall';
   const effectiveGrade = isRope
     ? editRopeBase + (ROPE_BASES_WITH_MODIFIER.includes(editRopeBase) ? editRopeModifier : '')
     : editBoulderGrade;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(modalOpacity, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-      Animated.spring(modalScale, {
-        toValue: 1,
-        tension: 300,
-        friction: 20,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [modalOpacity, modalScale]);
 
   const handleSave = () => {
     const hex = ROUTE_COLOR_OPTIONS.find((c) => c.name === editColor)?.hex ?? route.color;
@@ -106,6 +138,23 @@ export default function RouteEditPopup({ route, onCancel, onSave }: RouteEditPop
       color: hex,
       type: isRope ? 'ROPE' : 'BOULDER',
     });
+  };
+
+  const handleAddBounty = async () => {
+    if (hasActiveBounty || isAddingBounty) return;
+    setIsAddingBounty(true);
+    try {
+      await api.addManualBounty(route.routeId);
+      setHasActiveBounty(true);
+      Alert.alert('Bounty added', 'Manual bounty was created for this route.');
+    } catch (error: any) {
+      if (error?.message?.toLowerCase?.().includes('already')) {
+        setHasActiveBounty(true);
+      }
+      Alert.alert('Unable to add bounty', error?.message || 'Please try again.');
+    } finally {
+      setIsAddingBounty(false);
+    }
   };
 
   const getRouteTileStyles = (routeColor: string) => {
@@ -133,224 +182,269 @@ export default function RouteEditPopup({ route, onCancel, onSave }: RouteEditPop
   };
 
   return (
-    <Modal visible transparent animationType="none" onRequestClose={onCancel}>
-      <Animated.View
-        style={[StyleSheet.absoluteFill, { opacity: modalOpacity, transform: [{ scale: modalScale }] }]}
+    <Modal
+      visible
+      transparent
+      animationType="none"
+      onRequestClose={onCancel}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
       >
-        <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            className="flex-1"
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+        <Animated.View
+          style={[{ flex: 1, justifyContent: 'flex-end' }, { opacity: backdropOpacity }]}
+          pointerEvents="box-none"
+        >
+          <Pressable className="absolute inset-0 bg-black/70" onPress={onCancel} />
+          <Animated.View
+            style={{ transform: [{ translateY: sheetTranslateY }] }}
+            pointerEvents="box-none"
           >
-            <Pressable className="flex-1 items-center justify-center p-4" onPress={onCancel}>
-              <Pressable
-                onPress={(e) => e.stopPropagation()}
-                className={cn(
-                  'w-full max-w-sm rounded-lg border-2 bg-slate-900/90 p-6',
-                  getRouteTileStyles(editColor)
-                )}
-              >
-                <TouchableOpacity onPress={onCancel} className="absolute right-4 top-4 z-10">
-                  <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-                    <Path
-                      d="M6 18L18 6M6 6l12 12"
-                      stroke="#fff"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </Svg>
-                </TouchableOpacity>
+            <Pressable
+              onPress={(e) => e.stopPropagation()}
+              className={cn(
+                'rounded-t-2xl border-t-2 bg-slate-900',
+                getRouteTileStyles(editColor)
+              )}
+              style={{ paddingBottom: insets.bottom + 24 }}
+            >
+            {/* Drag handle */}
+            <View className="items-center pt-3 pb-1">
+              <View className="h-1 w-10 rounded-full bg-slate-600" />
+            </View>
+            <View className="flex-row items-center justify-between px-6 pb-4">
+              <Text className="font-plus-jakarta-700 text-lg text-white">Edit route</Text>
+              <TouchableOpacity onPress={onCancel} className="p-2" hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+                <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+                  <Path
+                    d="M6 18L18 6M6 6l12 12"
+                    stroke="#fff"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </Svg>
+              </TouchableOpacity>
+            </View>
+            <Text className="font-plus-jakarta mb-4 px-6 text-sm text-slate-400">
+              Position (x, y) is edited on the map.
+            </Text>
 
-                <Text className="font-plus-jakarta-700 mb-4 text-lg text-white">Edit route</Text>
-                <Text className="font-plus-jakarta mb-4 text-sm text-slate-400">
-                  Position (x, y) is edited on the map.
-                </Text>
+            <ScrollView
+              className="max-h-full"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 24 }}
+            >
+              <View className="gap-4">
+                <View>
+                  <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Title</Text>
+                  <TextInput
+                    className="rounded-lg bg-slate-800 px-4 py-3 font-plus-jakarta text-white"
+                    placeholder="Route name"
+                    placeholderTextColor="#9CA3AF"
+                    value={editTitle}
+                    onChangeText={setEditTitle}
+                    autoCapitalize="sentences"
+                  />
+                </View>
 
-                <ScrollView className="max-h-min" showsVerticalScrollIndicator={false}>
-                  <View className="gap-4">
-                    <View>
-                      <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Title</Text>
-                      <TextInput
-                        className="rounded-lg bg-slate-800 px-4 py-3 font-plus-jakarta text-white"
-                        placeholder="Route name"
-                        placeholderTextColor="#9CA3AF"
-                        value={editTitle}
-                        onChangeText={setEditTitle}
-                        autoCapitalize="sentences"
-                      />
+                <View>
+                  <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Wall</Text>
+                  <TouchableOpacity
+                    onPress={() => setShowWallPicker(!showWallPicker)}
+                    className="rounded-lg border border-slate-600 bg-slate-800 px-4 py-3"
+                  >
+                    <Text className="font-plus-jakarta text-white">
+                      {formatWallName(editLocation)}
+                    </Text>
+                  </TouchableOpacity>
+                  {showWallPicker && (
+                    <View className="mt-2 rounded-lg border border-slate-600 bg-slate-800">
+                      {ALL_LOCATIONS.map((loc) => (
+                        <TouchableOpacity
+                          key={loc}
+                          onPress={() => {
+                            setEditLocation(loc);
+                            setShowWallPicker(false);
+                            if (loc.startsWith('rope') || loc === 'ABWall') {
+                              if (!editRopeBase) setEditRopeBase('5.10');
+                            } else {
+                              if (!editBoulderGrade) setEditBoulderGrade('v2');
+                            }
+                          }}
+                          className={cn(
+                            'border-b border-slate-700 px-4 py-3 last:border-b-0',
+                            editLocation === loc && 'bg-slate-700'
+                          )}
+                        >
+                          <Text
+                            className={cn(
+                              'font-plus-jakarta',
+                              editLocation === loc ? 'font-plus-jakarta-700 text-white' : 'text-slate-300'
+                            )}
+                          >
+                            {formatWallName(loc)}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
                     </View>
+                  )}
+                </View>
 
-                    <View>
-                      <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Wall</Text>
-                      <TouchableOpacity
-                        onPress={() => setShowWallPicker(!showWallPicker)}
-                        className="rounded-lg border border-slate-600 bg-slate-800 px-4 py-3"
-                      >
-                        <Text className="font-plus-jakarta text-white">
-                          {formatWallName(editLocation)}
-                        </Text>
-                      </TouchableOpacity>
-                      {showWallPicker && (
-                        <View className="mt-2 rounded-lg border border-slate-600 bg-slate-800">
-                          {ALL_LOCATIONS.map((loc) => (
-                            <TouchableOpacity
-                              key={loc}
-                              onPress={() => {
-                                setEditLocation(loc);
-                                setShowWallPicker(false);
-                                if (loc.startsWith('rope') || loc === 'ABWall') {
-                                  if (!editRopeBase) setEditRopeBase('5.10');
-                                } else {
-                                  if (!editBoulderGrade) setEditBoulderGrade('v2');
-                                }
-                              }}
-                              className={cn(
-                                'border-b border-slate-700 px-4 py-3 last:border-b-0',
-                                editLocation === loc && 'bg-slate-700'
-                              )}
-                            >
-                              <Text
-                                className={cn(
-                                  'font-plus-jakarta',
-                                  editLocation === loc ? 'font-plus-jakarta-700 text-white' : 'text-slate-300'
-                                )}
-                              >
-                                {formatWallName(loc)}
-                              </Text>
-                            </TouchableOpacity>
-                          ))}
-                        </View>
-                      )}
-                    </View>
+                <View>
+                  <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Color</Text>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ gap: 8 }}
+                  >
+                    {ROUTE_COLOR_OPTIONS.map((c) => {
+                      const selected = editColor === c.name;
+                      const light = c.name === 'white' || c.name === 'yellow';
+                      return (
+                        <TouchableOpacity
+                          key={c.name}
+                          onPress={() => setEditColor(c.name)}
+                          className={cn(
+                            'h-9 w-9 rounded-full',
+                            selected ? 'border-2 border-white' : light && 'border border-slate-500'
+                          )}
+                          style={{ backgroundColor: c.hex }}
+                        />
+                      );
+                    })}
+                  </ScrollView>
+                </View>
 
-                    <View>
-                      <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Color</Text>
+                <View>
+                  <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Grade</Text>
+                  {isRope ? (
+                    <View className="gap-3">
                       <ScrollView
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={{ gap: 8 }}
                       >
-                        {ROUTE_COLOR_OPTIONS.map((c) => {
-                          const selected = editColor === c.name;
-                          const light = c.name === 'white' || c.name === 'yellow';
+                        {ROPE_BASE_GRADES.map((g) => {
+                          const selected = editRopeBase === g;
                           return (
                             <TouchableOpacity
-                              key={c.name}
-                              onPress={() => setEditColor(c.name)}
+                              key={g}
+                              onPress={() => setEditRopeBase(g)}
                               className={cn(
-                                'h-9 w-9 rounded-full',
-                                selected ? 'border-2 border-white' : light && 'border border-slate-500'
+                                'rounded-lg px-3 py-2',
+                                selected ? 'bg-green-600' : 'bg-slate-800'
                               )}
-                              style={{ backgroundColor: c.hex }}
-                            />
+                            >
+                              <Text className="font-plus-jakarta-700 text-sm text-white">
+                                {g === '5.feature' ? '5.FEATURE' : g}
+                              </Text>
+                            </TouchableOpacity>
                           );
                         })}
                       </ScrollView>
-                    </View>
+                      {ROPE_BASES_WITH_MODIFIER.includes(editRopeBase) && (
+                        <View className="flex-row gap-2">
+                          {ROPE_MODIFIERS.map((m) => {
+                            if (editRopeBase === '5.8' && m === '-') return null;
+                            if (editRopeBase === '5.9' && m === '-') return null;
 
-                    <View>
-                      <Text className="font-plus-jakarta-700 mb-2 text-sm text-white">Grade</Text>
-                      {isRope ? (
-                        <View className="gap-3">
-                          <ScrollView
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={{ gap: 8 }}
-                          >
-                            {ROPE_BASE_GRADES.map((g) => {
-                              const selected = editRopeBase === g;
-                              console.log(editRopeBase);
-                              return (
-                                <TouchableOpacity
-                                  key={g}
-                                  onPress={() => setEditRopeBase(g)}
-                                  className={cn(
-                                    'rounded-lg px-3 py-2',
-                                    selected ? 'bg-green-600' : 'bg-slate-800'
-                                  )}
-                                >
-                                  <Text className="font-plus-jakarta-700 text-sm text-white">
-                                    {g === '5.feature' ? '5.FEATURE' : g}
-                                  </Text>
-                                </TouchableOpacity>
-                              );
-                            })}
-                          </ScrollView>
-                          {ROPE_BASES_WITH_MODIFIER.includes(editRopeBase) && (
-                            <View className="flex-row gap-2">
-                              {ROPE_MODIFIERS.map((m) => {
-                                if (editRopeBase === '5.8' && m === '-') return null;
-                                if (editRopeBase === '5.9' && m === '-') return null;
-
-                                const selected = editRopeModifier === m;
-                                return (
-                                  <TouchableOpacity
-                                    key={m || 'none'}
-                                    onPress={() => setEditRopeModifier(m)}
-                                    className={cn(
-                                      'rounded-lg px-3 py-2',
-                                      selected ? 'bg-green-600' : 'bg-slate-800'
-                                    )}
-                                  >
-                                    <Text className="font-plus-jakarta-700 text-sm text-white">
-                                      {m === '' ? 'none' : m}
-                                    </Text>
-                                  </TouchableOpacity>
-                                );
-                              })}
-                            </View>
-                          )}
-                        </View>
-                      ) : (
-                        <ScrollView
-                          horizontal
-                          showsHorizontalScrollIndicator={false}
-                          contentContainerStyle={{ gap: 8 }}
-                        >
-                          {BOULDER_GRADES.map((g) => {
-                            const label =
-                              g === 'vfeature' ? 'vFEATURE' : g === 'vb' ? 'VB' : g.toUpperCase();
-                            const selected = editBoulderGrade === g;
+                            const selected = editRopeModifier === m;
                             return (
                               <TouchableOpacity
-                                key={g}
-                                onPress={() => setEditBoulderGrade(g)}
+                                key={m || 'none'}
+                                onPress={() => setEditRopeModifier(m)}
                                 className={cn(
                                   'rounded-lg px-3 py-2',
                                   selected ? 'bg-green-600' : 'bg-slate-800'
                                 )}
                               >
-                                <Text className="font-plus-jakarta-700 text-sm text-white">{label}</Text>
+                                <Text className="font-plus-jakarta-700 text-sm text-white">
+                                  {m === '' ? 'none' : m}
+                                </Text>
                               </TouchableOpacity>
                             );
                           })}
-                        </ScrollView>
+                        </View>
                       )}
                     </View>
+                  ) : (
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={{ gap: 8 }}
+                    >
+                      {BOULDER_GRADES.map((g) => {
+                        const label =
+                          g === 'vfeature' ? 'vFEATURE' : g === 'vb' ? 'VB' : g.toUpperCase();
+                        const selected = editBoulderGrade === g;
+                        return (
+                          <TouchableOpacity
+                            key={g}
+                            onPress={() => setEditBoulderGrade(g)}
+                            className={cn(
+                              'rounded-lg px-3 py-2',
+                              selected ? 'bg-green-600' : 'bg-slate-800'
+                            )}
+                          >
+                            <Text className="font-plus-jakarta-700 text-sm text-white">{label}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </ScrollView>
+                  )}
+                </View>
 
-                    <View className="my-2 flex-row gap-3">
-                      <TouchableOpacity
-                        onPress={onCancel}
-                        className="flex-1 items-center rounded-lg border border-slate-500 bg-slate-800 py-3"
-                      >
-                        <Text className="font-plus-jakarta-700 text-white">Cancel</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={handleSave}
-                        className="flex-1 items-center rounded-lg bg-green-600 py-3"
-                      >
-                        <Text className="font-plus-jakarta-700 text-white">Save</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                <View className="my-2 flex-row gap-3">
+                  <TouchableOpacity
+                    onPress={handleAddBounty}
+                    disabled={hasActiveBounty || isAddingBounty || isBountyStatusLoading}
+                    className={cn(
+                      'flex-1 items-center rounded-lg border py-3',
+                      hasActiveBounty || isBountyStatusLoading
+                        ? 'border-slate-600 bg-slate-800 opacity-60'
+                        : 'border-amber-400 bg-amber-500/20'
+                    )}
+                  >
+                    <Text
+                      className={cn(
+                        'font-plus-jakarta-700',
+                        hasActiveBounty || isBountyStatusLoading ? 'text-slate-400' : 'text-amber-300'
+                      )}
+                    >
+                      {isBountyStatusLoading
+                        ? 'Checking bounty...'
+                        : hasActiveBounty
+                          ? 'Bounty Active'
+                          : isAddingBounty
+                            ? 'Adding bounty...'
+                            : 'Add Bounty'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View className="my-2 flex-row gap-3">
+                  <TouchableOpacity
+                    onPress={onCancel}
+                    className="flex-1 items-center rounded-lg border border-slate-500 bg-slate-800 py-3"
+                  >
+                    <Text className="font-plus-jakarta-700 text-white">Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleSave}
+                    className="flex-1 items-center rounded-lg bg-green-600 py-3"
+                  >
+                    <Text className="font-plus-jakarta-700 text-white">Save</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
                 </ScrollView>
-              </Pressable>
             </Pressable>
-          </KeyboardAvoidingView>
-        </BlurView>
-      </Animated.View>
+          </Animated.View>
+        </Animated.View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

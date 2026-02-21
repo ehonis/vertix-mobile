@@ -70,6 +70,9 @@ interface Route {
   x?: number | null;
   y?: number | null;
   order?: number | null;
+  isBounty?: boolean;
+  bountyXp?: number | null;
+  bountyStartedAt?: string | null;
 }
 
 export default function TabOneScreen() {
@@ -563,106 +566,107 @@ export default function TabOneScreen() {
           />
         }
       >
-      <Animated.View
-        className="justify-start items-center overflow-hidden px-2"
-      >
-        {/* Map title - shows wall name when selected, "Gym Map" when not */}
+        <Animated.View
+          className="justify-start items-center overflow-hidden px-2"
+        >
+          {/* Map title - shows wall name when selected, "Gym Map" when not */}
 
 
-        <View className={cn("bg-slate-900/80 border-2 border-blue-500/50 rounded-lg p-3 items-center overflow-hidden w-full max-w-full")}>
-          <View className="flex-row items-center w-full relative">
-            <Animated.View
-              className="flex-1"
-              style={{
-                transform: [
-                  {
-                    translateX: textPositionAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -110], // Slide left to make room for button
-                    }),
-                  },
-                ],
-                alignItems: 'center',
-              }}
-            >
-              <Text className="text-white text-2xl mb-4 font-plus-jakarta-700 text-center">
-                {selectedWall ? formatWallName(selectedWall) : 'Gym Map'}
-              </Text>
-            </Animated.View>
-
-            {/* Zoom out button - appears when wall is selected */}
-            {selectedWall && (
+          <View className={cn("bg-slate-900/80 border-2 border-blue-500/50 rounded-lg p-3 items-center overflow-hidden w-full max-w-full")}>
+            <View className="flex-row items-center w-full relative mb-2">
               <Animated.View
-                className="absolute right-0 -top-1"
+                className="flex-1"
                 style={{
-                  opacity: textPositionAnim,
                   transform: [
                     {
-                      scale: textPositionAnim.interpolate({
+                      translateX: textPositionAnim.interpolate({
                         inputRange: [0, 1],
-                        outputRange: [0, 1],
+                        outputRange: [0, -100], // Slide left to make room for button
                       }),
                     },
                   ],
+                  alignItems: 'center',
                 }}
               >
-                <TouchableOpacity
-                  onPress={() => setSelectedWall(null)}
-                  className="bg-black/70 border border-gray-500 rounded-full p-2 shadow-lg"
-                  style={{ elevation: 5 }}
-                >
-                  <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                    <SvgLine
-                      x1="6"
-                      y1="6"
-                      x2="18"
-                      y2="18"
-                      stroke="#ffffff"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    <SvgLine
-                      x1="18"
-                      y1="6"
-                      x2="6"
-                      y2="18"
-                      stroke="#ffffff"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </Svg>
-                </TouchableOpacity>
+                <Text className="text-white text-2xl font-plus-jakarta-700 text-center">
+                  {selectedWall ? formatWallName(selectedWall) : 'Gym Map'}
+                </Text>
+                {!selectedWall && (
+                  <View className="items-center">
+                    <Text className="text-gray-400 text-sm font-plus-jakarta text-center">
+                      Tap a wall section to view routes
+                    </Text>
+                  </View>
+                )}
               </Animated.View>
-            )}
+
+              {/* Zoom out button - appears when wall is selected */}
+              {selectedWall && (
+                <Animated.View
+                  className="absolute right-0 -top-1"
+                  style={{
+                    opacity: textPositionAnim,
+                    transform: [
+                      {
+                        scale: textPositionAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, 1],
+                        }),
+                      },
+                    ],
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => setSelectedWall(null)}
+                    className="bg-black/70 border border-gray-500 rounded-full p-2 shadow-lg"
+                    style={{ elevation: 5 }}
+                  >
+                    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                      <SvgLine
+                        x1="6"
+                        y1="6"
+                        x2="18"
+                        y2="18"
+                        stroke="#ffffff"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                      <SvgLine
+                        x1="18"
+                        y1="6"
+                        x2="6"
+                        y2="18"
+                        stroke="#ffffff"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                    </Svg>
+                  </TouchableOpacity>
+                </Animated.View>
+              )}
+            </View>
+            <View className={"w-full items-center overflow-hidden transition-all duration-300 "}>
+              <TopDown
+                onData={handleWallSelection}
+                initialSelection={selectedWall}
+                routes={routesForMap}
+                selectedRouteId={routes[activeIndex]?.id ?? null}
+                onRouteSelect={handleRouteSelectFromMap}
+                mode="view"
+              />
+            </View>
+
           </View>
-          <View className={"w-full items-center overflow-hidden transition-all duration-300 "}>
-            <TopDown
-              onData={handleWallSelection}
-              initialSelection={selectedWall}
-              routes={routesForMap}
-              selectedRouteId={routes[activeIndex]?.id ?? null}
-              onRouteSelect={handleRouteSelectFromMap}
-              mode="view"
-            />
-          </View>
 
-        </View>
+          {/* Helper text when no wall selected - outside blue box */}
 
-        {/* Helper text when no wall selected - outside blue box */}
-        {!selectedWall && (
-          <View className="items-center">
-            <Text className="text-gray-400 text-sm font-plus-jakarta text-center">
-              Tap a wall section to view routes
-            </Text>
-          </View>
-        )}
 
-        {/* Legend - outside blue box */}
-        {!selectedWall && <Legend showWhenSelected={true} />}
-      </Animated.View>
+          {/* Legend - outside blue box */}
+          {!selectedWall && <Legend showWhenSelected={true} />}
+        </Animated.View>
 
-      <View className="px-2 mt-2">
-        {/* {selectedWall && (
+        <View className="px-2 mt-2">
+          {/* {selectedWall && (
           <View className="items-center">
             <Text className="text-white text-xl font-plus-jakarta-600 mt-3 text-start">
               Routes Sorted Left to Right
@@ -670,88 +674,88 @@ export default function TabOneScreen() {
           </View>
         )} */}
 
-        {/* Carousel Section - Takes remaining space when wall is selected */}
-        {selectedWall && (
-          <Animated.View
-            className=""
-            style={{
-              opacity: carouselOpacityAnim,
-              transform: [
-                {
-                  translateY: carouselTranslateYAnim,
-                },
-              ],
-            }}
-          >
-            {routes.length === 0 && showRoutes ? (
-              <View className="items-center justify-center h-full">
-                <Text className="text-gray-400 text-lg">
-                  No routes found for this wall
-                </Text>
-                <TouchableOpacity onPress={() => setSelectedWall(null)}>
-                  <Text className="text-blue-500 mt-2 underline">
-                    Clear filter
+          {/* Carousel Section - Takes remaining space when wall is selected */}
+          {selectedWall && (
+            <Animated.View
+              className=""
+              style={{
+                opacity: carouselOpacityAnim,
+                transform: [
+                  {
+                    translateY: carouselTranslateYAnim,
+                  },
+                ],
+              }}
+            >
+              {routes.length === 0 && showRoutes ? (
+                <View className="items-center justify-center h-full">
+                  <Text className="text-gray-400 text-lg">
+                    No routes found for this wall
                   </Text>
-                </TouchableOpacity>
-              </View>
-            ) : showRoutes && routes.length > 0 ? (
-              <>
-                <FlatList
-                  ref={carouselRef}
-                  data={routes}
-                  renderItem={renderCarouselItem}
-                  keyExtractor={(item) => item.id}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  pagingEnabled={false}
-                  snapToOffsets={snapOffsets}
-                  snapToAlignment="start"
-                  decelerationRate={0.9}
-                  scrollEventThrottle={16}
-                  onScroll={handleScroll}
-                  onMomentumScrollEnd={handleMomentumScrollEnd}
-                  initialScrollIndex={0}
-                  bounces={false}
-                  contentContainerStyle={{
-                    paddingHorizontal: PEEK_WIDTH,
-                    marginTop: 10
-                  }}
-                  getItemLayout={(data, index) => ({
-                    length: CARD_WIDTH,
-                    offset: CARD_WIDTH * index,
-                    index,
-                  })}
-                />
-                <View className="mt-3 flex-row items-center justify-center gap-2">
-                  {routes.map((_, index) => {
-                    const isActive = activeIndex === index;
-                    return (
-                      <TouchableOpacity
-                        key={index}
-                        onPress={() => {
-                          if (isActive) {
-                            setSelectedRoute(routes[index]);
-                          } else {
-                            carouselRef.current?.scrollToOffset({
-                              offset: index * CARD_WIDTH,
-                              animated: true,
-                            });
-                            setActiveIndex(index);
-                          }
-                        }}
-                        className={cn(
-                          'rounded-full',
-                          isActive ? 'h-3.5 w-3.5 bg-white' : 'h-2 w-2 bg-slate-500/60'
-                        )}
-                      />
-                    );
-                  })}
+                  <TouchableOpacity onPress={() => setSelectedWall(null)}>
+                    <Text className="text-blue-500 mt-2 underline">
+                      Clear filter
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-              </>
-            ) : null}
-          </Animated.View>
-        )}
-      </View>
+              ) : showRoutes && routes.length > 0 ? (
+                <>
+                  <FlatList
+                    ref={carouselRef}
+                    data={routes}
+                    renderItem={renderCarouselItem}
+                    keyExtractor={(item) => item.id}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    pagingEnabled={false}
+                    snapToOffsets={snapOffsets}
+                    snapToAlignment="start"
+                    decelerationRate={0.9}
+                    scrollEventThrottle={16}
+                    onScroll={handleScroll}
+                    onMomentumScrollEnd={handleMomentumScrollEnd}
+                    initialScrollIndex={0}
+                    bounces={false}
+                    contentContainerStyle={{
+                      paddingHorizontal: PEEK_WIDTH,
+                      marginTop: 10
+                    }}
+                    getItemLayout={(data, index) => ({
+                      length: CARD_WIDTH,
+                      offset: CARD_WIDTH * index,
+                      index,
+                    })}
+                  />
+                  <View className="mt-3 flex-row items-center justify-center gap-2">
+                    {routes.map((_, index) => {
+                      const isActive = activeIndex === index;
+                      return (
+                        <TouchableOpacity
+                          key={index}
+                          onPress={() => {
+                            if (isActive) {
+                              setSelectedRoute(routes[index]);
+                            } else {
+                              carouselRef.current?.scrollToOffset({
+                                offset: index * CARD_WIDTH,
+                                animated: true,
+                              });
+                              setActiveIndex(index);
+                            }
+                          }}
+                          className={cn(
+                            'rounded-full',
+                            isActive ? 'h-3.5 w-3.5 bg-white' : 'h-2 w-2 bg-slate-500/60'
+                          )}
+                        />
+                      );
+                    })}
+                  </View>
+                </>
+              ) : null}
+            </Animated.View>
+          )}
+        </View>
       </ScrollView>
 
       {/* Route Popup */}

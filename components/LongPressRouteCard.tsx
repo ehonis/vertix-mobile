@@ -88,6 +88,9 @@ interface Route {
     completions: RouteCompletion[];
     bonusXp?: number | null;
     isArchive?: boolean;
+    isBounty?: boolean;
+    bountyXp?: number | null;
+    bountyStartedAt?: string | null;
 }
 
 interface LongPressRouteCardProps {
@@ -523,6 +526,13 @@ export default function LongPressRouteCard({
                 {user && (
                     <View className="flex-row gap-1 items-center absolute -top-3 -right-3 z-20">
                         {xpDisplay}
+                        {route.isBounty && (
+                            <View className="bg-black border border-amber-400 rounded-full px-3 py-2 flex items-center justify-center">
+                                <Text className="text-amber-300 font-plus-jakarta-700 text-base">
+                                    BOUNTY {route.bountyXp ? `+${route.bountyXp}XP` : ''}
+                                </Text>
+                            </View>
+                        )}
                         {route.completed && (
                             <View className="bg-black border border-green-400 rounded-full p-4 py-2 flex items-center justify-center">
                                 <Svg

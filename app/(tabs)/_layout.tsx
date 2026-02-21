@@ -24,6 +24,7 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const isAdminOrRouteSetter =
     user?.role === 'ADMIN' || user?.role === 'ROUTE_SETTER';
 
@@ -128,6 +129,18 @@ export default function TabLayout() {
           ),
         }}
       />}
+      {isAdmin && (
+        <Tabs.Screen
+          name="bounty-test"
+          options={{
+            title: 'Bounty Test',
+            href: isAdmin ? '/(tabs)/bounty-test' : null,
+            tabBarIcon: ({ color }) => (
+              <TabBarIcon name="flask" color={color} />
+            ),
+          }}
+        />
+      )}
       <Tabs.Screen
         name="dashboard"
         options={{

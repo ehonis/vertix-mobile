@@ -40,6 +40,9 @@ export const API_ENDPOINTS = {
   ROUTE_ARCHIVE: '/api/routes/edit/archive-route',
   ROUTE_UPDATE: '/api/routes/edit/updateRoute',
   ROUTE_CREATE: '/api/mobile/routes/create',
+  BOUNTY_RUN_MANUAL: '/api/mobile/routes/bounties/run-manual',
+  BOUNTY_ADD_MANUAL: '/api/mobile/routes/bounties/add-manual',
+  BOUNTY_STATUS: '/api/mobile/routes/bounties/status',
 
   // Dashboard endpoints
   DASHBOARD_COMPLETIONS: '/api/mobile/dashboard/completions',
